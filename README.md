@@ -11,5 +11,5 @@ But this will be another alternative client for my vanilla-7.0 server source.
 
 ### Requirements
 
-Unity version 2022.3.11f1
-Any C# Code Editor (Visual Studio/Code, Rider etc)
+- Unity version 2022.3.11f1
+- Any C# Code Editor (Visual Studio/Code, Rider etc)
