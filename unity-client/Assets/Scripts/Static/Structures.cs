@@ -7,6 +7,25 @@ using Networking.Tcp;
 
 namespace Static
 {
+    public readonly struct GameInitData
+    {
+        public readonly int WorldId;
+        public readonly int CharId;
+        public readonly bool NewCharacter;
+        public readonly int ClassType;
+        public readonly int SkinType;
+        public readonly int Difficulty;
+
+        public GameInitData(int worldId, int charId, bool newCharacter, int classType, int skinType, int difficulty)
+        {
+            WorldId = worldId;
+            CharId = charId;
+            NewCharacter = newCharacter;
+            ClassType = classType;
+            SkinType = skinType;
+            Difficulty = difficulty;
+        }
+    }
     [StructLayout(LayoutKind.Explicit)]
     public struct Vec2
     {

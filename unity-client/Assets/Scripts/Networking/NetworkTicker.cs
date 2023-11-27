@@ -7,16 +7,13 @@ using System.Net;
 using System;
 using System.Threading.Tasks;
 
-namespace Networking
-{
-    public enum SocketEventState
-    {
+namespace Networking {
+    public enum SocketEventState {
         Awaiting,
         InProgress
     }
 
-    public static class TcpTicker
-    {
+    public static class TcpTicker {
         private const int BUFFER_SIZE = 0x50000;
         private const int PREFIX_LENGTH = 5;
         private const int PREFIX_LENGTH_WITH_ID = PREFIX_LENGTH - 1;
@@ -33,23 +30,20 @@ namespace Networking
         private static ConcurrentQueue<IOutgoingPacket> _pending;
 
         private static PacketHandler _packetHandler;
-        public static void Start(PacketHandler packetHandler)
-        {
+        public static void Start(PacketHandler packetHandler) {
             if (Running) {
                 Utils.Warn("TcpTicker already started");
                 return;
             }
 
             //ServerInfo serverInfo = (ServerInfo)GameConfiguration.ServerInfos[GameConfiguration.SelectedServer];
-            try
-            {
+            try {
                 _socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
                 _socket.Connect(Settings.IP_ADDRESS, Settings.GAME_PORT);
                 _socket.NoDelay = true;
                 _socket.Blocking = false;
             }
-            catch (Exception)
-            {
+            catch (Exception) {
                 //ViewManager.Instance.ChangeView(View.Menu);
                 return;
             }
@@ -63,8 +57,7 @@ namespace Networking
         }
 
         // called on main thread
-        public static void Stop()
-        {
+        public static void Stop() {
             if (!Running && !_crashed)
                 return;
 
@@ -73,13 +66,11 @@ namespace Networking
             _tickingTask = null;
             _crashed = false;
 
-            try
-            {
+            try {
                 _socket.Shutdown(SocketShutdown.Both);
                 _socket.Close();
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 Utils.Log(e.Message);
             }
 
@@ -87,8 +78,7 @@ namespace Networking
         }
 
         // called on main thread
-        public static void Send(IOutgoingPacket packet)
-        {
+        public static void Send(IOutgoingPacket packet) {
             if (!Running) {
                 //SpriteUtils.ClearCache(SpriteUtils.CacheType.All);
                 //ViewManager.Instance.ChangeView(View.Menu);
@@ -99,34 +89,26 @@ namespace Networking
         }
 
         // called on worker thread
-        private static void Tick()
-        {
-            try
-            {
-                while (Running)
-                {
+        private static void Tick() {
+            try {
+                while (Running) {
                     StartSend();
                     StartReceive();
                     WebController.Tick();
                 }
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 Utils.Error(e.Message + "\n" + e.StackTrace);
                 _crashed = true;
             }
         }
 
         // called on worker thread
-        private static void StartSend()
-        {
-            switch (_Send.State)
-            {
+        private static void StartSend() {
+            switch (_Send.State) {
                 case SocketEventState.Awaiting:
-                    if (_pending.TryDequeue(out var packet))
-                    {
-                        using (var wtr = new PacketWriter(new MemoryStream()))
-                        {
+                    if (_pending.TryDequeue(out var packet)) {
+                        using (var wtr = new PacketWriter(new MemoryStream())) {
                             //Debug.Log($"TcpTicker::SentPacket::{packet.Id}");
                             wtr.Write((byte)packet.Id);
                             packet.Write(wtr);
@@ -153,13 +135,10 @@ namespace Networking
         }
 
         // called on worker thread
-        private static void StartReceive()
-        {
-            switch (_Receive.State)
-            {
+        private static void StartReceive() {
+            switch (_Receive.State) {
                 case SocketEventState.Awaiting:
-                    if (_socket.Available >= PREFIX_LENGTH)
-                    {
+                    if (_socket.Available >= PREFIX_LENGTH) {
                         _socket.Receive(_Receive.PacketBytes, PREFIX_LENGTH, SocketFlags.None);
                         _Receive.PacketLength = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(_Receive.PacketBytes, 0));
                         _Receive.State = SocketEventState.InProgress;
@@ -168,13 +147,11 @@ namespace Networking
                     break;
                 case SocketEventState.InProgress:
                     if (_Receive.PacketLength < PREFIX_LENGTH ||
-                        _Receive.PacketLength > BUFFER_SIZE)
-                    {
+                        _Receive.PacketLength > BUFFER_SIZE) {
                         throw new Exception($"Unable to process packet of size {_Receive.PacketLength}");
                     }
-
-                    if (_socket.Available + PREFIX_LENGTH >= _Receive.PacketLength) //Full packet now arrived. Time to process it.
-                    {
+                    //Full packet now arrived. Time to process it.
+                    if (_socket.Available + PREFIX_LENGTH >= _Receive.PacketLength) {
                         if (_socket.Available != 0)
                             _socket.Receive(_Receive.PacketBytes, PREFIX_LENGTH, _Receive.PacketLength - PREFIX_LENGTH, SocketFlags.None);
                         var packetId = (S2CPacketId)_Receive.GetPacketId();
@@ -189,53 +166,39 @@ namespace Networking
             }
         }
 
-        private class ReceiveState
-        {
+        private class ReceiveState {
             public int PacketLength;
             public readonly byte[] PacketBytes;
             public SocketEventState State;
 
-            public ReceiveState()
-            {
+            public ReceiveState() {
                 PacketBytes = new byte[BUFFER_SIZE];
                 PacketLength = PREFIX_LENGTH;
             }
-
-            public byte[] GetPacketBody()
-            {
+            public byte[] GetPacketBody() {
                 var packetBody = new byte[PacketLength - PREFIX_LENGTH];
                 Array.Copy(PacketBytes, PREFIX_LENGTH, packetBody, 0, packetBody.Length);
                 return packetBody;
             }
-
-            public int GetPacketId()
-            {
+            public int GetPacketId() {
                 return PacketBytes[4];
             }
-
-            public void Reset()
-            {
+            public void Reset() {
                 State = SocketEventState.Awaiting;
                 PacketLength = 0;
             }
         }
 
-        private class SendState
-        {
+        private class SendState {
             public int BytesWritten;
             public int PacketLength;
             public byte[] PacketBytes;
             public SocketEventState State;
-
             public readonly byte[] Data;
-
-            public SendState()
-            {
+            public SendState() {
                 Data = new byte[0x10000];
             }
-
-            public void Reset()
-            {
+            public void Reset() {
                 State = SocketEventState.Awaiting;
                 PacketLength = 0;
                 BytesWritten = 0;

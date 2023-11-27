@@ -2,6 +2,14 @@
 
 namespace Static
 {
+    public enum GameObjectType
+    {
+        Entity,
+        Static,
+        Interactive,
+        Projectile,
+        Player,
+    }
     public enum StatType
     {
         MaxHp,

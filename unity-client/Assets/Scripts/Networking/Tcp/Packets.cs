@@ -1,4 +1,5 @@
 using Static;
+using System;
 
 namespace Networking.Tcp
 {
@@ -93,7 +94,10 @@ namespace Networking.Tcp
                 Statuses[i] = new ObjectStatus(rdr);
             }
         }
-        public void Handle() { }
+        public void Handle() {
+            PacketHandler.Instance.TickId = TickId;
+            PacketHandler.Instance.TickTime = TickTime;
+        }
     }
     public readonly struct Update : IIncomingPacket {
         public S2CPacketId Id => S2CPacketId.Update;
@@ -293,7 +297,10 @@ namespace Networking.Tcp
             NightLightIntensity = rdr.ReadSingle();
             TotalElapsedMicroSeconds = rdr.ReadInt64();
         }
-        public void Handle() { }
+        public void Handle() {
+            Map.Instance.Init(this);
+            PacketHandler.Instance.Random = new wRandom(Seed);
+        }
     }
     public readonly struct NameResult : IIncomingPacket {
         public S2CPacketId Id => S2CPacketId.NameResult;

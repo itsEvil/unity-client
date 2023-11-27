@@ -1,6 +1,8 @@
 using Account;
 using Networking;
 using Networking.Tcp;
+using Networking.Web;
+using Static;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -8,19 +10,16 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-public class PacketHandler
-{
+public class PacketHandler {
+    public static PacketHandler Instance { get; private set; }
     private ConcurrentQueue<IIncomingPacket> _toBeHandled;
 
     public int PlayerId;
-
-    //public readonly GameInitData InitData;
-
-    //public Player Player;
-
-    //private readonly Map _map;
-
-    //public wRandom Random;
+    public int TickId;
+    public long TickTime;
+    public MoveRecord[] History = new MoveRecord[10];
+    public readonly GameInitData InitData;
+    public wRandom Random;
 
     //public PacketHandler(GameInitData initData, Map map)
     //{
@@ -29,32 +28,34 @@ public class PacketHandler
     //    //UpdateObjects.OnMyPlayerJoined += OnMyPlayerJoined;
     //}
 
-    //private void OnMyPlayerJoined(Player player)
+    //public static void OnMyPlayerJoined(Player player)
     //{
     //    Player = player;
     //    Player.SkinType = InitData.SkinType;
     //    player.Random = Random;
     //}
 
-    public void Start()
-    {
+    public void Start() {
+
+        for(int i = 0; i < History.Length; i++) {
+            History[i] = new MoveRecord();
+        }
+
+        Instance = this;
         _toBeHandled = new ConcurrentQueue<IIncomingPacket>();
         TcpTicker.Start(this);
         TcpTicker.Send(new Hello(Settings.GameVersion, Settings.NexusId, AccountData.GetEmail(), AccountData.GetPassword()));
     }
 
-    public void Stop()
-    {
+    public void Stop() {
         TcpTicker.Stop();
         // this needs to be unassigned since we create again on reconnect
         // assignments done in Awake() shouldn't be unassigned unless changing scenes
         //UpdateObjects.OnMyPlayerJoined -= OnMyPlayerJoined;
     }
 
-    public void Tick()
-    {
-        while (_toBeHandled.TryDequeue(out var packet))
-        {
+    public void Tick() {
+        while (_toBeHandled.TryDequeue(out var packet)) {
             Utils.Log("Handing {0} packet", packet.Id);
 
             packet.Handle();
@@ -66,13 +67,11 @@ public class PacketHandler
         }
     }
 
-    public void AddPacket(IIncomingPacket packet)
-    {
+    public void AddPacket(IIncomingPacket packet) {
         _toBeHandled.Enqueue(packet);
     }
 
-    public void ReadPacket(S2CPacketId id, byte[] data)
-    {
+    public void ReadPacket(S2CPacketId id, byte[] data) {
         var packet = CreatePacket(id, data);
 
         if (packet == null)
@@ -83,12 +82,10 @@ public class PacketHandler
         AddPacket(packet);
     }
 
-    private IIncomingPacket CreatePacket(S2CPacketId id, byte[] data)
-    {
+    private IIncomingPacket CreatePacket(S2CPacketId id, byte[] data) {
         IIncomingPacket packet = null;
         using var rdr = new PacketReader(new MemoryStream(data));
-        switch (id)
-        {
+        switch (id) {
             case S2CPacketId.Failure:
                 packet = new Failure(rdr);
                 break;

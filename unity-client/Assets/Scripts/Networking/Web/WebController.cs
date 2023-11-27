@@ -44,6 +44,9 @@ namespace Networking.Web
 
             await Task.WhenAll(_tasksList);
         }
+        public static void Stop() {
+            _tokenSource.Cancel();
+        }
     }
     public readonly struct WebWork
     {
