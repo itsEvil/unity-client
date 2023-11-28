@@ -13,16 +13,21 @@ namespace Game
         public ushort Type;
         public int SinkLevel;
         public Entity StaticObject;
-        public Vector3Int Position;
-        public void Init(ushort type, int x, int y) {
-            Position = new Vector3Int(x, y);
-            Type = type;
-            //var desc = AssetLibrary.Type2Tile[Type];
-            //if(desc.Sink){
-            //  SinkLevel = 12;
-            //}
+        public short X;
+        public short Y;
 
-            //sprite = desc.TextureData.GetTexture(Hash(x, y));
+        public TileDesc Desc;
+        public void Init(TileDesc desc, short x, short y) {
+            X = x;
+            Y = y;
+            Desc = desc;
+            Type = desc.Type;
+
+            if(desc.Sinking){
+              SinkLevel = 12;
+            }
+
+            sprite = desc.TextureData.GetTexture(Hash(x, y));
         }
         private static int Hash(int x, int y) {
             var l = LookUp[(x + y) % LookUp.Length];

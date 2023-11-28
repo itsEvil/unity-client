@@ -11,8 +11,11 @@ public class Entity : MonoBehaviour, IDisposable {
     public Vec2 Position;
     public int Hp;
     public int MaxHp;
-    public virtual void Init() {
 
+    public ushort[] Inventory;
+
+    public virtual void Init() {
+        Inventory = new ushort[8];
     }
     public virtual bool Tick() {
         return !Dead;

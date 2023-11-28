@@ -4,9 +4,42 @@ using System.Runtime.InteropServices;
 using System.Xml.Linq;
 using UnityEngine;
 using Networking.Tcp;
+namespace Static {
+    public struct TextureSheetData {
+        public SpriteSheetData[] SSD;
+        public Texture2D[] Textures;
+        public TextureSheetData(SpriteSheetData[] ssd, Texture2D[] tex) {
+            SSD = ssd;
+            Textures = tex;
+        }
+    }
+    public readonly struct SpriteSheetData {
+        public readonly string Id;
+        public readonly string SheetName;
+        public readonly int AnimationWidth;
+        public readonly int AnimationHeight;
+        public readonly Facing StartFacing;
+        public readonly int ImageWidth;
+        public readonly int ImageHeight;
 
-namespace Static
-{
+        public SpriteSheetData(XElement xml) {
+            Id = xml.ParseString("@id");
+            SheetName = xml.ParseString("@sheetName", Id);
+
+            var animationSize = xml.ParseIntArray("AnimationSize", "x", new[] { 0, 0 });
+            AnimationWidth = animationSize[0];
+            AnimationHeight = animationSize[1];
+            StartFacing = xml.ParseEnum("StartDirection", Facing.Right);
+
+            var imageSize = xml.ParseIntArray("ImageSize", "x", new[] { 0, 0 });
+            ImageWidth = imageSize[0];
+            ImageHeight = imageSize[1];
+        }
+
+        public bool IsAnimation() {
+            return AnimationWidth != 0 && AnimationHeight != 0;
+        }
+    }
     public readonly struct GameInitData
     {
         public readonly int WorldId;

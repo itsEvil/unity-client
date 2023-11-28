@@ -2,6 +2,19 @@
 
 namespace Static
 {
+    public enum Action
+    {
+        Stand,
+        Walk,
+        Attack
+    }
+    public enum Facing
+    {
+        Up,
+        Down,
+        Left,
+        Right
+    }
     public enum GameObjectType
     {
         Entity,
@@ -9,6 +22,40 @@ namespace Static
         Interactive,
         Projectile,
         Player,
+    }
+    public enum ObjectType
+    {
+        GameObject,
+        Equipment,
+        Skin,
+        Dye,
+        Character,
+        CharacterChanger,
+        ConnectedWall,
+        Container,
+        GuildChronicle,
+        GuildHallPortal,
+        GuildRegister,
+        GuildMerchant,
+        GuildBoard,
+        MarketObject,
+        Merchant,
+        NameChanger,
+        OneWayContainer,
+        Player,
+        Portal,
+        Projectile,
+        ReskinVendor,
+        Stalagmite,
+        VaultChest,
+        ClosedVaultChest,
+        ClosedGiftChest,
+        MoneyChanger,
+        SpiderWeb,
+        PetUpgrader,
+        CaveWall,
+        Sign,
+        Wall,
     }
     public enum StatType
     {
@@ -237,7 +284,7 @@ namespace Static
         ClearConditionEffectSelf,
         ClearConditionsEffectSelf,
         RemoveNegativeConditionsSelf,
-        Shuriken,
+        ShurikenAbility,
         DazeBlast,
         Backpack,
         PermaPet

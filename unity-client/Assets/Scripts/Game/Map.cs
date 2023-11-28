@@ -1,17 +1,22 @@
+using Data;
 using Networking;
 using Networking.Tcp;
 using Static;
-using System;
 using System.Collections.Generic;
-using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
+using UnityEngine.Tilemaps;
+using TileData = Static.TileData;
 
 namespace Game
 {
     public partial class Map : MonoBehaviour
     {
+        [SerializeField] private Tilemap _tileMap;
+
         public static Map Instance;
         public static MapInfo MapInfo;
+
+        public static Square[,] Tiles;
 
         public static Player MyPlayer;
         public static int GotosRequested;
@@ -35,6 +40,7 @@ namespace Game
         }
         public void Init(MapInfo mapInfo) {
             MapInfo = mapInfo;
+            Tiles = new Square[MapInfo.Width, MapInfo.Height];
         }
         
         public void OnMyPlayerConnected(Player player) {
@@ -48,6 +54,26 @@ namespace Game
             Tick();
             Remove();
         }
+        public void SetTile(TileData data) {
+            var tile = ScriptableObject.CreateInstance<Square>();
+            var tileDesc = AssetLibrary.GetTileDesc(data.TileType);
+            tile.Init(tileDesc, data.X, data.Y);
+            Tiles[data.X, data.Y] = tile;
+            _tileMap.SetTile(new Vector3Int(tile.X, tile.Y), tile);
+        }
+
+        public Square GetTile(int x, int y, bool checkBounds = false) {
+            if(checkBounds) {
+                if (x < 0 || y < 0)
+                    return null;
+
+                if(x >= MapInfo.Width || y >= MapInfo.Height) 
+                    return null;
+            }
+
+            return Tiles[x, y];
+        }
+
         public void AddEntity(int type, int objectId, Vec2 position) {
             //TODO Add AssetLibrary
             //var desc = AssetLibrary.Type2Object[type];
@@ -95,6 +121,16 @@ namespace Game
             if(MyPlayer != null) {
                 TickMyPlayer();
             }
+        }
+
+        private void Dispose() {
+            foreach(var (id, ent) in Entities) {
+                Destroy(ent);
+            }
+
+            Entities.Clear();
+            Interactives.Clear();
+            
         }
 
         private void TickInteractives() {

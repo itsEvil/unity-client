@@ -10,5 +10,7 @@ public static class Settings
 
     public const string GameVersion = "0"; //Not used atm
     public const int NexusId = -1;
+
+    public static float CameraAngle; // in radians
 }
 

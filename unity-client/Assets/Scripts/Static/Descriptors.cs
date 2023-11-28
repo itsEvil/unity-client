@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 using UnityEditor;
+using UnityEngine;
 
 namespace Static
 {
@@ -353,8 +354,18 @@ namespace Static
         public readonly float DX;
         public readonly float DY;
 
-        public TileDesc(XElement e, string id, ushort type)
-        {
+        public readonly TextureData TextureData;
+        public readonly int BlendPriority;
+        public readonly int CompositePriority;
+        public readonly bool HasEdge;
+        public readonly TextureData EdgeTextureData;
+        public readonly TextureData CornerTextureData;
+        public readonly TextureData InnerCornerTextureData;
+        public readonly bool SameTypeEdgeMode;
+
+        private Sprite[] _edges;
+        private Sprite[] _innerCorners;
+        public TileDesc(XElement e, string id, ushort type) {
             Id = id;
             Type = type;
             NoWalk = e.ParseBool("NoWalk");
@@ -366,6 +377,38 @@ namespace Static
                 DX = e.Element("Animate").ParseFloat("@dx") / 1000f;
                 DY = e.Element("Animate").ParseFloat("@dy") / 1000f;
             }
+        }
+
+        public Sprite[] GetEdges() {
+            if (!HasEdge || _edges != null)
+                return _edges;
+
+            _edges = new Sprite[9];
+            _edges[3] = EdgeTextureData.GetTexture();
+            _edges[1] = SpriteUtils.Rotate(_edges[3], 3);
+            _edges[5] = SpriteUtils.Rotate(_edges[3], 2);
+            _edges[7] = SpriteUtils.Rotate(_edges[3], 1);
+            if (CornerTextureData != null) {
+                _edges[0] = SpriteUtils.CreateSingleTextureSprite(CornerTextureData.GetTexture());
+                _edges[2] = SpriteUtils.Rotate(_edges[0], 1);
+                _edges[8] = SpriteUtils.Rotate(_edges[0], 2);
+                _edges[6] = SpriteUtils.Rotate(_edges[0], 3);
+            }
+
+            return _edges;
+        }
+
+        public Sprite[] GetInnerCorners() {
+            if (InnerCornerTextureData == null || _innerCorners != null)
+                return _innerCorners;
+
+            _innerCorners = _edges.ToArray();
+            _innerCorners[0] = SpriteUtils.CreateSingleTextureSprite(InnerCornerTextureData.GetTexture());
+            _innerCorners[2] = SpriteUtils.Rotate(_innerCorners[0], 1);
+            _innerCorners[8] = SpriteUtils.Rotate(_innerCorners[0], 2);
+            _innerCorners[6] = SpriteUtils.Rotate(_innerCorners[0], 3);
+
+            return _innerCorners;
         }
     }
 
