@@ -139,7 +139,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &185156401
 Transform:
   m_ObjectHideFlags: 0
@@ -172,7 +172,7 @@ MonoBehaviour:
   _playButton: {fileID: 1424062530}
   _loginWidget: {fileID: 1174298868}
   _registerWidget: {fileID: 1076708972}
-  _loggedInWidget: {fileID: 0}
+  _loggedInWidget: {fileID: 1168344094}
 --- !u!1 &188306549
 GameObject:
   m_ObjectHideFlags: 0
@@ -2589,8 +2589,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b825de96f383543468a7b74c2d9b3094, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _emailInput: {fileID: 4390597340664824820}
-  _passwordInput: {fileID: 2086786932}
+  _emailInput: {fileID: 4390597340664824822}
+  _passwordInput: {fileID: 2086786934}
   _loginButton: {fileID: 901549601}
   _registerButton: {fileID: 1269883648}
 --- !u!1 &1222830676
@@ -3898,7 +3898,7 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 3145793846708242882, guid: d1aeb838a93f4734eb12526d80ac98c9, type: 3}
   m_PrefabInstance: {fileID: 2086786930}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &2086786932 stripped
+--- !u!114 &2086786934 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1424124730855973816, guid: d1aeb838a93f4734eb12526d80ac98c9, type: 3}
   m_PrefabInstance: {fileID: 2086786930}
@@ -4149,7 +4149,7 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 3145793846708242882, guid: d1aeb838a93f4734eb12526d80ac98c9, type: 3}
   m_PrefabInstance: {fileID: 4390597340664824818}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &4390597340664824820 stripped
+--- !u!114 &4390597340664824822 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1424124730855973816, guid: d1aeb838a93f4734eb12526d80ac98c9, type: 3}
   m_PrefabInstance: {fileID: 4390597340664824818}
