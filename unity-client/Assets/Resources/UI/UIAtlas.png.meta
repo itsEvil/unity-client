@@ -1,0 +1,1689 @@
+fileFormatVersion: 2
+guid: a4b5f712951d00f468b90e09054e0456
+TextureImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 12
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 0
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: 4
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Server
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: ButtonBase
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 2029
+        width: 19
+        height: 19
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 6, y: 6, z: 6, w: 6}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 012b08fe2e91f8f4289c5f022f7e799a
+      internalID: -644011366
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ButtonHover
+      rect:
+        serializedVersion: 2
+        x: 19
+        y: 2029
+        width: 19
+        height: 19
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 6, y: 6, z: 6, w: 6}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ecbd8bf35c31a4245a876ddb36876d18
+      internalID: -971742231
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ButtonPress
+      rect:
+        serializedVersion: 2
+        x: 38
+        y: 2029
+        width: 19
+        height: 19
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 6, y: 6, z: 6, w: 6}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d1a6e0e0b2aec3e48bc0ac8df8218fc1
+      internalID: 2088500837
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: CheckBoxBase
+      rect:
+        serializedVersion: 2
+        x: 57
+        y: 2000
+        width: 48
+        height: 48
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c8b6eb808aaee96458069d340eaf96ff
+      internalID: 268995661
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: CheckBoxHover
+      rect:
+        serializedVersion: 2
+        x: 105
+        y: 2000
+        width: 48
+        height: 48
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0f2b792620841124c8c26a4550dde42f
+      internalID: 828987723
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: CheckBoxPress
+      rect:
+        serializedVersion: 2
+        x: 153
+        y: 2000
+        width: 48
+        height: 48
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2775d46d43678db499b11d8fa77d1814
+      internalID: -602444151
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DropdownBase
+      rect:
+        serializedVersion: 2
+        x: 201
+        y: 2000
+        width: 48
+        height: 48
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cd96ffb48674f7b4c9b2e76bf00e162d
+      internalID: 724536519
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DropdownHover
+      rect:
+        serializedVersion: 2
+        x: 249
+        y: 2000
+        width: 48
+        height: 48
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b4964287d4e08b345825767e9e4c7e96
+      internalID: 477304442
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DropdownPress
+      rect:
+        serializedVersion: 2
+        x: 297
+        y: 2000
+        width: 48
+        height: 48
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d66588c34982ca542b0f2c46f6f23a9f
+      internalID: 1166673824
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DropdownExtendBase
+      rect:
+        serializedVersion: 2
+        x: 345
+        y: 2000
+        width: 48
+        height: 48
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e10b269717fddd04f9bea1a40a7b4e81
+      internalID: 652859172
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DropdownExtendHover
+      rect:
+        serializedVersion: 2
+        x: 393
+        y: 2000
+        width: 48
+        height: 48
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 899fecd093e84544e9751abc2986b0de
+      internalID: 495599717
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DropdownExtendPress
+      rect:
+        serializedVersion: 2
+        x: 441
+        y: 2000
+        width: 48
+        height: 48
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9cdb3e7d6d250864788ad93b7e83218d
+      internalID: -2058033177
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DropdownScrollbarCursorBase
+      rect:
+        serializedVersion: 2
+        x: 491
+        y: 2038
+        width: 6
+        height: 8
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 00d903a03aac6e24e9659f38223147ca
+      internalID: -1065609177
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DropdownScrollbarCursorHover
+      rect:
+        serializedVersion: 2
+        x: 499
+        y: 2038
+        width: 6
+        height: 8
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d775bc48f025c23418af65c8f2cf07f8
+      internalID: 1692049020
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DropdownScrollbarCursorPress
+      rect:
+        serializedVersion: 2
+        x: 507
+        y: 2038
+        width: 6
+        height: 8
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a8ac690bc3cc6b2408ac8daf28245e5c
+      internalID: -106408468
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DropdownScrollbarLimiterBase
+      rect:
+        serializedVersion: 2
+        x: 491
+        y: 2035
+        width: 1
+        height: 1
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f39cefc1897b9bd4b9fc525a63cc568e
+      internalID: 1009466514
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DropdownScrollbarLimiterHover
+      rect:
+        serializedVersion: 2
+        x: 493
+        y: 2035
+        width: 1
+        height: 1
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b8f8bca5afa94614582ddca65b01a578
+      internalID: -1729944111
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DropdownScrollbarLimiterPress
+      rect:
+        serializedVersion: 2
+        x: 495
+        y: 2035
+        width: 1
+        height: 1
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cd43a7b80d791d843b786837b46e7f43
+      internalID: 167167416
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DropdownSelectionBackgroundBase
+      rect:
+        serializedVersion: 2
+        x: 516
+        y: 2000
+        width: 48
+        height: 48
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 01bc1e141ef1e814da6f25e811572fcb
+      internalID: -749832191
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DropdownSelectionBackgroundHover
+      rect:
+        serializedVersion: 2
+        x: 564
+        y: 2000
+        width: 48
+        height: 48
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5e6a077e03cb6b443b21d5c16819c4c8
+      internalID: -243138672
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DropdownSelectionBackgroundPress
+      rect:
+        serializedVersion: 2
+        x: 612
+        y: 2000
+        width: 48
+        height: 48
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a88e52bc22d05ec458cffff13297bf19
+      internalID: -236944318
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DropdownTitleBackgroundBase
+      rect:
+        serializedVersion: 2
+        x: 660
+        y: 2000
+        width: 48
+        height: 48
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e11a079e078ac93468099cff5b2eccb6
+      internalID: 620697133
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DropdownTitleBackgroundHover
+      rect:
+        serializedVersion: 2
+        x: 708
+        y: 2000
+        width: 48
+        height: 48
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cdbb8a64d4fc8f04ab7970d5f18a7cbc
+      internalID: -763433100
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DropdownTitleBackgroundPress
+      rect:
+        serializedVersion: 2
+        x: 756
+        y: 2000
+        width: 48
+        height: 48
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e728d0eef37f7ee47ada23a318250a50
+      internalID: 323967675
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SliderBackground
+      rect:
+        serializedVersion: 2
+        x: 807
+        y: 2040
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1dc4cd9398954c04c9035fadcab80067
+      internalID: -994435948
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SliderKnobBase
+      rect:
+        serializedVersion: 2
+        x: 816
+        y: 2034
+        width: 12
+        height: 12
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2b2ec6fc903a5e74b811066d98266ed5
+      internalID: 1233261237
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SliderKnobHover
+      rect:
+        serializedVersion: 2
+        x: 830
+        y: 2034
+        width: 12
+        height: 12
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: db222cec31bfed9469062170804cd01b
+      internalID: 726958604
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SliderKnobPress
+      rect:
+        serializedVersion: 2
+        x: 844
+        y: 2034
+        width: 12
+        height: 12
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1631ee0474ea0a74aae81955a8ba34a8
+      internalID: -1662842014
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TextInputBase
+      rect:
+        serializedVersion: 2
+        x: 859
+        y: 2000
+        width: 48
+        height: 48
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e53062aaab6f61e478ad1a5416c4b45f
+      internalID: 1331985070
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TextInputHover
+      rect:
+        serializedVersion: 2
+        x: 907
+        y: 2000
+        width: 48
+        height: 48
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3bc366df153fae240a63cf73d22fd88f
+      internalID: 2010681083
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TextInputPress
+      rect:
+        serializedVersion: 2
+        x: 955
+        y: 2000
+        width: 48
+        height: 48
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b6c9f8896f905c74da05fcfef5504128
+      internalID: -717958633
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ToggleSliderBaseOff
+      rect:
+        serializedVersion: 2
+        x: 1003
+        y: 2000
+        width: 84
+        height: 48
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 27607232aff67c44f958e78bfe4754b8
+      internalID: -1853892532
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ToggleSliderBaseOn
+      rect:
+        serializedVersion: 2
+        x: 1087
+        y: 2000
+        width: 84
+        height: 48
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 829f8d9275b1cc64e9d4af5424795dc4
+      internalID: 346717355
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ToggleSliderHoverOff
+      rect:
+        serializedVersion: 2
+        x: 1171
+        y: 2000
+        width: 84
+        height: 48
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0c15bf1940ad2864b8cece2f46426ec7
+      internalID: -1774818409
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ToggleSliderHoverOn
+      rect:
+        serializedVersion: 2
+        x: 1255
+        y: 2000
+        width: 84
+        height: 48
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d76da27144757c54f84ae54aa950f95b
+      internalID: 2039264740
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ToggleSliderPressOff
+      rect:
+        serializedVersion: 2
+        x: 1339
+        y: 2000
+        width: 84
+        height: 48
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4229aff2479905948b7f710200c03e00
+      internalID: -66426184
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ToggleSliderPressOn
+      rect:
+        serializedVersion: 2
+        x: 1423
+        y: 2000
+        width: 84
+        height: 48
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 902efade70a6aaf45aaa7de198a617bc
+      internalID: -1331331542
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TooltipBackground
+      rect:
+        serializedVersion: 2
+        x: 1507
+        y: 2015
+        width: 33
+        height: 33
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 159cd00c3bd668f4da4465f77d90d8c6
+      internalID: 1687995112
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TooltipSpacer
+      rect:
+        serializedVersion: 2
+        x: 1540
+        y: 2044
+        width: 27
+        height: 4
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 60f1b6070224b3444bf53a7e906670a8
+      internalID: 952988083
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UncheckedBoxBase
+      rect:
+        serializedVersion: 2
+        x: 1567
+        y: 2000
+        width: 48
+        height: 48
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a4eef75ca1232d54c9b13b59e19d417f
+      internalID: 2017780490
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UncheckedBoxHover
+      rect:
+        serializedVersion: 2
+        x: 1615
+        y: 2000
+        width: 48
+        height: 48
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3ca2846aa65c3eb4fb2cb68ed9f3859b
+      internalID: 678042627
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UncheckedBoxPress
+      rect:
+        serializedVersion: 2
+        x: 1663
+        y: 2000
+        width: 48
+        height: 48
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b6ae06fb66d8c4d45a47b7983aa9c029
+      internalID: -1198954957
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BasicPanel
+      rect:
+        serializedVersion: 2
+        x: 1711
+        y: 1904
+        width: 182
+        height: 144
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6d8a36e431f3bc04d9a9d087461ce3d6
+      internalID: 1080474496
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ContainerView
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1853
+        width: 182
+        height: 147
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d60b222cfb99d32498f1f151b80ea877
+      internalID: 476200000
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ItemRow
+      rect:
+        serializedVersion: 2
+        x: 182
+        y: 1960
+        width: 172
+        height: 40
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7eac1ae55f5a93b41925201709cab49f
+      internalID: -785648469
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Minimap
+      rect:
+        serializedVersion: 2
+        x: 354
+        y: 1812
+        width: 182
+        height: 188
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ddba66927d2f76448a5953750fc99424
+      internalID: -1844175658
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MinimapIcon_1
+      rect:
+        serializedVersion: 2
+        x: 536
+        y: 1992
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7fa28693d71536b4ebb0104d7ace0d49
+      internalID: -2042167065
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MinimapIcon_2
+      rect:
+        serializedVersion: 2
+        x: 544
+        y: 1992
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 58091ed9c7b08b44f868206d61ac0289
+      internalID: 28917000
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MinimapIcon_3
+      rect:
+        serializedVersion: 2
+        x: 552
+        y: 1992
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8a8c888679cd3344abc73fec4c738fb5
+      internalID: -454343215
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MinimapIcon_4
+      rect:
+        serializedVersion: 2
+        x: 560
+        y: 1992
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a269ac4775103574c818a86c5a35cd9f
+      internalID: 1838541308
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MinimapIcon_5
+      rect:
+        serializedVersion: 2
+        x: 568
+        y: 1992
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1964c5dc532142f478bd1466f0b9b94d
+      internalID: 1377524108
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MinimapIcon_6
+      rect:
+        serializedVersion: 2
+        x: 576
+        y: 1992
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5e96cbfbbca2fa349b62e76293b0ca71
+      internalID: 2072730662
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MinimapIcon_7
+      rect:
+        serializedVersion: 2
+        x: 584
+        y: 1992
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 838f08c717df1ef46aba366f740dabb5
+      internalID: -13753392
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MinimapIcon_8
+      rect:
+        serializedVersion: 2
+        x: 592
+        y: 1992
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 51b53ed2df7e0004c913cd895c34aa51
+      internalID: 1257796261
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: GreyBackground
+      rect:
+        serializedVersion: 2
+        x: 602
+        y: 1992
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fc9f704a5f1e7dd46b6b953a2205a0d8
+      internalID: 1161534474
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerInventory
+      rect:
+        serializedVersion: 2
+        x: 612
+        y: 1710
+        width: 182
+        height: 290
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 08fb7034e0363a9439ebd024f49fc911
+      internalID: -1985005906
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerStatusBarFame
+      rect:
+        serializedVersion: 2
+        x: 794
+        y: 1984
+        width: 124
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8df26ad07ae1d0846b233bb5260f02bd
+      internalID: 2109679427
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerStatusBarHealth
+      rect:
+        serializedVersion: 2
+        x: 794
+        y: 1960
+        width: 192
+        height: 24
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0b91dc4bae64abe47a05237e047661a0
+      internalID: -729179727
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerStatusBarMana
+      rect:
+        serializedVersion: 2
+        x: 794
+        y: 1936
+        width: 192
+        height: 24
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1c1faf5b8cad91c40a03ae2696b7f0fc
+      internalID: -1455366268
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerStatusBarXp
+      rect:
+        serializedVersion: 2
+        x: 794
+        y: 1920
+        width: 124
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 06cbc37e5ece0a047ae0ea35903b4aed
+      internalID: 768021543
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerStatusBarsDecor
+      rect:
+        serializedVersion: 2
+        x: 986
+        y: 1895
+        width: 208
+        height: 105
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cebf2e0e72b6e7647b9ccb8618c827f5
+      internalID: -1312475767
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerStatusBarStatIcon
+      rect:
+        serializedVersion: 2
+        x: 1199
+        y: 1978
+        width: 18
+        height: 18
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9656a7dcfedc2b04fbf86709a5ccc570
+      internalID: -1992574157
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StatsView
+      rect:
+        serializedVersion: 2
+        x: 1223
+        y: 1934
+        width: 208
+        height: 66
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 53a6c966059ec8945a139657b6cd0301
+      internalID: 1236058179
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StatsViewIcon_1
+      rect:
+        serializedVersion: 2
+        x: 1432
+        y: 1991
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 292a1bc295ea3b144891592844046325
+      internalID: -1426234445
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StatsViewIcon_2
+      rect:
+        serializedVersion: 2
+        x: 1440
+        y: 1991
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f9211ac222def36418aae292cb0992c8
+      internalID: -221056144
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StatsViewIcon_3
+      rect:
+        serializedVersion: 2
+        x: 1448
+        y: 1991
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1306b477b4d0ce14b90c016e4a0437fa
+      internalID: -215455931
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StatsViewIcon_4
+      rect:
+        serializedVersion: 2
+        x: 1456
+        y: 1991
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b974a4a82a66d33439b908b2403ced01
+      internalID: -171935674
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StatsViewIcon_5
+      rect:
+        serializedVersion: 2
+        x: 1464
+        y: 1991
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 132a8359ea24369469ffc31dff0cc47a
+      internalID: -1721104430
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StatsViewIcon_6
+      rect:
+        serializedVersion: 2
+        x: 1472
+        y: 1991
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d08496fd15635e347be0c783df8d4eb5
+      internalID: 1483522462
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StatsViewIcon_7
+      rect:
+        serializedVersion: 2
+        x: 1480
+        y: 1991
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0d21b02d76e705e45be3803a77aafb53
+      internalID: 794885073
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: StatsViewIcon_8
+      rect:
+        serializedVersion: 2
+        x: 1488
+        y: 1991
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 06ade484a0dd1cd48bbac45ebae74dba
+      internalID: 515595065
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: b4246709dccd8074d8d74e6faeca3acd
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    nameFileIdTable:
+      BasicPanel: 1080474496
+      ButtonBase: -971742231
+      ButtonHover: 2088500837
+      ButtonPress: 268995661
+      CheckBoxBase: 828987723
+      CheckBoxHover: -602444151
+      CheckBoxPress: 724536519
+      ContainerView: 476200000
+      DropdownBase: 477304442
+      DropdownExtendBase: 495599717
+      DropdownExtendHover: -2058033177
+      DropdownExtendPress: -1065609177
+      DropdownHover: 1166673824
+      DropdownPress: 652859172
+      DropdownScrollbarCursorBase: 1692049020
+      DropdownScrollbarCursorHover: -106408468
+      DropdownScrollbarCursorPress: 1009466514
+      DropdownScrollbarLimiterBase: -1729944111
+      DropdownScrollbarLimiterHover: 167167416
+      DropdownScrollbarLimiterPress: -749832191
+      DropdownSelectionBackgroundBase: -243138672
+      DropdownSelectionBackgroundHover: -236944318
+      DropdownSelectionBackgroundPress: 620697133
+      DropdownTitleBackgroundBase: -763433100
+      DropdownTitleBackgroundHover: 323967675
+      DropdownTitleBackgroundPress: -994435948
+      GreyBackground: 1161534474
+      ItemRow: -785648469
+      Minimap: -1844175658
+      MinimapIcon_1: -2042167065
+      MinimapIcon_2: 28917000
+      MinimapIcon_3: -454343215
+      MinimapIcon_4: 1838541308
+      MinimapIcon_5: 1377524108
+      MinimapIcon_6: 2072730662
+      MinimapIcon_7: -13753392
+      MinimapIcon_8: 1257796261
+      PlayerInventory: -1985005906
+      PlayerStatusBarFame: 2109679427
+      PlayerStatusBarHealth: -729179727
+      PlayerStatusBarMana: -1455366268
+      PlayerStatusBarStatIcon: -1992574157
+      PlayerStatusBarXp: 768021543
+      PlayerStatusBarsDecor: -1312475767
+      SliderBackground: 1233261237
+      SliderKnobBase: 726958604
+      SliderKnobHover: -1662842014
+      SliderKnobPress: 1331985070
+      StatsView: 1236058179
+      StatsViewIcon_1: -1426234445
+      StatsViewIcon_2: -221056144
+      StatsViewIcon_3: -215455931
+      StatsViewIcon_4: -171935674
+      StatsViewIcon_5: -1721104430
+      StatsViewIcon_6: 1483522462
+      StatsViewIcon_7: 794885073
+      StatsViewIcon_8: 515595065
+      TextInputBase: 2010681083
+      TextInputHover: -717958633
+      TextInputPress: -1853892532
+      ToggleSliderBaseOff: 346717355
+      ToggleSliderBaseOn: -1774818409
+      ToggleSliderHoverOff: -1774818409
+      ToggleSliderHoverOn: 2039264740
+      ToggleSliderPressOff: -66426184
+      ToggleSliderPressOn: -1331331542
+      TooltipBackground: 1687995112
+      TooltipSpacer: 952988083
+      UncheckedBoxBase: 2017780490
+      UncheckedBoxHover: 678042627
+      UncheckedBoxPress: -1198954957
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
