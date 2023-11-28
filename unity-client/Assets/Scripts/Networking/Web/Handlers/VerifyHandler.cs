@@ -11,6 +11,9 @@ namespace Networking.Web {
             _email = email;
             _password = password;
         }
+        public void Enqueue() {
+            WebController.WorkQueue.Enqueue(new WebWork(this));
+        }
         public async Task SendAsync() {
             var dict = new Dictionary<string, string>() {
                 { WebConstants.Email, _email },
@@ -25,8 +28,10 @@ namespace Networking.Web {
         private void OnLogInRequestComplete(WebResponse result) {
             if (result.Result == WebResult.Success) {
                 AccountData.OnSuccessfulLogin(_email, _password);
-                var charListRequest = new CharListHandler();
-                WebController.WorkQueue.Enqueue(new WebWork(charListRequest));
+                new CharListHandler().Enqueue();
+            }
+            else {
+                Requests.OnLoginResult?.Invoke(false);
             }
         }
     }

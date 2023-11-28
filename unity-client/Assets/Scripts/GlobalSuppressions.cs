@@ -11,3 +11,5 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Type Safety", "UNT0006:Incorrect message signature", Justification = "<Pending>", Scope = "member", Target = "~M:UI.SkinScreenController.Reset(System.Object)")]
 [assembly: SuppressMessage("Type Safety", "UNT0006:Incorrect message signature", Justification = "<Pending>", Scope = "member", Target = "~M:UI.GameScreenController.Reset(System.Object)")]
 [assembly: SuppressMessage("Type Safety", "UNT0006:Incorrect message signature", Justification = "<Pending>", Scope = "member", Target = "~M:UI.NewCharacterController.Reset(System.Object)")]
+[assembly: SuppressMessage("Type Safety", "UNT0006:Incorrect message signature", Justification = "<Pending>", Scope = "member", Target = "~M:UI.LoginWidget.Reset(System.Object)")]
+[assembly: SuppressMessage("Type Safety", "UNT0006:Incorrect message signature", Justification = "<Pending>", Scope = "member", Target = "~M:UI.LoggedInWidget.Reset(System.Object)")]
