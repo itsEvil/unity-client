@@ -25,6 +25,9 @@ namespace UI {
             AccountData.TryLoginWithSavedData();
         }
         public void OnLogin(bool value) {
+
+            Utils.Log("GotLogin, {0}", value);
+
             _playButton.interactable = true;
             _loginWidget.SetButtonFunctionality(true);
             _registerWidget.SetButtonFunctionality(true);

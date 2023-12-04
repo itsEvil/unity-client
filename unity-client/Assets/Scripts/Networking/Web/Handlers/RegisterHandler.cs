@@ -5,22 +5,22 @@ using System.Threading.Tasks;
 
 namespace Networking.Web {
     public class RegisterHandler : IWebRequest {
-        private readonly string _newEmail;
-        private readonly string _newPassword;
-        private readonly string _newPlayerName;
+        private readonly string _email;
+        private readonly string _pass;
+        private readonly string _playerName;
         public RegisterHandler(string email, string password, string playerName) {
-            _newEmail = email;
-            _newPlayerName = playerName;
-            _newPassword = password;
+            _email = email;
+            _playerName = playerName;
+            _pass = password;
         }
         public void Enqueue() {
             WebController.WorkQueue.Enqueue(new WebWork(this));
         }
         public async Task SendAsync() {
             var dict = new Dictionary<string, string>() {
-                { WebConstants.NewEmail, _newEmail },
-                { WebConstants.NewPassword, _newPassword },
-                { WebConstants.NewUsername, _newPlayerName },
+                { WebConstants.Email, _email },
+                { WebConstants.Password, _pass },
+                { WebConstants.Username, _playerName },
             };
 
             var result = await WebSender.SendWebRequest(WebConstants.ACCOUNT_REGISTER, dict);
@@ -30,7 +30,7 @@ namespace Networking.Web {
 
         private void OnRegisterRequestComplete(WebResponse result) {
             if (result.Result == WebResult.Success) {
-                AccountData.OnSuccessfulLogin(_newEmail, _newPassword);
+                AccountData.OnSuccessfulLogin(_email, _pass);
                 new CharListHandler().Enqueue();
             }
             else {

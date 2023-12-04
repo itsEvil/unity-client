@@ -25,14 +25,16 @@ namespace Networking.Web {
             OnLogInRequestComplete(result);
         }
 
-        private void OnLogInRequestComplete(WebResponse result) {
-            if (result.Result == WebResult.Success) {
+        private void OnLogInRequestComplete(WebResponse response) {
+
+            Utils.Log("LoginRequestComplete, {0}", response.ResultToString());
+
+            if (response.Result == WebResult.Success) {
                 AccountData.OnSuccessfulLogin(_email, _password);
                 new CharListHandler().Enqueue();
             }
-            else {
-                Requests.OnLoginResult?.Invoke(false);
-            }
+            
+            Requests.OnLoginResult?.Invoke(false);
         }
     }
 }

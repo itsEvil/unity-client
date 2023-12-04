@@ -39,7 +39,7 @@ namespace Networking {
             //ServerInfo serverInfo = (ServerInfo)GameConfiguration.ServerInfos[GameConfiguration.SelectedServer];
             try {
                 _socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
-                _socket.Connect(Settings.IP_ADDRESS, Settings.GAME_PORT);
+                _socket.Connect(Settings.GAME_ADDRESS, Settings.GAME_PORT);
                 _socket.NoDelay = true;
                 _socket.Blocking = false;
             }
@@ -94,11 +94,10 @@ namespace Networking {
                 while (Running) {
                     StartSend();
                     StartReceive();
-                    WebController.Tick();
                 }
             }
             catch (Exception e) {
-                Utils.Error(e.Message + "\n" + e.StackTrace);
+                Utils.Error("TcpTicker::", e.Message ,e.StackTrace);
                 _crashed = true;
             }
         }

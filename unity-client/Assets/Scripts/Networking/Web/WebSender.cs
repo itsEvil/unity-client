@@ -19,10 +19,12 @@ namespace Networking.Web
         private static async Task<WebResponse> SendPostRequestAsync(string request, FormUrlEncodedContent content, WebDataType dataType = WebDataType.Xml) {
             Utils.Log("SendingAPIRequest::{0}", request);
             try {
-
-                var response = await _HttpClient.PostAsync(Settings.IP_ADDRESS + request, content);
-                Utils.Log($"HandlingResponse::DataType::{dataType}");
+                
+                var response = await _HttpClient.PostAsync(Settings.API_ADDRESS + request, content);
+                Utils.Log("HandlingResponse::DataType::{0}", dataType);
+                
                 var textResponse = await response.Content.ReadAsStringAsync();
+                Utils.Log("HandlingResponse::{0}::{1}::{2}", response.StatusCode, response.Content, textResponse);
 
                 if (!response.IsSuccessStatusCode) {
                     Utils.Error($"HandlingResponse::Error::{textResponse}");
@@ -49,6 +51,17 @@ namespace Networking.Web
             Result = result;
             Type = type;
             Reply = reply;
+        }
+
+        public string ResultToString() {
+            return
+                Result switch
+            {
+                WebResult.Success => nameof(WebResult.Success),
+                WebResult.FailedToConnect => nameof(WebResult.FailedToConnect),
+                WebResult.Error => nameof(WebResult.Error),
+                _ => string.Empty,
+            };
         }
     }
 

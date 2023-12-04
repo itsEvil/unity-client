@@ -52,8 +52,8 @@ namespace UI {
             Requests.TryLogin(email, pass);
         }
         public void SetButtonFunctionality(bool val) {
-            _loginButton.interactable = val;
-            _registerButton.interactable = val;
+            //_loginButton.interactable = val;
+            //_registerButton.interactable = val;
         }
     }
 }

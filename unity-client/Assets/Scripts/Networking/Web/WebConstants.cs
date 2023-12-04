@@ -19,9 +19,7 @@ namespace Networking.Web
 
         public const string Email = "email";
         public const string Password = "password";
-        public const string NewUsername = "newUsername";
-        public const string NewEmail = "newEmail";
-        public const string NewPassword = "newPassword";
+        public const string Username = "username";
         public const string CharId = "charId";
         public const string AccountId = "accountId";
     }
