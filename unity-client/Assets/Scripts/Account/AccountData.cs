@@ -31,7 +31,8 @@ namespace Account
 
         private static readonly Dictionary<int, ClassStats> _ClassStats = new();
         public static readonly ReadOnlyDictionary<int, ClassStats> ClassStats = new(_ClassStats);
-        private static readonly List<CharacterStats> _Characters = new();
+
+        private static readonly List<CharacterStats> _Characters = new(); //Maybe sort by last played?
         public static ReadOnlyCollection<CharacterStats> Characters = new(_Characters);
         private static readonly List<NewsInfos> _News = new();
         public static ReadOnlyCollection<NewsInfos> News = new(_News);

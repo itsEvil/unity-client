@@ -9,6 +9,14 @@ namespace UI {
         public GameObject Object { get => gameObject; }
         public void Reset(object data = null) {
             _menuButton.onClick.AddListener(OnMenu);
+
+            if(data == null) {
+                ViewManager.ChangeView(View.Menu);
+                Utils.Error("Game | Data is null, expected int value");
+                return;
+            }
+
+            var charId = (int)data;
         }
         public void Hide() {
             _menuButton.onClick.RemoveAllListeners();

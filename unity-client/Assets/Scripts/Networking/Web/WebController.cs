@@ -9,12 +9,9 @@ namespace Networking.Web
 {
     public sealed partial class WebController
     {
-        public static Queue<WebWork> WorkQueue = new();//Remember to overrite this data when you send inventory action requests (InvSwap, InvDrop etc)
+        public static Queue<WebWork> WorkQueue = new();
         private static readonly List<Task> _tasksList = new(16);
         private static CancellationTokenSource _tokenSource = new();
-        /// <summary>
-        /// Called on MapInfo/Map Init
-        /// </summary>
         public static void Init() {
             _tokenSource.Cancel();
             WorkQueue.Clear();

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Xml.Linq;
 using UnityEditor;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace Static
@@ -41,6 +43,10 @@ namespace Static
         public readonly int MinSize;
         public readonly int MaxSize;
 
+        public readonly bool Flying;
+        public readonly float Z;
+        public readonly bool NoMiniMap;
+
         public readonly int MaxHp;
         public readonly int Defense;
 
@@ -51,6 +57,13 @@ namespace Static
 
         public readonly ProjectileDesc[] Projectiles;
 
+        public readonly TextureData TextureData;
+        public readonly TextureData TopTextureData;
+        public readonly TextureData Portrait;
+        public readonly AnimationsData AnimationsData;
+
+        public readonly float AngleCorrection;
+        public readonly float Rotation;
         public ObjectDesc(XElement e, string id, ushort type)
         {
             Id = id;
@@ -94,7 +107,32 @@ namespace Static
                 SpawnData = new SpawnData(e.Element("Spawn"));
             PerRealmMax = e.ParseInt("PerRealmMax");
 
-            Projectiles = e.Elements("Projectile").Select(i => new ProjectileDesc(i, Type)).ToArray();
+            List<ProjectileDesc> projs = new();
+            foreach(var elem in e.Elements("Projectile")) {
+                var projDesc = new ProjectileDesc(elem, Type);
+                projs.Add(projDesc);
+            }
+            Projectiles = projs.ToArray();
+
+            Flying = e.ParseBool("Flying");
+            Z = e.ParseFloat("Z");
+            NoMiniMap = e.ParseBool("NoMiniMap");
+
+            TextureData = new TextureData(e);
+
+            if (e.Element("Top") != null)
+                TopTextureData = new TextureData(e.Element("Top"));
+            if (e.Element("Portrait") != null)
+                Portrait = new TextureData(e.Element("Portrait"));
+
+
+            if (e.Element("Animation") != null) {
+                AnimationsData = new AnimationsData(e);
+            }
+
+            AngleCorrection = e.ParseFloat("AngleCorrection") * -Mathf.PI / 4;
+            Rotation = e.ParseFloat("Rotation");
+
             /*
             Projectiles = new Dictionary<int, ProjectileDesc>();
             foreach (var k in e.Elements("Projectile"))
@@ -152,6 +190,23 @@ namespace Static
             Stats = Stats.OrderBy(k => k.Index).ToArray();
 
             StartingValues = Stats.Select(k => k.StartingValue).ToArray();
+        }
+
+        public int GetMaxedStats(int[] playerStats) {
+            if (playerStats == null || playerStats.Length == 0)
+                return 0;
+
+            int maxed = 0;
+            for(int i = 0; i < playerStats.Length; i++) {
+                var curr = playerStats[i];
+                var max = Stats[i].MaxValue;
+
+                if (curr == max)
+                    maxed++;
+            }
+
+
+            return maxed;
         }
     }
 
