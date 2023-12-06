@@ -1,12 +1,17 @@
 using Account;
 using Static;
-using System;
-
 public sealed class Player : Entity {
+    public const int MaxLevel = 20;
+
+    private bool _isMyPlayer = false;
 
     public int CurrentExp;
     public int NextLevelExp;
     public int Level;
+
+    public int CurrentFame;
+    public int NextFameGoal;
+
     public int Fame;
     public int Credits;
     public int NumStars;
@@ -15,14 +20,22 @@ public sealed class Player : Entity {
     public bool HasBackpack;
     public short SkinType;
     public ItemType[] SlotTypes;
+    
+    //Stats
     public int Mp;
     public int MaxMp;
-
+    public int Attack;
+    public int Defense;
+    public int Speed;
+    public int Dexterity;
+    public int Vitality;
+    public int Wisdom;
     /// <summary>
     /// Runs when any player gets initalized
     /// </summary>
     public override void Init(ObjectDesc desc) {
         base.Init(desc);
+        _isMyPlayer = false;
         SlotTypes = new ItemType[Inventory.Length];
         Type = GameObjectType.Player;
     }
@@ -32,6 +45,7 @@ public sealed class Player : Entity {
     public void OnMyPlayer() {
         var charStats = AccountData.Characters[AccountData.CurrentCharId];
         Inventory = charStats.Inventory;
+        _isMyPlayer = true;
     }
     public override void UpdateStat(StatType stat, object value) {
         base.UpdateStat(stat, value);
@@ -69,6 +83,9 @@ public sealed class Player : Entity {
                 return;
             case StatType.MaxMp:
                 MaxMp = (int)value;
+                return;
+            case StatType.Attack:
+                Attack = (int)value;
                 return;
         }
     }

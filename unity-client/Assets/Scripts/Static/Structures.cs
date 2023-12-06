@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using System.Xml.Linq;
 using UnityEngine;
 using Networking.Tcp;
+
 namespace Static {
     public struct TextureSheetData {
         public SpriteSheetData[] SSD;
@@ -56,27 +57,21 @@ namespace Static {
             SkinType = skinType;
         }
     }
+
     [StructLayout(LayoutKind.Explicit)]
-    public struct Vec2
-    {
+    public struct Vec2 {
         [FieldOffset(0)]
         public float x;
-
         [FieldOffset(4)]
         public float y;
 
         public readonly static Vec2 zero = new(0f, 0f);
-
         public readonly static Vec2 one = new(1f, 1f);
-
         public readonly float Length => (float)Math.Sqrt(x * x + y * y);
-
         public readonly float SqrLength => x * x + y * y;
-
         public readonly float Angle => (float)Math.Atan2(y, x);
 
-        public Vec2(float x, float y)
-        {
+        public Vec2(float x, float y) {
             this.x = x;
             this.y = y;
         }
@@ -87,204 +82,121 @@ namespace Static {
         //}
 
         public readonly Vec2 Add(Vec2 vec)
-        {
-            return new Vec2(x + vec.x, y + vec.y);
-        }
-
+            => new(x + vec.x, y + vec.y);
+        public readonly Vec2 Add(Vector2 vec)
+            => new(x + vec.x, y + vec.y);
+        public readonly Vec2 Add(Vector3 vec)
+            => new(x + vec.x, y + vec.y);
         public readonly Vec2 Subtract(Vec2 vec)
-        {
-            return new Vec2(x - vec.x, y - vec.y);
-        }
-
+            => new(x - vec.x, y - vec.y);
+        public readonly Vec2 Subtract(Vector2 vec)
+            => new(x - vec.x, y - vec.y);
+        public readonly Vec2 Subtract(Vector3 vec)
+            => new(x - vec.x, y - vec.y);
         public readonly Vec2 Multiply(Vec2 vec)
-        {
-            return new Vec2(x * vec.x, y * vec.y);
-        }
-
+            => new(x * vec.x, y * vec.y);
+        public readonly Vec2 Multiply(Vector2 vec)
+            => new(x * vec.x, y * vec.y);
+        public readonly Vec2 Multiply(Vector3 vec)
+            => new(x * vec.x, y * vec.y);
         public readonly Vec2 Divide(Vec2 vec)
-        {
-            return new Vec2(x / vec.x, y / vec.y);
-        }
-
+            => new(x / vec.x, y / vec.y);
+        public readonly Vec2 Divide(Vector2 vec)
+            => new(x / vec.x, y / vec.y);
+        public readonly Vec2 Divide(Vector3 vec)
+            => new(x / vec.x, y / vec.y);
         public readonly Vec2 Add(float value)
-        {
-            return new Vec2(x + value, y + value);
-        }
-
+            => new(x + value, y + value);
         public readonly Vec2 Subtract(float value)
-        {
-            return new Vec2(x - value, y - value);
-        }
-
+            => new(x - value, y - value);
         public readonly Vec2 Multiply(float value)
-        {
-            return new Vec2(x * value, y * value);
-        }
-
+            => new(x * value, y * value);
         public readonly Vec2 Divide(float value)
-        {
-            return new Vec2(x / value, y / value);
-        }
-
+            => new(x / value, y / value);
         public readonly Vec2 RotateAround(Vec2 pivot, float radians)
-        {
-            return Subtract(pivot).RotateOrigin(radians).Add(pivot);
-        }
-
+            => Subtract(pivot).RotateOrigin(radians).Add(pivot);
         public readonly Vec2 RotateAround(Vec2 pivot, float sin, float cos)
-        {
-            return Subtract(pivot).RotateOrigin(sin, cos).Add(pivot);
-        }
-
+            => Subtract(pivot).RotateOrigin(sin, cos).Add(pivot);
         public readonly Vec2 RotateOrigin(float radians)
-        {
-            return RotateOrigin((float)Math.Sin(radians), (float)Math.Cos(radians));
-        }
-
+            => RotateOrigin((float)Math.Sin(radians), (float)Math.Cos(radians));
         public readonly Vec2 RotateOrigin(float sin, float cos)
-        {
-            return new Vec2(x * cos - y * sin, x * sin + y * cos);
-        }
-
+            => new(x * cos - y * sin, x * sin + y * cos);
         public readonly float AngleTo(Vec2 vec)
-        {
-            return (float)Math.Atan2(vec.y - y, vec.x - x);
-        }
-
+            => (float)Math.Atan2(vec.y - y, vec.x - x);
         public readonly float DistanceTo(Vec2 vec)
-        {
-            return vec.Subtract(this).Length;
-        }
-
+            => vec.Subtract(this).Length;
         public readonly float SqrDistanceTo(Vec2 vec)
-        {
-            return vec.Subtract(this).SqrLength;
-        }
-
-        public readonly Vec2 Normalize()
-        {
+            => vec.Subtract(this).SqrLength;
+        public readonly Vec2 Normalize() {
             float length = Length;
             return new Vec2(x / length, y / length);
         }
-
-        public readonly Vec2 Invert()
-        {
-            return this * -1f;
-        }
-
-        public readonly Vec2 ChangeLength(float length)
-        {
+        public readonly Vec2 Invert() => this * -1f;
+        public readonly Vec2 ChangeLength(float length) {
             float length2 = Length;
             return new Vec2(x / length2 * length, y / length2 * length);
         }
-
         public readonly Vec2 ChangeLength(float length, float currentLength)
-        {
-            return new Vec2(x / currentLength * length, y / currentLength * length);
-        }
-
+            => new(x / currentLength * length, y / currentLength * length);
         public readonly bool LongerThan(float radius)
-        {
-            return SqrLength > radius * radius;
-        }
-
+            => SqrLength > radius * radius;
         public readonly bool RadiusContains(Vec2 position, float radius)
-        {
-            return !(position - this).LongerThan(radius);
-        }
+            => !(position - this).LongerThan(radius);
         public static Vec2 FromAngle(float radians)
-        {
-            return new Vec2((float)Math.Cos(radians), (float)Math.Sin(radians));
-        }
-
+            => new((float)Math.Cos(radians), (float)Math.Sin(radians));
         public static Vec2 FromAngle(float sin, float cos)
-        {
-            return new Vec2(cos, sin);
-        }
-
+            => new(cos, sin);
         public static Vec2 operator +(Vec2 a, Vec2 b)
-        {
-            return a.Add(b);
-        }
-
+            => a.Add(b);
         public static Vec2 operator -(Vec2 a, Vec2 b)
-        {
-            return a.Subtract(b);
-        }
-
+            => a.Subtract(b);
         public static Vec2 operator *(Vec2 a, Vec2 b)
-        {
-            return a.Multiply(b);
-        }
-
+            => a.Multiply(b);
         public static Vec2 operator /(Vec2 a, Vec2 b)
-        {
-            return a.Divide(b);
-        }
-
+            => a.Divide(b);
         public static Vec2 operator +(Vec2 a, float b)
-        {
-            return a.Add(b);
-        }
-
+            => a.Add(b);
         public static Vec2 operator -(Vec2 a, float b)
-        {
-            return a.Subtract(b);
-        }
-
+            => a.Subtract(b);
         public static Vec2 operator *(Vec2 a, float b)
-        {
-            return a.Multiply(b);
-        }
-
+            => a.Multiply(b);
         public static Vec2 operator /(Vec2 a, float b)
-        {
-            return a.Divide(b);
-        }
-
-        public static bool operator ==(Vec2 a, Vec2 b)
-        {
-            if (a.x == b.x)
-            {
+            => a.Divide(b);
+        public static bool operator ==(Vec2 a, Vec2 b) {
+            if (a.x == b.x) 
                 return a.y == b.y;
-            }
-
+            
             return false;
         }
-
-        public static bool operator !=(Vec2 a, Vec2 b)
-        {
-            if (a.x == b.x)
-            {
+        public static bool operator !=(Vec2 a, Vec2 b) {
+            if (a.x == b.x) 
                 return a.y != b.y;
-            }
-
+            
             return true;
         }
 
         public static implicit operator Vec2(float value)
-        {
-            return new Vec2(value, value);
-        }
-
+            => new(value, value);
+        public static Vec2 operator +(Vec2 a, Vector3 b)
+            => a.Add(b);
+        public static Vec2 operator *(Vec2 a, Vector3 b)
+            => a.Multiply(b);
+        public static Vec2 operator /(Vec2 a, Vector3 b)
+            => a.Divide(b);
+        public static Vec2 operator -(Vec2 a) 
+            => new(0f - a.x, 0f - a.y);
+        
         public readonly override string ToString()
-        {
-            return $"{x}, {y}";
-        }
-
-        public readonly override bool Equals(object obj)
-        {
-            if (obj is Vec2 vec) {
+            => $"{x}, {y}";
+        public readonly override bool Equals(object obj) {
+            if (obj is Vec2 vec) 
                 return this == vec;
-            }
-
             return base.Equals(obj);
         }
-
         public readonly override int GetHashCode()
-        {
-            return base.GetHashCode();
-        }
+            => base.GetHashCode();
+
+        public readonly Vector2 ToVector2() => new Vector2(x,y);
     }
 
     public readonly struct ClassStats
