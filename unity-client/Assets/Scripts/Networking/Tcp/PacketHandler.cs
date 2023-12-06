@@ -1,4 +1,5 @@
 using Account;
+using Game;
 using Networking;
 using Networking.Tcp;
 using Networking.Web;
@@ -21,22 +22,11 @@ public class PacketHandler {
     public readonly GameInitData InitData;
     public wRandom Random;
 
-    //public PacketHandler(GameInitData initData, Map map)
-    //{
-    //    //InitData = initData;
-    //    //_map = map;
-    //    //UpdateObjects.OnMyPlayerJoined += OnMyPlayerJoined;
-    //}
-
-    //public static void OnMyPlayerJoined(Player player)
-    //{
-    //    Player = player;
-    //    Player.SkinType = InitData.SkinType;
-    //    player.Random = Random;
-    //}
-
+    public PacketHandler(GameInitData initData) {
+        Instance = this;
+        InitData = initData;
+    }
     public void Start() {
-
         for(int i = 0; i < History.Length; i++) {
             History[i] = new MoveRecord();
         }
@@ -44,14 +34,16 @@ public class PacketHandler {
         Instance = this;
         _toBeHandled = new ConcurrentQueue<IIncomingPacket>();
         TcpTicker.Start(this);
-        TcpTicker.Send(new Hello(Settings.GameVersion, Settings.NexusId, AccountData.GetEmail(), AccountData.GetPassword()));
+        TcpTicker.Send(
+            new Hello(
+                Settings.GameVersion, Settings.NexusId, 
+                AccountData.GetEmail(), AccountData.GetPassword(), 
+                InitData.CharId, InitData.NewCharacter, 
+                InitData.ClassType, InitData.SkinType));
     }
 
     public void Stop() {
         TcpTicker.Stop();
-        // this needs to be unassigned since we create again on reconnect
-        // assignments done in Awake() shouldn't be unassigned unless changing scenes
-        //UpdateObjects.OnMyPlayerJoined -= OnMyPlayerJoined;
     }
 
     public void Tick() {

@@ -1,4 +1,6 @@
+using Account;
 using Data;
+using Static;
 using System;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,6 +14,7 @@ namespace UI {
         public void Awake() => Instance = this;
         private NewCharacterRect[] _spawned = Array.Empty<NewCharacterRect>();
         public void Reset(object data = null) {
+            ViewManager.SetBackgroundVisiblity(true);
             _backButton.onClick.AddListener(OnBack);
 
             //Only spawn classes once
@@ -27,7 +30,7 @@ namespace UI {
             }
         }
         public void Hide() => _backButton.onClick.RemoveAllListeners();
-        public void OnClassSelect(ushort classType) => ViewManager.ChangeView(View.Skin, classType);
+        public void OnClassSelect(short classType) => ViewManager.ChangeView(View.Skin, new GameInitData(Settings.NexusId, AccountData.NextCharId, true, classType, 0));
         private void OnBack() => ViewManager.ChangeView(View.Character);
     }
 }

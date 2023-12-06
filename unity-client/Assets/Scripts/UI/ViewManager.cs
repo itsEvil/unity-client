@@ -1,9 +1,9 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace UI {
     public class ViewManager : MonoBehaviour {
         public static ViewManager Instance { get; private set; }
-
         [SerializeField] private MainScreenController MainScreen;
         [SerializeField] private CharacterScreenController CharacterScreen;
         [SerializeField] private NewCharacterController NewCharacterScreen;
@@ -11,6 +11,7 @@ namespace UI {
         [SerializeField] private GameScreenController GameScreen;
         [SerializeField] private DeathScreenController DeathScreen;
 
+        [SerializeField] private Image _background;
         private IScreen _activeScreen;
         private void Awake() {
             Instance = this;
@@ -42,6 +43,8 @@ namespace UI {
             };
             return newScreen;
         }
+        public static void SetBackgroundVisiblity(bool value)
+            => Instance._background.gameObject.SetActive(value);
     }
 
     public enum View {

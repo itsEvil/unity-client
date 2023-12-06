@@ -43,20 +43,17 @@ namespace Static {
     public readonly struct GameInitData
     {
         public readonly int WorldId;
-        public readonly int CharId;
+        public readonly short CharId;
         public readonly bool NewCharacter;
-        public readonly int ClassType;
-        public readonly int SkinType;
-        public readonly int Difficulty;
-
-        public GameInitData(int worldId, int charId, bool newCharacter, int classType, int skinType, int difficulty)
+        public readonly short ClassType;
+        public readonly short SkinType;
+        public GameInitData(int worldId, short charId, bool newCharacter, short classType, short skinType)
         {
             WorldId = worldId;
             CharId = charId;
             NewCharacter = newCharacter;
             ClassType = classType;
             SkinType = skinType;
-            Difficulty = difficulty;
         }
     }
     [StructLayout(LayoutKind.Explicit)]

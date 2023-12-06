@@ -2,16 +2,21 @@ using Data;
 using Networking;
 using Networking.Tcp;
 using Static;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using TileData = Static.TileData;
 
-namespace Game
-{
-    public partial class Map : MonoBehaviour
-    {
+namespace Game {
+    public partial class Map : MonoBehaviour {
+        private const int BUFFER_SIZE_SMALL = 16;
+        private const int BUFFER_SIZE_MED = 32;
+        private const int BUFFER_SIZE_BIG = 64;
+        private const int BUFFER_SIZE_LARGE = 128;
+
         [SerializeField] private Tilemap _tileMap;
+        [SerializeField] private Transform _entityContainer;
 
         public static Map Instance;
         public static MapInfo MapInfo;
@@ -22,22 +27,29 @@ namespace Game
         public static int GotosRequested;
         public static int MovesRequested;
 
-        public static List<Entity> ToAddEntities = new();
-        public static List<Entity> ToRemoveEntities = new();
-        public static Dictionary<int, Entity> Entities = new();
-        public static Dictionary<int, Interactive> Interactives = new();
+        public static List<Entity> ToAddEntities = new(BUFFER_SIZE_MED);
+        public static List<Entity> ToRemoveEntities = new(BUFFER_SIZE_MED);
+        public static Dictionary<int, Entity> Entities = new(BUFFER_SIZE_LARGE);
+        public static Dictionary<int, Interactive> Interactives = new(BUFFER_SIZE_MED);
         
-        public static List<FPTimer> Timers = new();
-        public static List<FPTimer> ToAddTimers = new();
-        public static List<FPTimer> ToRemoveTimers = new();
+        public static List<FPTimer> Timers = new(BUFFER_SIZE_MED);
+        public static List<FPTimer> ToAddTimers = new(BUFFER_SIZE_SMALL);
+        public static List<FPTimer> ToRemoveTimers = new(BUFFER_SIZE_SMALL);
 
         public static EntityPool EntityPool;
         public void Awake() {
             Instance = this;
 
-            //TODO Add EntityPrefabs
-            //EntityPool = new();
+            var prefabs = new Dictionary<GameObjectType, Entity>();
+            foreach (var entity in Resources.LoadAll<Entity>("Prefabs/Entities"))
+                prefabs[Enum.Parse<GameObjectType>(entity.name)] = entity;
+            EntityPool = new(prefabs, _entityContainer);
         }
+
+        public void OnEnable() {
+            Dispose();
+        }
+
         public void Init(MapInfo mapInfo) {
             MapInfo = mapInfo;
             Tiles = new Square[MapInfo.Width, MapInfo.Height];
@@ -45,7 +57,7 @@ namespace Game
         
         public void OnMyPlayerConnected(Player player) {
             MyPlayer = player;
-            
+            MyPlayer.OnMyPlayer();
             //Hide preloader
         }
 
@@ -73,19 +85,13 @@ namespace Game
 
             return Tiles[x, y];
         }
-
-        public void AddEntity(int type, int objectId, Vec2 position) {
-            //TODO Add AssetLibrary
-            //var desc = AssetLibrary.Type2Object[type];
-            //var ent = EntityPool.Get(desc.GameObject);
-            //ent.Id = objectId;
-            //ent.Position = position;
-            //ToAddEntities.Add(ent);
+        public void AddEntity(Entity entity) {
+            ToAddEntities.Add(entity);
         }
         private void Add() {
             for (int i = 0; i < ToAddEntities.Count; i++) {
                 var ent = ToAddEntities[i];
-                ent.Init();
+                ent.AddToWorld();
                 Entities[ent.Id] = ent;
             }
 

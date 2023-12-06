@@ -15,6 +15,7 @@ namespace UI {
         public GameObject Object { get => gameObject; }
         private void Awake() => Instance = this;
         public void Reset(object data = null) {
+            ViewManager.SetBackgroundVisiblity(true);
             _firstCharId = -1;
             _playButton.onClick.AddListener(OnPlay);
             _backButton.onClick.AddListener(OnBack);

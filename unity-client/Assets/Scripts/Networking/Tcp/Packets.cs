@@ -123,7 +123,19 @@ namespace Networking.Tcp
                 Objects[i] = new ObjectDefinition(rdr);
             }
         }
-        public void Handle() { }
+        public void Handle() {
+
+            Span<ObjectDefinition> objects = Objects.AsSpan();
+            for(int i = 0; i < objects.Length; i++) {
+                var obj = objects[i];
+
+                //Creates entity data and places it at starting position
+                var entity = Entity.Resolve(obj);
+
+                //Prepares to add the entity to the world
+                Map.Instance.AddEntity(entity);
+            }
+        }
     }
     public readonly struct AccountList : IIncomingPacket {
         public S2CPacketId Id => S2CPacketId.AccountList;
@@ -556,18 +568,30 @@ namespace Networking.Tcp
         public readonly int WorldId;
         public readonly string Email;
         public readonly string Password;
-        public Hello(string version, int worldId, string email, string password)
+        public readonly short CharId;
+        public readonly bool CreateChar;
+        public readonly short CharType;
+        public readonly short SkinType;
+        public Hello(string version, int worldId, string email, string password, short charId, bool createChar, short charType, short skinType)
         {
             GameVersion = version;
             WorldId = worldId;
             Email = email;
             Password = password;
+            CharId = charId;
+            CreateChar = createChar;
+            CharType = charType;
+            SkinType = skinType;
         }
         public void Write(PacketWriter wtr) {
             wtr.Write(GameVersion);
             wtr.Write(WorldId);
             wtr.Write(Email);
             wtr.Write(Password);
+            wtr.Write(CharId);
+            wtr.Write(CreateChar);
+            wtr.Write(CharType);
+            wtr.Write(SkinType);
         }
     }
     public readonly struct GuildRemove : IOutgoingPacket

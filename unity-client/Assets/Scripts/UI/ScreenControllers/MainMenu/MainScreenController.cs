@@ -12,6 +12,7 @@ namespace UI {
         [SerializeField] private LoggedInWidget _loggedInWidget;
         public GameObject Object { get => gameObject; }
         public void Reset(object data = null) {
+            ViewManager.SetBackgroundVisiblity(true);
             Requests.OnLoginResult += OnLogin;
 
             _playButton.onClick.AddListener(OnPlay);

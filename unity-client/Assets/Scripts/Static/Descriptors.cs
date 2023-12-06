@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Xml.Linq;
 using UnityEditor;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace Static
@@ -18,7 +16,8 @@ namespace Static
         public readonly string Group;
 
         public readonly bool Static;
-        public readonly string Class;
+        public readonly ObjectType Class;
+        public readonly GameObjectType ObjectClass;
         public readonly bool BlocksSight;
 
         public readonly bool OccupySquare;
@@ -73,7 +72,10 @@ namespace Static
             Group = e.ParseString("Group");
 
             Static = e.ParseBool("Static");
-            Class = e.ParseString("Class");
+
+            Class = e.ParseEnum("Class", ObjectType.GameObject);
+            ObjectClass = ParseObjectClass(Class);
+
             BlocksSight = e.ParseBool("BlocksSight");
 
             OccupySquare = e.ParseBool("OccupySquare");
@@ -144,6 +146,19 @@ namespace Static
 #endif
                 Projectiles[desc.BulletType] = desc;
             }*/
+        }
+
+        public GameObjectType ParseObjectClass(ObjectType type)
+        {
+            return type switch
+            {
+                ObjectType.Player => GameObjectType.Player,
+                ObjectType.Projectile => GameObjectType.Projectile,
+                ObjectType.CharacterChanger or ObjectType.ConnectedWall or ObjectType.Container or ObjectType.GuildChronicle or ObjectType.GuildHallPortal or ObjectType.GuildRegister or ObjectType.GuildMerchant or ObjectType.GuildBoard or ObjectType.MarketObject or ObjectType.Merchant or ObjectType.NameChanger or ObjectType.OneWayContainer or ObjectType.Portal or ObjectType.ReskinVendor or ObjectType.VaultChest or ObjectType.PetUpgrader => GameObjectType.Interactive,
+                //Static, Define 3d Model in XML else it uses sprite
+                ObjectType.Wall or ObjectType.Stalagmite or ObjectType.CaveWall or ObjectType.Sign => GameObjectType.Static,
+                _ => GameObjectType.Entity,
+            };
         }
     }
 

@@ -22,7 +22,7 @@ namespace Account
         public static int CurrentCharId;
         public static int AccountId;
         public static int MaxCharacters;
-        public static int NextCharId;
+        public static short NextCharId;
 
         public static bool SignedIn;
         public static string PlayerName = UndefinedName;
@@ -65,7 +65,7 @@ namespace Account
         public static void LoadFromCharList(XElement data) {
             _Characters.Clear();
             MaxCharacters = data.ParseInt("@maxNumChars");
-            NextCharId = data.ParseInt("@nextCharId");
+            NextCharId = (short)data.ParseInt("@nextCharId");
             ParseAccountXml(data.Element("Account"));
             _Characters.Clear();
             foreach (var charXml in data.Elements("Char")) {

@@ -12,9 +12,9 @@ public class NewCharacterRect : MonoBehaviour
     [SerializeField] private TMP_Text _nameText;
     [SerializeField] private Image _charImage;
     [SerializeField] private Button _button;
-    private ushort _classType;
+    private short _classType;
     public void Init(PlayerDesc desc) {
-        _classType = desc.Type;
+        _classType = (short)desc.Type;
         _nameText.text = desc.DisplayId;
         _charImage.sprite = desc.TextureData.GetTexture(0);
     }
