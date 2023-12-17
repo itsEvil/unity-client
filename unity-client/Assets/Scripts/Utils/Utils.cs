@@ -1,3 +1,4 @@
+using Networking.Web;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -22,4 +23,6 @@ public static class Utils
     public static void Error(string msg, params object[] objs) {
         Debug.LogErrorFormat(msg, objs);
     }
+    public static void Enqueue(this IWebRequest request)
+       => WebController.WorkQueue.Enqueue(new WebWork(request));
 }

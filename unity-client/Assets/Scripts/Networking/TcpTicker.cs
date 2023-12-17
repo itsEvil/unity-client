@@ -6,6 +6,9 @@ using System.Net.Sockets;
 using System.Net;
 using System;
 using System.Threading.Tasks;
+using System.Buffers.Binary;
+using System.Text;
+using UnityEditor.Experimental.Rendering;
 
 namespace Networking {
     public enum SocketEventState {
@@ -14,7 +17,10 @@ namespace Networking {
     }
 
     public static class TcpTicker {
-        private const int BUFFER_SIZE = 0x50000;
+
+        private const int LENGTH_PREFIX = 2;
+
+        private const int BUFFER_SIZE = ushort.MaxValue;
         private const int PREFIX_LENGTH = 5;
         private const int PREFIX_LENGTH_WITH_ID = PREFIX_LENGTH - 1;
 
@@ -43,7 +49,8 @@ namespace Networking {
                 _socket.NoDelay = true;
                 _socket.Blocking = false;
             }
-            catch (Exception) {
+            catch (Exception e) {
+                Utils.Error("FailedToConnectViaTcp {0}\n{1}", e.Message, e.StackTrace);
                 //ViewManager.Instance.ChangeView(View.Menu);
                 return;
             }
@@ -103,34 +110,69 @@ namespace Networking {
         }
 
         // called on worker thread
-        private static void StartSend() {
-            switch (_Send.State) {
-                case SocketEventState.Awaiting:
-                    if (_pending.TryDequeue(out var packet)) {
-                        using (var wtr = new PacketWriter(new MemoryStream())) {
-                            //Debug.Log($"TcpTicker::SentPacket::{packet.Id}");
-                            wtr.Write((byte)packet.Id);
-                            packet.Write(wtr);
+        private static async void StartSend() {
+            if (!_socket.Connected)
+                return;
 
-                            var bytes = ((MemoryStream)wtr.BaseStream).ToArray();
-                            _Send.PacketBytes = bytes;
-                            _Send.PacketLength = bytes.Length;
-                        }
-                        _Send.State = SocketEventState.InProgress;
-                        StartSend();
-                    }
-                    break;
-                case SocketEventState.InProgress:
-                    Buffer.BlockCopy(_Send.PacketBytes, 0, _Send.Data, PREFIX_LENGTH_WITH_ID, _Send.PacketLength);
-                    Buffer.BlockCopy(BitConverter.GetBytes(IPAddress.HostToNetworkOrder(_Send.PacketLength + PREFIX_LENGTH_WITH_ID)), 0, _Send.Data, 0, PREFIX_LENGTH_WITH_ID);
-                    var written = _socket.Send(_Send.Data, _Send.BytesWritten, _Send.PacketLength + PREFIX_LENGTH_WITH_ID - _Send.BytesWritten, SocketFlags.None);
-                    if (written < _Send.PacketLength + PREFIX_LENGTH_WITH_ID)
-                        _Send.BytesWritten += written;
-                    else
-                        _Send.Reset();
-                    StartSend();
-                    break;
+            while(_pending.TryDequeue(out var packet)) {
+                using (var wtr = new PacketWriter(new MemoryStream())) {
+                    wtr.Write((byte)0);
+                    wtr.Write((byte)0);
+                    packet.Write(wtr);
+                    var bytes = ((MemoryStream)wtr.BaseStream).ToArray();
+                    _Send.PacketBytes = bytes;
+                    _Send.PacketLength = bytes.Length;
+                }
+
+                //Buffer.BlockCopy(_Send.PacketBytes, 0, _Send.Data, PREFIX_LENGTH_WITH_ID, _Send.PacketLength);
+                //Buffer.BlockCopy(BitConverter.GetBytes(IPAddress.HostToNetworkOrder(_Send.PacketLength + PREFIX_LENGTH_WITH_ID)), 0, _Send.Data, 0, PREFIX_LENGTH_WITH_ID);
+
+                try
+                {
+                    Utils.Log($"Sending packet {(C2SPacketId)_Send.PacketBytes.AsSpan()[LENGTH_PREFIX]} {_Send.PacketBytes.AsSpan()[LENGTH_PREFIX]} {_Send.PacketLength}");
+                    BinaryPrimitives.WriteUInt16LittleEndian(_Send.PacketBytes.AsSpan(), (ushort)(_Send.PacketLength - LENGTH_PREFIX));
+                    
+                    StringBuilder sb = new();
+                    foreach(var bytes in _Send.PacketBytes) 
+                        sb.Append('[').Append(bytes).Append(']');
+                
+                    Utils.Log("Sending | Length: {0} Bytes: {1}", _Send.PacketLength, sb.ToString());
+                    
+                    _ = await _socket.SendAsync(new ArraySegment<byte>(_Send.PacketBytes, 0, _Send.PacketLength), SocketFlags.None);
+                }
+                catch (Exception e)
+                {
+                    //Disconnect();
+                    Utils.Error("Send Error {0}", e);
+                }
             }
+            //switch (_Send.State) {
+            //    case SocketEventState.Awaiting:
+            //        if (_pending.TryDequeue(out var packet)) {
+            //            using (var wtr = new PacketWriter(new MemoryStream())) {
+            //                Utils.Log($"TcpTicker::SentPacket::{packet.Id}");
+            //                wtr.Write((byte)packet.Id);
+            //                packet.Write(wtr);
+            //
+            //                var bytes = ((MemoryStream)wtr.BaseStream).ToArray();
+            //                _Send.PacketBytes = bytes;
+            //                _Send.PacketLength = bytes.Length;
+            //            }
+            //            _Send.State = SocketEventState.InProgress;
+            //            StartSend();
+            //        }
+            //        break;
+            //    case SocketEventState.InProgress:
+            //        Buffer.BlockCopy(_Send.PacketBytes, 0, _Send.Data, PREFIX_LENGTH_WITH_ID, _Send.PacketLength);
+            //        Buffer.BlockCopy(BitConverter.GetBytes(IPAddress.HostToNetworkOrder(_Send.PacketLength + PREFIX_LENGTH_WITH_ID)), 0, _Send.Data, 0, PREFIX_LENGTH_WITH_ID);
+            //        var written = _socket.Send(_Send.Data, _Send.BytesWritten, _Send.PacketLength + PREFIX_LENGTH_WITH_ID - _Send.BytesWritten, SocketFlags.None);
+            //        if (written < _Send.PacketLength + PREFIX_LENGTH_WITH_ID)
+            //            _Send.BytesWritten += written;
+            //        else
+            //            _Send.Reset();
+            //        StartSend();
+            //        break;
+            //}
         }
 
         // called on worker thread
@@ -195,7 +237,7 @@ namespace Networking {
             public SocketEventState State;
             public readonly byte[] Data;
             public SendState() {
-                Data = new byte[0x10000];
+                Data = new byte[ushort.MaxValue];
             }
             public void Reset() {
                 State = SocketEventState.Awaiting;

@@ -3,31 +3,30 @@ using Game;
 using Static;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Xml.Linq;
 using UnityEngine;
 
 public class Entity : MonoBehaviour, IDisposable {
-    [SerializeField] private string _name;
+    [SerializeField] protected SpriteRenderer Renderer;
     public GameObjectType Type = GameObjectType.Entity;
+
     public int Id;
     public bool Dead;
     public bool IsInteractive;
-    public Vec2 Position;
-    public int Hp;
-    public int MaxHp;
-    public int Size;
-    public string Name;
-    public int SinkLevel;
-
-    public ushort[] Inventory;
-    public ObjectDesc Desc;
+    protected Vec2 Position;
+    protected int Hp;
+    protected int MaxHp;
+    protected int Size;
+    protected string Name;
+    protected int SinkLevel;
+    protected ushort[] Inventory;
+    protected ObjectDesc Desc;
     public virtual void Init(ObjectDesc desc) {
         Desc = desc;
         Inventory = new ushort[8];
+        Renderer.sprite = desc.TextureData.GetTexture(0);
     }
     public virtual void AddToWorld() {
-
+        
     }
     public virtual bool Tick() {
         return !Dead;
@@ -81,4 +80,9 @@ public class Entity : MonoBehaviour, IDisposable {
 
         return entity;
     }
+    public ushort[] GetInventory() => Inventory;
+    public int GetHp() => Hp;
+    public int GetMaxHp() => MaxHp;
+    public void SetPosition(Vec2 position) => Position = position;
+    public Vec2 GetPosition() => Position;
 }

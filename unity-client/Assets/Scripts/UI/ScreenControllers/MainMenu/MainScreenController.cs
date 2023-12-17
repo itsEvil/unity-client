@@ -5,16 +5,16 @@ using UnityEngine;
 using UnityEngine.UI;
 namespace UI {
     public class MainScreenController : MonoBehaviour, IScreen {
+        public static MainScreenController Instance { get; private set; }
         [SerializeField] private TMP_Text _errorText;
         [SerializeField] private Button _playButton;
         [SerializeField] private LoginWidget _loginWidget;
         [SerializeField] private RegisterWidget _registerWidget;
         [SerializeField] private LoggedInWidget _loggedInWidget;
         public GameObject Object { get => gameObject; }
+        private void Awake() => Instance = this;
         public void Reset(object data = null) {
             ViewManager.SetBackgroundVisiblity(true);
-            Requests.OnLoginResult += OnLogin;
-
             _playButton.onClick.AddListener(OnPlay);
 
             _loginWidget.Reset(this);
@@ -56,7 +56,6 @@ namespace UI {
         public void Hide() {
             _errorText.gameObject.SetActive(false);
             _playButton.interactable = false;
-            Requests.OnLoginResult -= OnLogin;
 
             _playButton.onClick.RemoveAllListeners();
             _loginWidget.Hide();

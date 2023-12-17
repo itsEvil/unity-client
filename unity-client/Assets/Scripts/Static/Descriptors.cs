@@ -447,6 +447,24 @@ namespace Static
                 DX = e.Element("Animate").ParseFloat("@dx") / 1000f;
                 DY = e.Element("Animate").ParseFloat("@dy") / 1000f;
             }
+
+            TextureData = new TextureData(e);
+            BlendPriority = e.ParseInt("BlendPriority", -1);
+            CompositePriority = e.ParseInt("CompositePriority");
+            if (HasEdge = e.Element("Edge") != null)
+            {
+                EdgeTextureData = new TextureData(e.Element("Edge"));
+                if (e.Element("Corner") != null)
+                {
+                    CornerTextureData = new TextureData(e.Element("Corner"));
+                }
+                if (e.Element("InnerCorner") != null)
+                {
+                    InnerCornerTextureData = new TextureData(e.Element("InnerCorner"));
+                }
+            }
+
+            SameTypeEdgeMode = e.ParseBool("SameTypeEdgeMode");
         }
 
         public Sprite[] GetEdges() {

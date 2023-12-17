@@ -41,11 +41,12 @@ namespace Game {
             Instance = this;
 
             var prefabs = new Dictionary<GameObjectType, Entity>();
-            foreach (var entity in Resources.LoadAll<Entity>("Prefabs/Entities"))
+            foreach (var entity in Resources.LoadAll<Entity>("Prefabs/Entities")) {
+                Utils.Log("Loaded prefab: {0}", entity.name);
                 prefabs[Enum.Parse<GameObjectType>(entity.name)] = entity;
+            }
             EntityPool = new(prefabs, _entityContainer);
         }
-
         public void OnEnable() {
             Dispose();
         }
@@ -150,7 +151,8 @@ namespace Game {
             //}
 
             while (MovesRequested > 0) {
-                TcpTicker.Send(new Move(GameTime.Time, PacketHandler.Instance.TickTime, MyPlayer.Position.x, MyPlayer.Position.y, PacketHandler.Instance.History));
+                var pos = MyPlayer.GetPosition();
+                TcpTicker.Send(new Move(GameTime.Time, PacketHandler.Instance.TickTime, pos.x, pos.y, PacketHandler.Instance.History));
                 MyPlayer.OnMove();
                 MovesRequested--;
             }

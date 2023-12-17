@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public sealed class Interactive : Entity
+public sealed class Projectile : Entity
 {
     public override void Init(ObjectDesc desc) {
         base.Init(desc);

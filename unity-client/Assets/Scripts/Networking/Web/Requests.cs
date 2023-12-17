@@ -10,8 +10,6 @@ namespace Networking.Web
 {
     public static class Requests
     {
-        public static Action<bool> OnLoginResult;
-
         /// <summary>
         /// Send Verify Request, Automatically sends CharListRequest if Successful
         /// </summary>

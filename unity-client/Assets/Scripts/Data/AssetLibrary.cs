@@ -23,6 +23,7 @@ namespace Data {
         public static void AddAnimations(Texture2D texture, SpriteSheetData data) {
             if (!Animations.ContainsKey(data.Id))
                 Animations[data.Id] = new List<CharacterAnimation>();
+
             try {
                 for (var y = texture.height; y >= 0; y -= data.AnimationHeight) {
                     for (var x = 0; x < data.AnimationWidth; x += data.AnimationWidth) {
@@ -107,17 +108,31 @@ namespace Data {
         }
 
         public static Sprite GetImage(string sheetName, int index) {
-            try {
-                return Images[sheetName][index];
-            }
-            catch (Exception e) {
-                Debug.LogError($"Sheet name {sheetName} index {index} Error {e}");
+            if(!Images.TryGetValue(sheetName, out var list)) {
+                Utils.Error("Sheet name {0} not found", sheetName);
                 return Images["ErrorTexture"][0];
             }
+
+            if(index > list.Count) {
+                Utils.Error("{0} is out of bounds {1}", index, list.Count);
+                return Images["ErrorTexture"][0];
+            }
+
+            return list[index];
         }
 
         public static CharacterAnimation GetAnimation(string sheetName, int index) {
-            return Animations[sheetName][index];
+            if(!Animations.TryGetValue(sheetName, out var list)) {
+                Utils.Error("{0} not found", sheetName);
+                return Animations["ErrorAnimation"][0];
+            }
+
+            if(index > list.Count) {
+                Utils.Error("{0} is out of bounds {1}", index, list.Count);
+                return Animations["ErrorAnimation"][0];
+            }
+
+            return list[index];
         }
 
         //public static GameObject GetModel(string modelName)
@@ -174,13 +189,17 @@ namespace Data {
                 return -1;
             }
 
-            if (entity is Player plr) {
-                for (int i = 0; i < plr.Inventory.Length; i++) {
-                    if (plr.SlotTypes[i] == slotType)
-                        return i; //we found a slot that matches the item slotType
-                }
+            if (entity is not Player plr)
+                return -1;
+
+            var slots = plr.SlotTypes.AsSpan();
+
+            for (int i = 0; i < slots.Length; i++) {
+                if (slots[i] == slotType)
+                    return i; //we found a slot that matches the item slotType
             }
-            return -1; //no slot found
+
+            return -1; //not found
         }
     }
 }

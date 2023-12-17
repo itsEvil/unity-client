@@ -49,7 +49,7 @@ namespace UI {
             }
 
             d.Cancel = true;
-            Requests.TryLogin(email, pass);
+            Requests.TryLogin(email, EncryptionUtils.ToSHA256(pass));
         }
         public void SetButtonFunctionality(bool val) {
             //_loginButton.interactable = val;

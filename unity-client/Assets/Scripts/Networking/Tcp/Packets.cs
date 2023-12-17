@@ -433,48 +433,66 @@ namespace Networking.Tcp
         {
 
         }
-        public void Handle() { }
+        public void Handle() { 
+        
+        }
     }
     #endregion
     #region Outgoing
     public readonly struct JoinGuild : IOutgoingPacket {
         public C2SPacketId Id => C2SPacketId.JoinGuild;
-        public void Write(PacketWriter wtr) { }
+        public void Write(PacketWriter wtr) {
+            wtr.Write((byte)Id);
+        }
     }
     public readonly struct ChooseName : IOutgoingPacket
     {
         public C2SPacketId Id => C2SPacketId.ChooseName;
-        public void Write(PacketWriter wtr) { }
+        public void Write(PacketWriter wtr) {
+            wtr.Write((byte)Id);
+        }
     }
     public readonly struct UsePortal : IOutgoingPacket
     {
         public C2SPacketId Id => C2SPacketId.UsePortal;
-        public void Write(PacketWriter wtr) { }
+        public void Write(PacketWriter wtr) {
+            wtr.Write((byte)Id);
+        }
     }
     public readonly struct UseItem : IOutgoingPacket
     {
         public C2SPacketId Id => C2SPacketId.UseItem;
-        public void Write(PacketWriter wtr) { }
+        public void Write(PacketWriter wtr) {
+            wtr.Write((byte)Id);
+        }
     }
     public readonly struct UpdateAck : IOutgoingPacket
     {
         public C2SPacketId Id => C2SPacketId.UpdateAck;
-        public void Write(PacketWriter wtr) { }
+        public void Write(PacketWriter wtr) {
+            wtr.Write((byte)Id);
+        }
     }
     public readonly struct UnknownOut: IOutgoingPacket
     {
         public C2SPacketId Id => C2SPacketId.Unknown;
-        public void Write(PacketWriter wtr) { }
+        public void Write(PacketWriter wtr) {
+            wtr.Write((byte)Id);
+        }
     }
     public readonly struct Teleport : IOutgoingPacket
     {
         public C2SPacketId Id => C2SPacketId.Teleport;
-        public void Write(PacketWriter wtr) { }
+        public void Write(PacketWriter wtr) {
+            wtr.Write((byte)Id);
+        }
     }
     public readonly struct SquareHit: IOutgoingPacket
     {
         public C2SPacketId Id => C2SPacketId.SquareHit;
-        public void Write(PacketWriter wtr) { }
+        public void Write(PacketWriter wtr) {
+            wtr.Write((byte)Id);
+        }
     }
     public readonly struct ShootAck : IOutgoingPacket
     {
@@ -501,6 +519,7 @@ namespace Networking.Tcp
             Time = time;
         }
         public void Write(PacketWriter wtr) {
+            wtr.Write((byte)Id);
             wtr.Write(Serial);
             wtr.Write(Time);
         }
@@ -542,6 +561,7 @@ namespace Networking.Tcp
             History = history;
         }
         public void Write(PacketWriter wtr) {
+            wtr.Write((byte)Id);
             wtr.Write(TickId);
             wtr.Write(TickTime);
             wtr.Write(X);
@@ -584,6 +604,7 @@ namespace Networking.Tcp
             SkinType = skinType;
         }
         public void Write(PacketWriter wtr) {
+            wtr.Write((byte)Id);
             wtr.Write(GameVersion);
             wtr.Write(WorldId);
             wtr.Write(Email);

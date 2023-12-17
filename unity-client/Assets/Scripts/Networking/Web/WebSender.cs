@@ -24,7 +24,7 @@ namespace Networking.Web
                 Utils.Log("HandlingResponse::DataType::{0}", dataType);
                 
                 var textResponse = await response.Content.ReadAsStringAsync();
-                Utils.Log("HandlingResponse::{0}::{1}::{2}", response.StatusCode, response.Content, textResponse);
+                Utils.Log("HandlingResponse::{0}::{1}", response.StatusCode, textResponse);
 
                 if (!response.IsSuccessStatusCode) {
                     Utils.Error($"HandlingResponse::Error::{textResponse}");
@@ -54,8 +54,7 @@ namespace Networking.Web
         }
 
         public string ResultToString() {
-            return
-                Result switch
+            return Result switch
             {
                 WebResult.Success => nameof(WebResult.Success),
                 WebResult.FailedToConnect => nameof(WebResult.FailedToConnect),

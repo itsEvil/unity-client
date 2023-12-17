@@ -53,7 +53,7 @@ namespace UI {
             }
 
             d.Cancel = true;
-            Requests.TryRegister(email, pass, name);
+            Requests.TryRegister(email, EncryptionUtils.ToSHA256(pass), name);
         }
         /// <summary>
         /// Switches back to Login Widget

@@ -26,7 +26,7 @@ namespace Game {
             if (queue.Count > 0)
                 return queue.Dequeue();
 
-            //Debug.Log($"Loading entity type [{type}]");
+            Debug.Log($"Instantiating object [{type}]");
             var entity = Object.Instantiate(_entityPrefabs[type], _wrapperParent);
             return entity;
         }

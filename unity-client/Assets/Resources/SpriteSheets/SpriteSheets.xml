@@ -2,6 +2,11 @@
 	<Sheet id="ErrorTexture">
 		<ImageSize>8x8</ImageSize>
 	</Sheet>
+	<Sheet id="ErrorAnimation">
+		<ImageSize>8x8</ImageSize>
+		<AnimationSize>48x8</AnimationSize>
+		<StartDirection>Right</StartDirection>
+	</Sheet>
 	<Sheet id="Bars">
 		<ImageSize>24x8</ImageSize>
 	</Sheet>

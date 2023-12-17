@@ -3,7 +3,7 @@ using Static;
 public sealed class Player : Entity {
     public const int MaxLevel = 20;
 
-    private bool _isMyPlayer = false;
+    public bool IsMyPlayer = false;
 
     public int CurrentExp;
     public int NextLevelExp;
@@ -35,7 +35,7 @@ public sealed class Player : Entity {
     /// </summary>
     public override void Init(ObjectDesc desc) {
         base.Init(desc);
-        _isMyPlayer = false;
+        IsMyPlayer = false;
         SlotTypes = new ItemType[Inventory.Length];
         Type = GameObjectType.Player;
     }
@@ -45,7 +45,7 @@ public sealed class Player : Entity {
     public void OnMyPlayer() {
         var charStats = AccountData.Characters[AccountData.CurrentCharId];
         Inventory = charStats.Inventory;
-        _isMyPlayer = true;
+        IsMyPlayer = true;
     }
     public override void UpdateStat(StatType stat, object value) {
         base.UpdateStat(stat, value);

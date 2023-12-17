@@ -38,7 +38,7 @@ namespace Account
         public static ReadOnlyCollection<NewsInfos> News = new(_News);
 
         public static string GetEmail() => _email;
-        public static string GetPassword() => EncryptionUtils.ToSHA256(_password);
+        public static string GetPassword() => _password;
         /// <summary>
         /// Try login on startup with saved data
         /// </summary>
@@ -63,6 +63,7 @@ namespace Account
             PlayerPrefs.SetString(PASSWORD_KEY, GetPassword());
         }
         public static void LoadFromCharList(XElement data) {
+            Utils.Log("Loading char list data");
             _Characters.Clear();
             MaxCharacters = data.ParseInt("@maxNumChars");
             NextCharId = (short)data.ParseInt("@nextCharId");
@@ -76,6 +77,7 @@ namespace Account
             foreach (var newsItem in news.Elements("Item")) {
                 _News.Add(new NewsInfos(newsItem));
             }
+            Utils.Log("Finished char list data");
         }
 
         private static void ParseAccountXml(XElement xml) {

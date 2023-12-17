@@ -2,9 +2,11 @@ using Account;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using UI;
 
 namespace Networking.Web {
     public class RegisterHandler : IWebRequest {
+        public WebResponse Response { get; set; }
         private readonly string _email;
         private readonly string _pass;
         private readonly string _playerName;
@@ -13,9 +15,6 @@ namespace Networking.Web {
             _playerName = playerName;
             _pass = password;
         }
-        public void Enqueue() {
-            WebController.WorkQueue.Enqueue(new WebWork(this));
-        }
         public async Task SendAsync() {
             var dict = new Dictionary<string, string>() {
                 { WebConstants.Email, _email },
@@ -23,19 +22,22 @@ namespace Networking.Web {
                 { WebConstants.Username, _playerName },
             };
 
-            var result = await WebSender.SendWebRequest(WebConstants.ACCOUNT_REGISTER, dict);
+            Response = await WebSender.SendWebRequest(WebConstants.ACCOUNT_REGISTER, dict);
 
-            OnRegisterRequestComplete(result);
+            int attempts = 0;
+            while (Response.Result != WebResult.Success && attempts < 2) {
+                Response = await WebSender.SendWebRequest(WebConstants.ACCOUNT_REGISTER, dict);
+                attempts++;
+            }
         }
-
-        private void OnRegisterRequestComplete(WebResponse result) {
-            if (result.Result == WebResult.Success) {
+        public void OnComplete(WebResponse response) {
+            if (response.Result == WebResult.Success) {
                 AccountData.OnSuccessfulLogin(_email, _pass);
                 new CharListHandler().Enqueue();
+                return;
             }
-            else {
-                Requests.OnLoginResult?.Invoke(false);
-            }
+
+            MainScreenController.Instance.OnLogin(false);
         }
     }
 }

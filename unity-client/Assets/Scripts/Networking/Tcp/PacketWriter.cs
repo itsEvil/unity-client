@@ -39,10 +39,10 @@ namespace Networking.Tcp
         public override void Write(string value)
         {
             var data = Encoding.UTF8.GetBytes(value);
-            Write((short)data.Length);
+            Write((ushort)value.Length);
+            //Write((short)data.Length);
             base.Write(data);
         }
-
         public void WriteUTF32(string value)
         {
             Write(value.Length);

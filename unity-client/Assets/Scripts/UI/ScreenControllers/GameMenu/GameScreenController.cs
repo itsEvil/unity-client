@@ -6,14 +6,12 @@ using UnityEngine.UI;
 namespace UI {
     public class GameScreenController : MonoBehaviour, IScreen {
         public static GameScreenController Instance { get; private set; }
-        [SerializeField] private Button _menuButton;
         [SerializeField] private StatsWidget _statsWidget;
         [SerializeField] private MinimapWidget _minimapWidget;
         public GameObject Object { get => gameObject; }
         private void Awake() => Instance = this;
         public void Reset(object data = null) {
             ViewManager.SetBackgroundVisiblity(false);
-            _menuButton.onClick.AddListener(OnMenu);
 
             if(data == null) {
                 ViewManager.ChangeView(View.Menu);
@@ -33,7 +31,6 @@ namespace UI {
         }
         public void Hide() {
             PacketHandler.Instance?.Stop();
-            _menuButton.onClick.RemoveAllListeners();
             _minimapWidget.gameObject.SetActive(false);
             _statsWidget.gameObject.SetActive(false);
         }
@@ -42,6 +39,11 @@ namespace UI {
         }
 
         void Update() {
+            if (Input.GetKeyDown(KeyCode.Escape)) {
+                OnMenu();
+                return;
+            }
+
             if (Map.MyPlayer == null)
                 return;
 

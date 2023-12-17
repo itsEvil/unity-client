@@ -93,6 +93,8 @@ namespace Static
 
         private static Dictionary<Action, Sprite[]> GetDirection(List<Sprite> frames, int offset, bool mirror)
         {
+            Utils.Log("Frames {0}", frames.Count);
+
             var ret = new Dictionary<Action, Sprite[]>();
 
             var stand = mirror ? frames[offset].Mirror() : frames[offset];
@@ -100,7 +102,7 @@ namespace Static
             var walk2 = mirror ? frames[offset + 2].Mirror() : frames[offset + 2];
             var attack1 = mirror ? frames[offset + 4].Mirror() : frames[offset + 4];
             var attack2 = frames[offset + 5];
-            var attackBit = frames[offset + 6];
+            //var attackBit = frames[offset + 6];
 
             var standAnim = new Sprite[]
             {

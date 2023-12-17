@@ -12,6 +12,7 @@ namespace Networking.Web
         public static Queue<WebWork> WorkQueue = new();
         private static readonly List<Task> _tasksList = new(16);
         private static CancellationTokenSource _tokenSource = new();
+        private static List<WebWork> _queueToReAdd = new(16);
         public static void Init() {
             _tokenSource.Cancel();
             WorkQueue.Clear();
@@ -23,7 +24,11 @@ namespace Networking.Web
         /// Called ONLY on Network thread
         /// </summary>
         public static async void Tick() {
+            if (WorkQueue.Count == 0)
+                return;
+
             _tasksList.Clear();
+            _queueToReAdd.Clear();
 
             if (_tokenSource.Token.IsCancellationRequested)
                 return;
@@ -34,12 +39,21 @@ namespace Networking.Web
                     return;
 
                 _tasksList.Add(work.Handler.SendAsync());
+                _queueToReAdd.Add(work);
             }
 
             if (_tokenSource.Token.IsCancellationRequested)
                 return;
 
+            Utils.Log("Awaiting {0} WebTasks", _tasksList.Count);
             await Task.WhenAll(_tasksList);
+            Utils.Log("Done awaiting all WebTasks");
+
+            Utils.Log("Handling all responses");
+            foreach(var work in _queueToReAdd)
+                HttpHandler.ToBeHandled.Enqueue(work);
+
+            Utils.Log("HttpHandler.ToBeHandled.Count: {0}", HttpHandler.ToBeHandled.Count);
         }
         public static void Stop() {
             _tokenSource.Cancel();
@@ -48,8 +62,7 @@ namespace Networking.Web
     public readonly struct WebWork
     {
         public readonly IWebRequest Handler;
-        public WebWork(IWebRequest handler)
-        {
+        public WebWork(IWebRequest handler) {
             Handler = handler;
         }
     }
