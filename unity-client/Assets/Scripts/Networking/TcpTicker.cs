@@ -18,7 +18,7 @@ namespace Networking {
 
     public static class TcpTicker {
 
-        private const int LENGTH_PREFIX = 2;
+        public const int LENGTH_PREFIX = 2;
 
         private const int BUFFER_SIZE = ushort.MaxValue;
         private const int PREFIX_LENGTH = 5;
@@ -115,34 +115,28 @@ namespace Networking {
                 return;
 
             while(_pending.TryDequeue(out var packet)) {
-                using (var wtr = new PacketWriter(new MemoryStream())) {
-                    wtr.Write((byte)0);
-                    wtr.Write((byte)0);
-                    packet.Write(wtr);
-                    var bytes = ((MemoryStream)wtr.BaseStream).ToArray();
-                    _Send.PacketBytes = bytes;
-                    _Send.PacketLength = bytes.Length;
-                }
-
-                //Buffer.BlockCopy(_Send.PacketBytes, 0, _Send.Data, PREFIX_LENGTH_WITH_ID, _Send.PacketLength);
-                //Buffer.BlockCopy(BitConverter.GetBytes(IPAddress.HostToNetworkOrder(_Send.PacketLength + PREFIX_LENGTH_WITH_ID)), 0, _Send.Data, 0, PREFIX_LENGTH_WITH_ID);
+                int ptr = LENGTH_PREFIX;
+                PacketUtils.WriteByte(_Send.Data.AsSpan()[ptr..], (byte)packet.Id, ref ptr);
+                packet.Write(_Send.Data.AsSpan()[(ptr - 3)..], ref ptr);
+                _Send.PacketLength = ptr;
 
                 try
                 {
-                    Utils.Log($"Sending packet {(C2SPacketId)_Send.PacketBytes.AsSpan()[LENGTH_PREFIX]} {_Send.PacketBytes.AsSpan()[LENGTH_PREFIX]} {_Send.PacketLength}");
-                    BinaryPrimitives.WriteUInt16LittleEndian(_Send.PacketBytes.AsSpan(), (ushort)(_Send.PacketLength - LENGTH_PREFIX));
+                    Utils.Log($"Sending packet {(C2SPacketId)_Send.Data[LENGTH_PREFIX]} {_Send.Data[LENGTH_PREFIX]} {_Send.PacketLength}");                    
+                    BinaryPrimitives.WriteUInt16LittleEndian(_Send.Data.AsSpan()[0..], (ushort)_Send.PacketLength); //Length
                     
+                    //Debug data
                     StringBuilder sb = new();
-                    foreach(var bytes in _Send.PacketBytes) 
-                        sb.Append('[').Append(bytes).Append(']');
-                
+                    for(int i = 0; i < _Send.PacketLength; i++)
+                        sb.Append('[').Append(_Send.Data[i]).Append(']');
+                                    
                     Utils.Log("Sending | Length: {0} Bytes: {1}", _Send.PacketLength, sb.ToString());
-                    
-                    _ = await _socket.SendAsync(new ArraySegment<byte>(_Send.PacketBytes, 0, _Send.PacketLength), SocketFlags.None);
+                    //End of Debug
+
+                    _ = await _socket.SendAsync(new ArraySegment<byte>(_Send.Data, 0, _Send.PacketLength), SocketFlags.None);
                 }
-                catch (Exception e)
-                {
-                    //Disconnect();
+                catch (Exception e) {
+                    Stop();
                     Utils.Error("Send Error {0}", e);
                 }
             }

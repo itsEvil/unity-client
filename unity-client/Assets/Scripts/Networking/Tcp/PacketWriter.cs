@@ -36,12 +36,12 @@ namespace Networking.Tcp
             base.Write(b);
         }
 
-        public override void Write(string value)
-        {
+        public override void Write(string value) {
             var data = Encoding.UTF8.GetBytes(value);
             Write((ushort)value.Length);
             //Write((short)data.Length);
             base.Write(data);
+            Utils.Log("Writing String: {0}, {1}, {2}", value, value.Length, data.Length);
         }
         public void WriteUTF32(string value)
         {

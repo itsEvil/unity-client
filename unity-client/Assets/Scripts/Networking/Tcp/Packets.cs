@@ -441,73 +441,81 @@ namespace Networking.Tcp
     #region Outgoing
     public readonly struct JoinGuild : IOutgoingPacket {
         public C2SPacketId Id => C2SPacketId.JoinGuild;
-        public void Write(PacketWriter wtr) {
-            wtr.Write((byte)Id);
+        public void Write(Span<byte> buffer, ref int ptr)
+        {
+
         }
     }
     public readonly struct ChooseName : IOutgoingPacket
     {
         public C2SPacketId Id => C2SPacketId.ChooseName;
-        public void Write(PacketWriter wtr) {
-            wtr.Write((byte)Id);
+        public void Write(Span<byte> buffer, ref int ptr)
+        {
+
         }
     }
     public readonly struct UsePortal : IOutgoingPacket
     {
         public C2SPacketId Id => C2SPacketId.UsePortal;
-        public void Write(PacketWriter wtr) {
-            wtr.Write((byte)Id);
+        public void Write(Span<byte> buffer, ref int ptr)
+        {
+
         }
     }
     public readonly struct UseItem : IOutgoingPacket
     {
         public C2SPacketId Id => C2SPacketId.UseItem;
-        public void Write(PacketWriter wtr) {
-            wtr.Write((byte)Id);
+        public void Write(Span<byte> buffer, ref int ptr)
+        {
+
         }
     }
     public readonly struct UpdateAck : IOutgoingPacket
     {
         public C2SPacketId Id => C2SPacketId.UpdateAck;
-        public void Write(PacketWriter wtr) {
-            wtr.Write((byte)Id);
+        public void Write(Span<byte> buffer, ref int ptr)
+        {
+
         }
     }
     public readonly struct UnknownOut: IOutgoingPacket
     {
         public C2SPacketId Id => C2SPacketId.Unknown;
-        public void Write(PacketWriter wtr) {
-            wtr.Write((byte)Id);
+        public void Write(Span<byte> buffer, ref int ptr)
+        {
+
         }
     }
     public readonly struct Teleport : IOutgoingPacket
     {
         public C2SPacketId Id => C2SPacketId.Teleport;
-        public void Write(PacketWriter wtr) {
-            wtr.Write((byte)Id);
+        public void Write(Span<byte> buffer, ref int ptr)
+        {
+
         }
     }
     public readonly struct SquareHit: IOutgoingPacket
     {
         public C2SPacketId Id => C2SPacketId.SquareHit;
-        public void Write(PacketWriter wtr) {
-            wtr.Write((byte)Id);
+        public void Write(Span<byte> buffer, ref int ptr)
+        {
+
         }
     }
     public readonly struct ShootAck : IOutgoingPacket
     {
         public C2SPacketId Id => C2SPacketId.ShootAck;
-        public void Write(PacketWriter wtr) { }
+        public void Write(Span<byte> buffer, ref int ptr) { }
     }
     public readonly struct Reskin : IOutgoingPacket
     {
         public C2SPacketId Id => C2SPacketId.Reskin;
-        public void Write(PacketWriter wtr) { }
+        public void Write(Span<byte> buffer, ref int ptr) { }
     }
     public readonly struct RequestTrade: IOutgoingPacket
     {
         public C2SPacketId Id => C2SPacketId.RequestTrade;
-        public void Write(PacketWriter wtr) { }
+        public void Write(Span<byte> buffer, ref int ptr) { }
     }
     public readonly struct Pong : IOutgoingPacket
     {
@@ -518,31 +526,33 @@ namespace Networking.Tcp
             Serial = serial;
             Time = time;
         }
-        public void Write(PacketWriter wtr) {
-            wtr.Write((byte)Id);
-            wtr.Write(Serial);
-            wtr.Write(Time);
+        public void Write(Span<byte> buffer, ref int ptr)
+        {
+            //wtr.Write(Serial);
+            //wtr.Write(Time);
+            PacketUtils.WriteInt(buffer, Serial, ref ptr);
+            PacketUtils.WriteLong(buffer, Time, ref ptr);
         }
     }
     public readonly struct PlayerText : IOutgoingPacket
     {
         public C2SPacketId Id => C2SPacketId.PlayerText;
-        public void Write(PacketWriter wtr) { }
+        public void Write(Span<byte> buffer, ref int ptr) { }
     }
     public readonly struct PlayerShoot : IOutgoingPacket
     {
         public C2SPacketId Id => C2SPacketId.PlayerShoot;
-        public void Write(PacketWriter wtr) { }
+        public void Write(Span<byte> buffer, ref int ptr) { }
     }
     public readonly struct PlayerHit : IOutgoingPacket
     {
         public C2SPacketId Id => C2SPacketId.PlayerHit;
-        public void Write(PacketWriter wtr) { }
+        public void Write(Span<byte> buffer, ref int ptr) { }
     }
     public readonly struct OtherHit : IOutgoingPacket
     {
         public C2SPacketId Id => C2SPacketId.OtherHit;
-        public void Write(PacketWriter wtr) { }
+        public void Write(Span<byte> buffer, ref int ptr) { }
     }
     public readonly struct Move : IOutgoingPacket
     {
@@ -560,31 +570,33 @@ namespace Networking.Tcp
             Y = y;
             History = history;
         }
-        public void Write(PacketWriter wtr) {
-            wtr.Write((byte)Id);
-            wtr.Write(TickId);
-            wtr.Write(TickTime);
-            wtr.Write(X);
-            wtr.Write(Y);
-            wtr.Write((ushort)History.Length);
-            for (int i = 0; i < History.Length; i++)
-                History[i].Write(wtr);
+        public void Write(Span<byte> buffer, ref int ptr)
+        {
+            //wtr.Write(TickId);
+            //wtr.Write(TickTime);
+            //wtr.Write(X);
+            //wtr.Write(Y);
+            //wtr.Write((ushort)History.Length);
+            //for (int i = 0; i < History.Length; i++)
+            //    History[i].Write(wtr);
+
         }
     }
     public readonly struct InvSwap : IOutgoingPacket
     {
         public C2SPacketId Id => C2SPacketId.InvSwap;
-        public void Write(PacketWriter wtr) { }
+        public void Write(Span<byte> buffer, ref int ptr) { }
     }
     public readonly struct InvDrop : IOutgoingPacket
     {
         public C2SPacketId Id => C2SPacketId.InvDrop;
-        public void Write(PacketWriter wtr) { }
+        public void Write(Span<byte> buffer, ref int ptr) { }
     }
     public readonly struct Hello : IOutgoingPacket
     {
         public C2SPacketId Id => C2SPacketId.Hello;
-        public readonly string GameVersion;
+        public readonly ushort MajorVersion;
+        public readonly ushort MinorVersion;
         public readonly int WorldId;
         public readonly string Email;
         public readonly string Password;
@@ -592,9 +604,10 @@ namespace Networking.Tcp
         public readonly bool CreateChar;
         public readonly short CharType;
         public readonly short SkinType;
-        public Hello(string version, int worldId, string email, string password, short charId, bool createChar, short charType, short skinType)
+        public Hello(ushort majorVersion, ushort minorVersion, int worldId, string email, string password, short charId, bool createChar, short charType, short skinType)
         {
-            GameVersion = version;
+            MajorVersion = majorVersion;
+            MinorVersion = minorVersion;
             WorldId = worldId;
             Email = email;
             Password = password;
@@ -603,82 +616,93 @@ namespace Networking.Tcp
             CharType = charType;
             SkinType = skinType;
         }
-        public void Write(PacketWriter wtr) {
-            wtr.Write((byte)Id);
-            wtr.Write(GameVersion);
-            wtr.Write(WorldId);
-            wtr.Write(Email);
-            wtr.Write(Password);
-            wtr.Write(CharId);
-            wtr.Write(CreateChar);
-            wtr.Write(CharType);
-            wtr.Write(SkinType);
+        public void Write(Span<byte> buffer, ref int ptr)
+        {
+            //wtr.Write((ushort)MajorVersion);
+            //wtr.Write((ushort)MinorVersion);
+            //wtr.Write(WorldId);
+            //wtr.Write(Email);
+            //wtr.Write(Password);
+            //wtr.Write(CharId);
+            //wtr.Write(CreateChar);
+            //wtr.Write(CharType);
+            //wtr.Write(SkinType);
+
+            PacketUtils.WriteUShort(buffer, MajorVersion, ref ptr);
+            PacketUtils.WriteUShort(buffer, MinorVersion, ref ptr);
+            PacketUtils.WriteInt(buffer, WorldId, ref ptr);
+            PacketUtils.WriteString(buffer, Email, ref ptr);
+            PacketUtils.WriteString(buffer, Password, ref ptr);
+            PacketUtils.WriteShort(buffer, CharId, ref ptr);
+            PacketUtils.WriteBool(buffer, CreateChar, ref ptr);
+            PacketUtils.WriteShort(buffer, CharType, ref ptr);
+            PacketUtils.WriteShort(buffer, SkinType, ref ptr);
         }
     }
     public readonly struct GuildRemove : IOutgoingPacket
     {
         public C2SPacketId Id => C2SPacketId.GuildRemove;
-        public void Write(PacketWriter wtr) { }
+        public void Write(Span<byte> buffer, ref int ptr) { }
     }
     public readonly struct GuildInvite : IOutgoingPacket
     {
         public C2SPacketId Id => C2SPacketId.GuildInvite;
-        public void Write(PacketWriter wtr) { }
+        public void Write(Span<byte> buffer, ref int ptr) { }
     }
     public readonly struct GroundDamage : IOutgoingPacket
     {
         public C2SPacketId Id => C2SPacketId.GroundDamage;
-        public void Write(PacketWriter wtr) { }
+        public void Write(Span<byte> buffer, ref int ptr) { }
     }
     public readonly struct Escape : IOutgoingPacket
     {
         public C2SPacketId Id => C2SPacketId.Escape;
-        public void Write(PacketWriter wtr) { }
+        public void Write(Span<byte> buffer, ref int ptr) { }
     }
     public readonly struct EnemyHit : IOutgoingPacket
     {
         public C2SPacketId Id => C2SPacketId.EnemyHit;
-        public void Write(PacketWriter wtr) { }
+        public void Write(Span<byte> buffer, ref int ptr) { }
     }
     public readonly struct EditAccountList : IOutgoingPacket
     {
         public C2SPacketId Id => C2SPacketId.EditAccountList;
-        public void Write(PacketWriter wtr) { }
+        public void Write(Span<byte> buffer, ref int ptr) { }
     }
     public readonly struct CreateGuild : IOutgoingPacket
     {
         public C2SPacketId Id => C2SPacketId.CreateGuild;
-        public void Write(PacketWriter wtr) { }
+        public void Write(Span<byte> buffer, ref int ptr) { }
     }
     public readonly struct ChangeTrade : IOutgoingPacket
     {
         public C2SPacketId Id => C2SPacketId.ChangeTrade;
-        public void Write(PacketWriter wtr) { }
+        public void Write(Span<byte> buffer, ref int ptr) { }
     }
     public readonly struct ChangeGuildRank : IOutgoingPacket
     {
         public C2SPacketId Id => C2SPacketId.ChangeGuildRank;
-        public void Write(PacketWriter wtr) { }
+        public void Write(Span<byte> buffer, ref int ptr) { }
     }
     public readonly struct CancelTrade : IOutgoingPacket
     {
         public C2SPacketId Id => C2SPacketId.CancelTrade;
-        public void Write(PacketWriter wtr) { }
+        public void Write(Span<byte> buffer, ref int ptr) { }
     }
     public readonly struct Buy : IOutgoingPacket
     {
         public C2SPacketId Id => C2SPacketId.Buy;
-        public void Write(PacketWriter wtr) { }
+        public void Write(Span<byte> buffer, ref int ptr) { }
     }
     public readonly struct AoeAck : IOutgoingPacket
     {
         public C2SPacketId Id => C2SPacketId.AoeAck;
-        public void Write(PacketWriter wtr) { }
+        public void Write(Span<byte> buffer, ref int ptr) { }
     }
     public readonly struct AcceptTrade : IOutgoingPacket
     {
         public C2SPacketId Id => C2SPacketId.AcceptTrade;
-        public void Write(PacketWriter wtr) { }
+        public void Write(Span<byte> buffer, ref int ptr) { }
     }
     #endregion
 }

@@ -36,7 +36,7 @@ public class PacketHandler {
         TcpTicker.Start(this);
         TcpTicker.Send(
             new Hello(
-                Settings.GameVersion, Settings.NexusId, 
+                Settings.MajorBuild, Settings.MinorBuild, Settings.NexusId, 
                 AccountData.GetEmail(), AccountData.GetPassword(), 
                 InitData.CharId, InitData.NewCharacter, 
                 InitData.ClassType, InitData.SkinType));
