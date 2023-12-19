@@ -39,6 +39,8 @@ namespace UI {
         }
 
         void Update() {
+            PacketHandler.Instance.Tick();
+
             if (Input.GetKeyDown(KeyCode.Escape)) {
                 OnMenu();
                 return;
@@ -49,6 +51,13 @@ namespace UI {
 
             _statsWidget.Tick();
             _minimapWidget.Tick();
+        }
+
+        private void OnApplicationQuit() {
+            PacketHandler.Instance.Stop();
+        }
+        private void OnDisable() {
+            Hide();
         }
     }
 }

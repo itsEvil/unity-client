@@ -18,6 +18,7 @@ namespace Networking {
         }
         private static void Tick() {
             while(Running) {
+                Utils.Log("HttpTicker::Tick");
                 try {
                     WebController.Tick();
                 }

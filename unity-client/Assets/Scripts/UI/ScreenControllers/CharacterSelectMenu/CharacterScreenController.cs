@@ -1,6 +1,8 @@
 using Account;
+using Static;
 using System;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.UI;
 namespace UI {
     public class CharacterScreenController : MonoBehaviour, IScreen {
@@ -70,7 +72,7 @@ namespace UI {
                 ViewManager.ChangeView(View.NewCharacter);
                 return;
             }
-            ViewManager.ChangeView(View.Game, id);
+            ViewManager.ChangeView(View.Game, new GameInitData(Settings.NexusId, (short)id, false, 0, 0));
         }
     }
 }

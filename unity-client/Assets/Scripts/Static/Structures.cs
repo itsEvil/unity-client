@@ -516,17 +516,14 @@ namespace Static {
             TotalFame = xml.ParseInt("TotalFame");
         }
     }
-    public struct TileData
-    {
-        public ushort TileType;
-        public short X;
-        public short Y;
-
-        public TileData(PacketReader rdr)
-        {
-            X = rdr.ReadInt16();
-            Y = rdr.ReadInt16();
-            TileType = rdr.ReadUInt16();
+    public readonly struct TileData {
+        public readonly ushort TileType;
+        public readonly short X;
+        public readonly short Y;
+        public TileData(Span<byte> buffer, ref int ptr, int len) {
+            X = PacketUtils.ReadShort(buffer, ref ptr, len);
+            Y = PacketUtils.ReadShort(buffer, ref ptr, len);
+            TileType = PacketUtils.ReadUShort(buffer, ref ptr, len);
         }
     }
     public struct MoveRecord
@@ -545,27 +542,21 @@ namespace Static {
             wtr.Write(Y);
         }
     }
-    public struct ObjectDrop
-    {
-        public int Id;
-        public bool Explode;
-
-        public ObjectDrop(PacketReader rdr)
-        {
-            Id = rdr.ReadInt32();
-            Explode = rdr.ReadBoolean();
+    public readonly struct ObjectDrop {
+        public readonly int Id;
+        public readonly bool Explode;
+        public ObjectDrop(Span<byte> buffer, ref int ptr, int len) {
+            Id = PacketUtils.ReadInt(buffer, ref ptr, len);
+            Explode = PacketUtils.ReadBool(buffer, ref ptr, len);
         }
     }
 
-    public struct ObjectDefinition
-    {
-        public int ObjectType;
-        public ObjectStatus ObjectStatus;
-
-        public ObjectDefinition(PacketReader rdr)
-        {
-            ObjectType = rdr.ReadInt32();
-            ObjectStatus = new ObjectStatus(rdr);
+    public readonly struct ObjectDefinition {
+        public readonly int ObjectType;
+        public readonly ObjectStatus ObjectStatus;
+        public ObjectDefinition(Span<byte> buffer, ref int ptr, int len) {
+            ObjectType = PacketUtils.ReadInt(buffer, ref ptr, len);
+            ObjectStatus = new ObjectStatus(buffer, ref ptr, len);
         }
     }
     public struct SlotObjectData
@@ -573,31 +564,27 @@ namespace Static {
         public int ObjectId;
         public int SlotId;
     }
-    public struct ObjectStatus
-    {
-        public int Id;
-        public Vector3 Position;
-        public Dictionary<StatType, object> Stats;
-
-        public ObjectStatus(PacketReader rdr)
-        {
-            Id = rdr.ReadInt32();
-            Position = new Vector3()
-            {
-                x = rdr.ReadSingle(),
-                y = rdr.ReadSingle(),
+    public readonly struct ObjectStatus {
+        public readonly int Id;
+        public readonly Vector3 Position;
+        public readonly Dictionary<StatType, object> Stats;
+        public ObjectStatus(Span<byte> buffer, ref int ptr, int len) {
+            Id = PacketUtils.ReadInt(buffer, ref ptr, len);
+            Position = new Vector3() {
+                x = PacketUtils.ReadFloat(buffer, ref ptr, len),
+                y = PacketUtils.ReadFloat(buffer, ref ptr, len),
                 z = 0
             };
 
-            var statsCount = rdr.ReadByte();
+            var statsCount = PacketUtils.ReadByte(buffer, ref ptr, len);
             Stats = new Dictionary<StatType, object>();
             for (var i = 0; i < statsCount; i++) {
-                var key = (StatType)rdr.ReadByte();
+                var key = (StatType)PacketUtils.ReadByte(buffer, ref ptr, len);
                 if (IsStringStat(key)) {
-                    Stats[key] = rdr.ReadString();
+                    Stats[key] = PacketUtils.ReadString(buffer, ref ptr, len);
                 }
                 else {
-                    Stats[key] = rdr.ReadInt32();
+                    Stats[key] = PacketUtils.ReadInt(buffer, ref ptr, len);
                 }
             }
         }

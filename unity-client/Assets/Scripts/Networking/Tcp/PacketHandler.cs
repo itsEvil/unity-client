@@ -43,7 +43,7 @@ public class PacketHandler {
     }
 
     public void Stop() {
-        TcpTicker.Stop();
+        TcpTicker.Stop(nameof(PacketHandler));
     }
 
     public void Tick() {
@@ -63,8 +63,8 @@ public class PacketHandler {
         _toBeHandled.Enqueue(packet);
     }
 
-    public void ReadPacket(S2CPacketId id, byte[] data) {
-        var packet = CreatePacket(id, data);
+    public void ReadPacket(S2CPacketId id, Span<byte> data, ref int ptr, int len) {
+        var packet = CreatePacket(id, data, ref ptr, len);
 
         if (packet == null)
             return;
@@ -74,69 +74,68 @@ public class PacketHandler {
         AddPacket(packet);
     }
 
-    private IIncomingPacket CreatePacket(S2CPacketId id, byte[] data) {
+    private IIncomingPacket CreatePacket(S2CPacketId id, Span<byte> data, ref int ptr, int len) {
         IIncomingPacket packet = null;
-        using var rdr = new PacketReader(new MemoryStream(data));
         switch (id) {
             case S2CPacketId.Failure:
-                packet = new Failure(rdr);
+                packet = new Failure(data, ref ptr, len);
                 break;
             case S2CPacketId.CreateSuccess:
-                packet = new CreateSuccess(rdr);
+                packet = new CreateSuccess(data, ref ptr, len);
                 break;
             case S2CPacketId.Text:
-                packet = new Text(rdr);
+                packet = new Text(data, ref ptr, len);
                 break;
             case S2CPacketId.ServerPlayerShoot:
-                packet = new ServerPlayerShoot(rdr);
+                packet = new ServerPlayerShoot(data, ref ptr, len);
                 break;
             case S2CPacketId.Damage:
-                packet = new Damage(rdr);
+                packet = new Damage(data, ref ptr, len);
                 break;
             case S2CPacketId.Notification:
-                packet = new Notification(rdr);
+                packet = new Notification(data, ref ptr, len);
                 break;
             case S2CPacketId.NewTick:
-                packet = new NewTick(rdr);
+                packet = new NewTick(data, ref ptr, len);
                 break;
             case S2CPacketId.ShowEffect:
-                packet = new ShowEffect(rdr);
+                packet = new ShowEffect(data, ref ptr, len);
                 break;
             case S2CPacketId.Goto:
-                packet = new Goto(rdr);
+                packet = new Goto(data, ref ptr, len);
                 break;
             case S2CPacketId.Reconnect:
-                packet = new Reconnect(rdr);
+                packet = new Reconnect(data, ref ptr, len);
                 break;
             case S2CPacketId.MapInfo:
-                packet = new MapInfo(rdr);
+                packet = new MapInfo(data, ref ptr, len);
                 break;
             case S2CPacketId.Death:
-                packet = new Death(rdr);
+                packet = new Death(data, ref ptr, len);
                 break;
             case S2CPacketId.Aoe:
-                packet = new Aoe(rdr);
+                packet = new Aoe(data, ref ptr, len);
                 break;
             case S2CPacketId.AccountList:
-                packet = new AccountList(rdr);
+                packet = new AccountList(data, ref ptr, len);
                 break;
             case S2CPacketId.QuestObjId:
-                packet = new QuestObjId(rdr);
+                packet = new QuestObjId(data, ref ptr, len);
                 break;
             case S2CPacketId.AllyShoot:
-                packet = new AllyShoot(rdr);
+                packet = new AllyShoot(data, ref ptr, len);
                 break;
             case S2CPacketId.EnemyShoot:
-                packet = new EnemyShoot(rdr);
+                packet = new EnemyShoot(data, ref ptr, len);
                 break;
             case S2CPacketId.PlaySound:
-                packet = new PlaySound(rdr);
+                packet = new PlaySound(data, ref ptr, len);
                 break;
             case S2CPacketId.GlobalNotification:
-                packet = new GlobalNotification(rdr);
+                packet = new GlobalNotification(data, ref ptr, len);
                 break;
             case S2CPacketId.Update:
-                packet = new Update(rdr);
+                packet = new Update(data, ref ptr, len);
                 break;
         }
 

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Buffers.Binary;
 using System.Text;
 using UnityEditor.Experimental.Rendering;
+using System.Threading;
 
 namespace Networking {
     public enum SocketEventState {
@@ -36,6 +37,7 @@ namespace Networking {
         private static ConcurrentQueue<IOutgoingPacket> _pending;
 
         private static PacketHandler _packetHandler;
+        private static CancellationTokenSource _tokenSource = new();
         public static void Start(PacketHandler packetHandler) {
             if (Running) {
                 Utils.Warn("TcpTicker already started");
@@ -57,6 +59,9 @@ namespace Networking {
 
             Utils.Log("Tcp Connected!");
 
+            _tokenSource.Dispose();
+            _tokenSource = new();
+
             _packetHandler = packetHandler;
             _pending = new ConcurrentQueue<IOutgoingPacket>();
             _crashed = false;
@@ -64,14 +69,13 @@ namespace Networking {
         }
 
         // called on main thread
-        public static void Stop() {
-            if (!Running && !_crashed)
-                return;
+        public static void Stop(string msg) {
+            Utils.Log("Trying to disconnect tcp from {0}", msg);
 
-            _Send.Reset();
-            _Receive.Reset();
-            _tickingTask = null;
-            _crashed = false;
+            _tokenSource.Cancel();
+
+            //if (!Running && !_crashed)
+            //    return;
 
             try {
                 _socket.Shutdown(SocketShutdown.Both);
@@ -80,6 +84,11 @@ namespace Networking {
             catch (Exception e) {
                 Utils.Log(e.Message);
             }
+
+            _Send.Reset();
+            _Receive.Reset();
+            _tickingTask = null;
+            _crashed = false;
 
             Utils.Log("Tcp Disconnected!");
         }
@@ -98,109 +107,95 @@ namespace Networking {
         // called on worker thread
         private static void Tick() {
             try {
-                while (Running) {
+                while (Running && !_tokenSource.IsCancellationRequested) {
+                    if (!_socket.Connected)
+                        return;
+
+                    Utils.Log("TcpTicker::Tick");
+
                     StartSend();
                     StartReceive();
                 }
             }
             catch (Exception e) {
-                Utils.Error("TcpTicker::", e.Message ,e.StackTrace);
-                _crashed = true;
+                Utils.Error("TcpTicker::{0}::{1}", e.Message , e.StackTrace);
+                Stop(nameof(Tick));
+                //_crashed = true;
             }
         }
 
         // called on worker thread
         private static async void StartSend() {
-            if (!_socket.Connected)
-                return;
+            try
+            {
+                while(_pending.TryDequeue(out var packet) && !_tokenSource.IsCancellationRequested) {
+                    int ptr = LENGTH_PREFIX;
+                    PacketUtils.WriteByte(_Send.Data.AsSpan()[ptr..], (byte)packet.Id, ref ptr);
+                    packet.Write(_Send.Data.AsSpan()[(ptr - 3)..], ref ptr);
+                    _Send.PacketLength = ptr;
 
-            while(_pending.TryDequeue(out var packet)) {
-                int ptr = LENGTH_PREFIX;
-                PacketUtils.WriteByte(_Send.Data.AsSpan()[ptr..], (byte)packet.Id, ref ptr);
-                packet.Write(_Send.Data.AsSpan()[(ptr - 3)..], ref ptr);
-                _Send.PacketLength = ptr;
+                        Utils.Log($"Sending packet {(C2SPacketId)_Send.Data[LENGTH_PREFIX]} {_Send.Data[LENGTH_PREFIX]} {_Send.PacketLength}");                    
+                        BinaryPrimitives.WriteUInt16LittleEndian(_Send.Data.AsSpan()[0..], (ushort)_Send.PacketLength); //Length
+                        
+                        //Debug data
+                        //StringBuilder sb = new();
+                        //for(int i = 0; i < _Send.PacketLength; i++)
+                        //    sb.Append('[').Append(_Send.Data[i]).Append(']');
+                        //                
+                        //Utils.Log("Sending | Length: {0} Bytes: {1}", _Send.PacketLength, sb.ToString());
+                        //End of Debug
 
-                try
-                {
-                    Utils.Log($"Sending packet {(C2SPacketId)_Send.Data[LENGTH_PREFIX]} {_Send.Data[LENGTH_PREFIX]} {_Send.PacketLength}");                    
-                    BinaryPrimitives.WriteUInt16LittleEndian(_Send.Data.AsSpan()[0..], (ushort)_Send.PacketLength); //Length
-                    
-                    //Debug data
-                    StringBuilder sb = new();
-                    for(int i = 0; i < _Send.PacketLength; i++)
-                        sb.Append('[').Append(_Send.Data[i]).Append(']');
-                                    
-                    Utils.Log("Sending | Length: {0} Bytes: {1}", _Send.PacketLength, sb.ToString());
-                    //End of Debug
-
-                    _ = await _socket.SendAsync(new ArraySegment<byte>(_Send.Data, 0, _Send.PacketLength), SocketFlags.None);
+                        _ = await _socket.SendAsync(new ArraySegment<byte>(_Send.Data, 0, _Send.PacketLength), SocketFlags.None);
+                    }
                 }
-                catch (Exception e) {
-                    Stop();
-                    Utils.Error("Send Error {0}", e);
-                }
+
+            catch (Exception e) {
+                throw e;
+                //Stop(nameof(StartSend));
+                //Utils.Error("Send Error {0}", e);
             }
-            //switch (_Send.State) {
-            //    case SocketEventState.Awaiting:
-            //        if (_pending.TryDequeue(out var packet)) {
-            //            using (var wtr = new PacketWriter(new MemoryStream())) {
-            //                Utils.Log($"TcpTicker::SentPacket::{packet.Id}");
-            //                wtr.Write((byte)packet.Id);
-            //                packet.Write(wtr);
-            //
-            //                var bytes = ((MemoryStream)wtr.BaseStream).ToArray();
-            //                _Send.PacketBytes = bytes;
-            //                _Send.PacketLength = bytes.Length;
-            //            }
-            //            _Send.State = SocketEventState.InProgress;
-            //            StartSend();
-            //        }
-            //        break;
-            //    case SocketEventState.InProgress:
-            //        Buffer.BlockCopy(_Send.PacketBytes, 0, _Send.Data, PREFIX_LENGTH_WITH_ID, _Send.PacketLength);
-            //        Buffer.BlockCopy(BitConverter.GetBytes(IPAddress.HostToNetworkOrder(_Send.PacketLength + PREFIX_LENGTH_WITH_ID)), 0, _Send.Data, 0, PREFIX_LENGTH_WITH_ID);
-            //        var written = _socket.Send(_Send.Data, _Send.BytesWritten, _Send.PacketLength + PREFIX_LENGTH_WITH_ID - _Send.BytesWritten, SocketFlags.None);
-            //        if (written < _Send.PacketLength + PREFIX_LENGTH_WITH_ID)
-            //            _Send.BytesWritten += written;
-            //        else
-            //            _Send.Reset();
-            //        StartSend();
-            //        break;
-            //}
         }
 
         // called on worker thread
-        private static void StartReceive() {
-            switch (_Receive.State) {
-                case SocketEventState.Awaiting:
-                    if (_socket.Available >= PREFIX_LENGTH) {
-                        _socket.Receive(_Receive.PacketBytes, PREFIX_LENGTH, SocketFlags.None);
-                        _Receive.PacketLength = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(_Receive.PacketBytes, 0));
-                        _Receive.State = SocketEventState.InProgress;
-                        StartReceive();
-                    }
-                    break;
-                case SocketEventState.InProgress:
-                    if (_Receive.PacketLength < PREFIX_LENGTH ||
-                        _Receive.PacketLength > BUFFER_SIZE) {
-                        throw new Exception($"Unable to process packet of size {_Receive.PacketLength}");
-                    }
-                    //Full packet now arrived. Time to process it.
-                    if (_socket.Available + PREFIX_LENGTH >= _Receive.PacketLength) {
-                        if (_socket.Available != 0)
-                            _socket.Receive(_Receive.PacketBytes, PREFIX_LENGTH, _Receive.PacketLength - PREFIX_LENGTH, SocketFlags.None);
-                        var packetId = (S2CPacketId)_Receive.GetPacketId();
-                        var packetBody = _Receive.GetPacketBody();
+        private static async void StartReceive() {
+            var len = await _socket.ReceiveAsync(new ArraySegment<byte>(_Receive.PacketBytes), SocketFlags.None);
 
-                        _packetHandler.ReadPacket(packetId, packetBody);
-                        _Receive.Reset();
-                    }
+            if (len == 0)
+                throw new Exception("Data received length is zero");
+            
+            if (len < 0)
+                return;
 
-                    StartReceive();
-                    break;
+            ProcessPacket(len);
+        }
+        private static void ProcessPacket(int len) {
+            try
+            {
+                int ptr = 0;
+                var buffer = _Receive.PacketBytes.AsSpan();
+
+                //while(ptr < len && !_tokenSource.IsCancellationRequested) {
+                var packetLen = PacketUtils.ReadUShort(buffer, ref ptr, len);
+
+                if(len != packetLen) {
+                    Utils.Warn("Packet length miss match {0} != {1}", len, packetLen);
+                }
+
+                var nextPacketPtr = ptr + packetLen - 2;
+                var packetId = (S2CPacketId)PacketUtils.ReadByte(buffer, ref ptr, nextPacketPtr);
+                Utils.Log("Received packet {0}", packetId);
+
+                PacketHandler.Instance.ReadPacket(packetId, buffer, ref ptr, nextPacketPtr);
+
+                ptr = nextPacketPtr;
+
+                //}
+            }
+            catch(Exception e) {
+                Utils.Error("Read exception {0}::{1}", e.Message, e.StackTrace);
+                Stop(nameof(ProcessPacket));
             }
         }
-
         private class ReceiveState {
             public int PacketLength;
             public readonly byte[] PacketBytes;

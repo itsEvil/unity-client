@@ -85,14 +85,13 @@ namespace Networking.Tcp
         public readonly int TickId;
         public readonly int TickTime;
         public readonly ObjectStatus[] Statuses;
-        public NewTick(PacketReader rdr)
-        {
-            TickId = rdr.ReadInt32();
-            TickTime = rdr.ReadInt32();
-            var length = rdr.ReadUInt16();
+        public NewTick(Span<byte> buffer, ref int ptr, int len) {
+            TickId = PacketUtils.ReadInt(buffer, ref ptr, len);
+            TickTime = PacketUtils.ReadInt(buffer, ref ptr, len);
+            var length = PacketUtils.ReadUShort(buffer, ref ptr, len);
             Statuses = new ObjectStatus[length];
-            for(int i = 0; i<length; i++) {
-                Statuses[i] = new ObjectStatus(rdr);
+            for(int i = 0; i < length; i++) {
+                Statuses[i] = new ObjectStatus(buffer, ref ptr, len);
             }
         }
         public void Handle() {
@@ -105,22 +104,22 @@ namespace Networking.Tcp
         public readonly TileData[] Tiles;
         public readonly ObjectDefinition[] Objects;
         public readonly ObjectDrop[] Drops;
-        public Update(PacketReader rdr)
+        public Update(Span<byte> buffer, ref int ptr, int len)
         {
-            var tilesLength = rdr.ReadUInt16();
+            var tilesLength = PacketUtils.ReadUShort(buffer, ref ptr, len);
             Tiles = new TileData[tilesLength];
             for(int i = 0; i <  tilesLength; i++) {
-                Tiles[i] = new TileData(rdr);
+                Tiles[i] = new TileData(buffer, ref ptr, len);
             }
-            var dropsLength = rdr.ReadUInt16();
+            var dropsLength = PacketUtils.ReadUShort(buffer, ref ptr, len);
             Drops = new ObjectDrop[dropsLength];
             for(int i = 0; i < dropsLength; i++) {
-                Drops[i] = new ObjectDrop(rdr);
+                Drops[i] = new ObjectDrop(buffer, ref ptr, len);
             }
-            var objLength = rdr.ReadUInt16();
+            var objLength = PacketUtils.ReadUShort(buffer, ref ptr, len);
             Objects = new ObjectDefinition[objLength];
             for(int i =0; i <  objLength; i++) {
-                Objects[i] = new ObjectDefinition(rdr);
+                Objects[i] = new ObjectDefinition(buffer, ref ptr, len);
             }
         }
         public void Handle() {
@@ -139,7 +138,7 @@ namespace Networking.Tcp
     }
     public readonly struct AccountList : IIncomingPacket {
         public S2CPacketId Id => S2CPacketId.AccountList;
-        public AccountList(PacketReader rdr)
+        public AccountList(Span<byte> buffer, ref int ptr, int lenr)
         {
 
         }
@@ -151,17 +150,17 @@ namespace Networking.Tcp
         public readonly int OwnerId;
         public readonly ushort ContainerType;
         public readonly float Angle;
-        public AllyShoot(PacketReader rdr) {
-            BulletId = rdr.ReadByte();
-            OwnerId = rdr.ReadInt32();
-            ContainerType = rdr.ReadUInt16();
-            Angle = rdr.ReadSingle();
+        public AllyShoot(Span<byte> buffer, ref int ptr, int len) {
+            BulletId = PacketUtils.ReadByte(buffer, ref ptr, len);
+            OwnerId = PacketUtils.ReadInt(buffer, ref ptr, len);
+            ContainerType = PacketUtils.ReadUShort(buffer, ref ptr, len);
+            Angle = PacketUtils.ReadFloat(buffer, ref ptr, len);
         }
         public void Handle() { }
     }
     public readonly struct Aoe : IIncomingPacket {
         public S2CPacketId Id => S2CPacketId.Aoe;
-        public Aoe(PacketReader rdr)
+        public Aoe(Span<byte> buffer, ref int ptr, int len)
         {
 
         }
@@ -169,7 +168,7 @@ namespace Networking.Tcp
     }
     public readonly struct BuyResult : IIncomingPacket {
         public S2CPacketId Id => S2CPacketId.BuyResult;
-        public BuyResult(PacketReader rdr)
+        public BuyResult(Span<byte> buffer, ref int ptr, int len)
         {
 
         }
@@ -177,7 +176,7 @@ namespace Networking.Tcp
     }
     public readonly struct ClientStat : IIncomingPacket {
         public S2CPacketId Id => S2CPacketId.ClientStat;
-        public ClientStat(PacketReader rdr)
+        public ClientStat(Span<byte> buffer, ref int ptr, int len)
         {
 
         }
@@ -187,15 +186,15 @@ namespace Networking.Tcp
         public S2CPacketId Id => S2CPacketId.CreateSuccess;
         public readonly int ObjectId;
         public readonly int CharacterId;
-        public CreateSuccess(PacketReader rdr) {
-            ObjectId = rdr.ReadInt32();
-            CharacterId = rdr.ReadInt32();
+        public CreateSuccess(Span<byte> buffer, ref int ptr, int len) {
+            ObjectId = PacketUtils.ReadInt(buffer, ref ptr, len);
+            CharacterId = PacketUtils.ReadInt(buffer, ref ptr, len);
         }
         public void Handle() { }
     }
     public readonly struct Damage : IIncomingPacket {
         public S2CPacketId Id => S2CPacketId.Damage;
-        public Damage(PacketReader rdr)
+        public Damage(Span<byte> buffer, ref int ptr, int len)
         {
 
         }
@@ -203,7 +202,7 @@ namespace Networking.Tcp
     }
     public readonly struct Death : IIncomingPacket {
         public S2CPacketId Id => S2CPacketId.Death;
-        public Death(PacketReader rdr)
+        public Death(Span<byte> buffer, ref int ptr, int len)
         {
 
         }
@@ -211,7 +210,7 @@ namespace Networking.Tcp
     }
     public readonly struct EnemyShoot : IIncomingPacket {
         public S2CPacketId Id => S2CPacketId.EnemyShoot;
-        public EnemyShoot(PacketReader rdr)
+        public EnemyShoot(Span<byte> buffer, ref int ptr, int len)
         {
 
         }
@@ -221,15 +220,15 @@ namespace Networking.Tcp
         public S2CPacketId Id => S2CPacketId.Failure;
         public readonly int ErrorCode;
         public readonly string Description;
-        public Failure(PacketReader rdr) {
-            ErrorCode = rdr.ReadInt32();
-            Description = rdr.ReadString();
+        public Failure(Span<byte> buffer, ref int ptr, int len) {
+            ErrorCode = PacketUtils.ReadInt(buffer, ref ptr, len);
+            Description = PacketUtils.ReadString(buffer, ref ptr, len);
         }
         public void Handle() { }
     }
     public readonly struct File : IIncomingPacket {
         public S2CPacketId Id => S2CPacketId.File;
-        public File(PacketReader rdr)
+        public File(Span<byte> buffer, ref int ptr, int len)
         {
 
         }
@@ -237,7 +236,7 @@ namespace Networking.Tcp
     }
     public readonly struct GlobalNotification : IIncomingPacket {
         public S2CPacketId Id => S2CPacketId.GlobalNotification;
-        public GlobalNotification(PacketReader rdr)
+        public GlobalNotification(Span<byte> buffer, ref int ptr, int len)
         {
 
         }
@@ -245,7 +244,7 @@ namespace Networking.Tcp
     }
     public readonly struct Goto : IIncomingPacket {
         public S2CPacketId Id => S2CPacketId.Goto;
-        public Goto(PacketReader rdr)
+        public Goto(Span<byte> buffer, ref int ptr, int len)
         {
 
         }
@@ -253,7 +252,7 @@ namespace Networking.Tcp
     }
     public readonly struct GuildResult : IIncomingPacket {
         public S2CPacketId Id => S2CPacketId.GuildResult;
-        public GuildResult(PacketReader rdr)
+        public GuildResult(Span<byte> buffer, ref int ptr, int len)
         {
 
         }
@@ -261,7 +260,7 @@ namespace Networking.Tcp
     }
     public readonly struct InvitedToGuild : IIncomingPacket {
         public S2CPacketId Id => S2CPacketId.InvitedToGuild;
-        public InvitedToGuild(PacketReader rdr)
+        public InvitedToGuild(Span<byte> buffer, ref int ptr, int len)
         {
 
         }
@@ -270,8 +269,8 @@ namespace Networking.Tcp
     public readonly struct InvResult : IIncomingPacket {
         public S2CPacketId Id => S2CPacketId.InvResult;
         public readonly byte Result;
-        public InvResult(PacketReader rdr) {
-            Result = rdr.ReadByte();
+        public InvResult(Span<byte> buffer, ref int ptr, int len) {
+            Result = PacketUtils.ReadByte(buffer, ref ptr, len);
         }
         public void Handle() { }
     }
@@ -292,23 +291,23 @@ namespace Networking.Tcp
         public readonly float DayLightIntensity;
         public readonly float NightLightIntensity;
         public readonly long TotalElapsedMicroSeconds;
-        public MapInfo(PacketReader rdr)
+        public MapInfo(Span<byte> buffer, ref int ptr, int len)
         {
-            Width = rdr.ReadInt32();
-            Height = rdr.ReadInt32();
-            WorldId = rdr.ReadString();
-            DisplayName = rdr.ReadString();
-            Seed = rdr.ReadUInt32();
-            Difficulty = rdr.ReadInt32();
-            Background = rdr.ReadInt32();
-            AllowTeleport = rdr.ReadBoolean();
-            ShowDisplays = rdr.ReadBoolean();
-            LightColor = rdr.ReadInt32();
-            LightIntensity = rdr.ReadSingle();
-            UseIntensity = rdr.ReadBoolean();
-            DayLightIntensity = rdr.ReadSingle();
-            NightLightIntensity = rdr.ReadSingle();
-            TotalElapsedMicroSeconds = rdr.ReadInt64();
+            Width = PacketUtils.ReadInt(buffer, ref ptr, len);
+            Height = PacketUtils.ReadInt(buffer, ref ptr, len);
+            WorldId = PacketUtils.ReadString(buffer, ref ptr, len);
+            DisplayName = PacketUtils.ReadString(buffer, ref ptr, len);
+            Seed = PacketUtils.ReadUInt(buffer, ref ptr, len);
+            Difficulty = PacketUtils.ReadInt(buffer, ref ptr, len);
+            Background = PacketUtils.ReadInt(buffer, ref ptr, len);
+            AllowTeleport = PacketUtils.ReadBool(buffer, ref ptr, len);
+            ShowDisplays = PacketUtils.ReadBool(buffer, ref ptr, len);
+            LightColor = PacketUtils.ReadInt(buffer, ref ptr, len);
+            LightIntensity = PacketUtils.ReadFloat(buffer, ref ptr, len);
+            UseIntensity = PacketUtils.ReadBool(buffer, ref ptr, len);
+            DayLightIntensity = PacketUtils.ReadFloat(buffer, ref ptr, len);
+            NightLightIntensity = PacketUtils.ReadFloat(buffer, ref ptr, len);
+            TotalElapsedMicroSeconds = PacketUtils.ReadLong(buffer, ref ptr, len);
         }
         public void Handle() {
             Map.Instance.Init(this);
@@ -317,7 +316,7 @@ namespace Networking.Tcp
     }
     public readonly struct NameResult : IIncomingPacket {
         public S2CPacketId Id => S2CPacketId.NameResult;
-        public NameResult(PacketReader rdr)
+        public NameResult(Span<byte> buffer, ref int ptr, int len)
         {
 
         }
@@ -325,7 +324,7 @@ namespace Networking.Tcp
     }
     public readonly struct Notification : IIncomingPacket {
         public S2CPacketId Id => S2CPacketId.Notification;
-        public Notification(PacketReader rdr)
+        public Notification(Span<byte> buffer, ref int ptr, int len)
         {
 
         }
@@ -333,7 +332,7 @@ namespace Networking.Tcp
     }
     public readonly struct Pic : IIncomingPacket {
         public S2CPacketId Id => S2CPacketId.Pic;
-        public Pic(PacketReader rdr)
+        public Pic(Span<byte> buffer, ref int ptr, int len)
         {
 
         }
@@ -342,14 +341,14 @@ namespace Networking.Tcp
     public readonly struct Ping : IIncomingPacket {
         public S2CPacketId Id => S2CPacketId.Ping;
         public readonly int Serial;
-        public Ping(PacketReader rdr) {
-            Serial = rdr.ReadInt32();
+        public Ping(Span<byte> buffer, ref int ptr, int len) {
+            Serial = PacketUtils.ReadInt(buffer, ref ptr, len);
         }
         public void Handle() { }
     }
     public readonly struct PlaySound : IIncomingPacket {
         public S2CPacketId Id => S2CPacketId.PlaySound;
-        public PlaySound(PacketReader rdr)
+        public PlaySound(Span<byte> buffer, ref int ptr, int len)
         {
 
         }
@@ -357,7 +356,7 @@ namespace Networking.Tcp
     }
     public readonly struct QuestObjId : IIncomingPacket {
         public S2CPacketId Id => S2CPacketId.QuestObjId;
-        public QuestObjId(PacketReader rdr)
+        public QuestObjId(Span<byte> buffer, ref int ptr, int len)
         {
 
         }
@@ -365,7 +364,7 @@ namespace Networking.Tcp
     }
     public readonly struct Reconnect : IIncomingPacket {
         public S2CPacketId Id => S2CPacketId.Reconnect;
-        public Reconnect(PacketReader rdr)
+        public Reconnect(Span<byte> buffer, ref int ptr, int len)
         {
 
         }
@@ -373,7 +372,7 @@ namespace Networking.Tcp
     }
     public readonly struct ServerPlayerShoot : IIncomingPacket {
         public S2CPacketId Id => S2CPacketId.ServerPlayerShoot;
-        public ServerPlayerShoot(PacketReader rdr)
+        public ServerPlayerShoot(Span<byte> buffer, ref int ptr, int len)
         {
 
         }
@@ -381,7 +380,7 @@ namespace Networking.Tcp
     }
     public readonly struct ShowEffect : IIncomingPacket {
         public S2CPacketId Id => S2CPacketId.ShowEffect;
-        public ShowEffect(PacketReader rdr)
+        public ShowEffect(Span<byte> buffer, ref int ptr, int len)
         {
 
         }
@@ -389,7 +388,7 @@ namespace Networking.Tcp
     }
     public readonly struct TradeStart : IIncomingPacket {
         public S2CPacketId Id => S2CPacketId.TradeStart;
-        public TradeStart(PacketReader rdr)
+        public TradeStart(Span<byte> buffer, ref int ptr, int len)
         {
 
         }
@@ -397,7 +396,7 @@ namespace Networking.Tcp
     }
     public readonly struct TradeRequested : IIncomingPacket {
         public S2CPacketId Id => S2CPacketId.TradeRequested;
-        public TradeRequested(PacketReader rdr)
+        public TradeRequested(Span<byte> buffer, ref int ptr, int len)
         {
 
         }
@@ -405,7 +404,7 @@ namespace Networking.Tcp
     }
     public readonly struct TradeDone : IIncomingPacket {
         public S2CPacketId Id => S2CPacketId.TradeDone;
-        public TradeDone(PacketReader rdr)
+        public TradeDone(Span<byte> buffer, ref int ptr, int len)
         {
 
         }
@@ -413,7 +412,7 @@ namespace Networking.Tcp
     }
     public readonly struct TradeChanged : IIncomingPacket {
         public S2CPacketId Id => S2CPacketId.TradeChanged;
-        public TradeChanged(PacketReader rdr)
+        public TradeChanged(Span<byte> buffer, ref int ptr, int len)
         {
 
         }
@@ -421,7 +420,7 @@ namespace Networking.Tcp
     }
     public readonly struct TradeAccepted : IIncomingPacket {
         public S2CPacketId Id => S2CPacketId.TradeAccepted;
-        public TradeAccepted(PacketReader rdr)
+        public TradeAccepted(Span<byte> buffer, ref int ptr, int len)
         {
 
         }
@@ -429,7 +428,7 @@ namespace Networking.Tcp
     }
     public readonly struct Text : IIncomingPacket {
         public S2CPacketId Id => S2CPacketId.Text;
-        public Text(PacketReader rdr)
+        public Text(Span<byte> buffer, ref int ptr, int len)
         {
 
         }
@@ -526,10 +525,7 @@ namespace Networking.Tcp
             Serial = serial;
             Time = time;
         }
-        public void Write(Span<byte> buffer, ref int ptr)
-        {
-            //wtr.Write(Serial);
-            //wtr.Write(Time);
+        public void Write(Span<byte> buffer, ref int ptr) {
             PacketUtils.WriteInt(buffer, Serial, ref ptr);
             PacketUtils.WriteLong(buffer, Time, ref ptr);
         }
@@ -616,18 +612,7 @@ namespace Networking.Tcp
             CharType = charType;
             SkinType = skinType;
         }
-        public void Write(Span<byte> buffer, ref int ptr)
-        {
-            //wtr.Write((ushort)MajorVersion);
-            //wtr.Write((ushort)MinorVersion);
-            //wtr.Write(WorldId);
-            //wtr.Write(Email);
-            //wtr.Write(Password);
-            //wtr.Write(CharId);
-            //wtr.Write(CreateChar);
-            //wtr.Write(CharType);
-            //wtr.Write(SkinType);
-
+        public void Write(Span<byte> buffer, ref int ptr) {
             PacketUtils.WriteUShort(buffer, MajorVersion, ref ptr);
             PacketUtils.WriteUShort(buffer, MinorVersion, ref ptr);
             PacketUtils.WriteInt(buffer, WorldId, ref ptr);
