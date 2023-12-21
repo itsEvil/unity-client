@@ -13,14 +13,14 @@ namespace Game
         public ushort Type;
         public int SinkLevel;
         public Entity StaticObject;
-        public short X;
-        public short Y;
+        public int X;
+        public int Y;
 
-        public TileDesc Desc;
-        public void Init(TileDesc desc, short x, short y) {
+        public TileDesc Descriptor;
+        public void Init(TileDesc desc, int x, int y) {
             X = x;
             Y = y;
-            Desc = desc;
+            Descriptor = desc;
             Type = desc.Type;
 
             if(desc.Sinking){

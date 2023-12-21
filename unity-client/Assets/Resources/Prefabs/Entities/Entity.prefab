@@ -48,15 +48,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Renderer: {fileID: 1268893023593391328}
   Type: 0
+  Name: 
   Id: 0
   Dead: 0
   IsInteractive: 0
-  Hp: 0
-  MaxHp: 0
-  Size: 0
-  Name: 
-  SinkLevel: 0
-  Inventory: 
+  Square: {fileID: 0}
 --- !u!1 &4671789077408090441
 GameObject:
   m_ObjectHideFlags: 0
@@ -219,7 +215,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.48, y: 0.24}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 0

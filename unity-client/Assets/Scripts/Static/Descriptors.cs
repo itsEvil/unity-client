@@ -63,6 +63,9 @@ namespace Static
 
         public readonly float AngleCorrection;
         public readonly float Rotation;
+
+        public readonly bool DrawOnGround;
+        public readonly bool DrawUnder;
         public ObjectDesc(XElement e, string id, ushort type)
         {
             Id = id;
@@ -102,6 +105,9 @@ namespace Static
 
             MaxHp = e.ParseInt("MaxHitPoints");
             Defense = e.ParseInt("Defense");
+
+            DrawOnGround = e.ParseBool("DrawOnGround");
+            DrawUnder = DrawOnGround || e.ParseBool("DrawUnder");
 
             DungeonName = e.ParseString("DungeonName");
 

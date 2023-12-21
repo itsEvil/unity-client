@@ -85,7 +85,7 @@ public static class TileRedrawer
         {
             sig = GetCompositeSig(square);
         }
-        else if (square.Desc.HasEdge)
+        else if (square.Descriptor.HasEdge)
         {
             sig = GetEdgeSig(square);
         }
@@ -114,7 +114,7 @@ public static class TileRedrawer
             //return newSprite;
         }
 
-        if (square.Desc.HasEdge)
+        if (square.Descriptor.HasEdge)
         {
             //var newSprite = DrawEdges(sig);
             //_Cache[sig] = newSprite;
@@ -403,7 +403,7 @@ public static class TileRedrawer
                 }
 
                 var n = map.GetTile(x, y);
-                if (n == null || n.Desc.BlendPriority <= square.Desc.BlendPriority)
+                if (n == null || n.Descriptor.BlendPriority <= square.Descriptor.BlendPriority)
                 {
                     sigs[index] = square.Type;
                     //sig.Add(square.Type);
@@ -424,7 +424,7 @@ public static class TileRedrawer
 
         var sig = new List<object>();
         var hasEdge = false;
-        var sameTypeEdgeMode = square.Desc.SameTypeEdgeMode;
+        var sameTypeEdgeMode = square.Descriptor.SameTypeEdgeMode;
         for (var y = square.Y - 1; y <= square.Y + 1; y++)
         {
             for (var x = square.X - 1; x <= square.X + 1; x++)
@@ -466,14 +466,14 @@ public static class TileRedrawer
         var n2 = map.GetTile(x - 1, y);
         var n3 = map.GetTile(x + 1, y);
         var n4 = map.GetTile(x, y + 1);
-        var p1 = n1 != null ? n1.Desc.CompositePriority : -1;
-        var p2 = n2 != null ? n2.Desc.CompositePriority : -1;
-        var p3 = n3 != null ? n3.Desc.CompositePriority : -1;
-        var p4 = n4 != null ? n4.Desc.CompositePriority : -1;
+        var p1 = n1 != null ? n1.Descriptor.CompositePriority : -1;
+        var p2 = n2 != null ? n2.Descriptor.CompositePriority : -1;
+        var p3 = n3 != null ? n3.Descriptor.CompositePriority : -1;
+        var p4 = n4 != null ? n4.Descriptor.CompositePriority : -1;
         if (p1 < 0 && p2 < 0)
         {
             var n0 = map.GetTile(x - 1, y - 1);
-            sig[0] = n0 == null || n0.Desc.CompositePriority < 0 ? 255 : n0.Type;
+            sig[0] = n0 == null || n0.Descriptor.CompositePriority < 0 ? 255 : n0.Type;
         }
         else if (p1 < p2)
         {
@@ -487,7 +487,7 @@ public static class TileRedrawer
         if (p1 < 0 && p3 < 0)
         {
             var n0 = map.GetTile(x + 1, y - 1);
-            sig[1] = n0 == null || n0.Desc.CompositePriority < 0 ? 255 : n0.Type;
+            sig[1] = n0 == null || n0.Descriptor.CompositePriority < 0 ? 255 : n0.Type;
         }
         else if (p1 < p3)
         {
@@ -501,7 +501,7 @@ public static class TileRedrawer
         if (p2 < 0 && p4 < 0)
         {
             var n0 = map.GetTile(x - 1, y + 1);
-            sig[2] = n0 == null || n0.Desc.CompositePriority < 0 ? 255 : n0.Type;
+            sig[2] = n0 == null || n0.Descriptor.CompositePriority < 0 ? 255 : n0.Type;
         }
         else if (p2 < p4)
         {
@@ -515,7 +515,7 @@ public static class TileRedrawer
         if (p3 < 0 && p4 < 0)
         {
             var n0 = map.GetTile(x + 1, y + 1);
-            sig[3] = n0 == null || n0.Desc.CompositePriority < 0 ? 255 : n0.Type;
+            sig[3] = n0 == null || n0.Descriptor.CompositePriority < 0 ? 255 : n0.Type;
         }
         else if (p3 < p4)
         {

@@ -1,6 +1,23 @@
 using Account;
+using Game;
+using Game.Controllers;
 using Static;
+using System;
+using UnityEngine;
 public sealed class Player : Entity {
+
+    private const float _MIN_MOVE_SPEED = 0.004f;
+    private const float _MAX_MOVE_SPEED = 0.0096f;
+    private const float _MIN_ATTACK_FREQ = 0.0015f;
+    private const float _MAX_ATTACK_FREQ = 0.008f;
+    private const float _MIN_ATTACK_MULT = 0.5f;
+    private const float _MAX_ATTACK_MULT = 2f;
+    private const float _MAX_SINK_LEVEL = 18f;
+    public float MoveMultiplier = 1f;
+    public float PushX;
+    public float PushY;
+
+
     public const int MaxLevel = 20;
 
     public bool IsMyPlayer = false;
@@ -33,8 +50,8 @@ public sealed class Player : Entity {
     /// <summary>
     /// Runs when any player gets initalized
     /// </summary>
-    public override void Init(ObjectDesc desc) {
-        base.Init(desc);
+    public override void Init(ObjectDesc desc, ObjectDefinition defi) {
+        base.Init(desc, defi);
         IsMyPlayer = false;
         SlotTypes = new ItemType[Inventory.Length];
         Type = GameObjectType.Player;
@@ -43,6 +60,7 @@ public sealed class Player : Entity {
     /// Only called when our player connects
     /// </summary>
     public void OnMyPlayer() {
+        _moveController = new PlayerMoveController(this);
         var charStats = AccountData.Characters[AccountData.CurrentCharId];
         Inventory = charStats.Inventory;
         IsMyPlayer = true;
@@ -89,11 +107,63 @@ public sealed class Player : Entity {
                 return;
         }
     }
+    public float GetMovementSpeed() {
+        if (HasEffect(ConditionEffectIndex.Paralyzed)) {
+            Utils.Log("We are paralyzed!");
+            return 0;
+        }
+
+        if (HasEffect(ConditionEffectIndex.Slowed)) {
+            Utils.Log("We are slowed!");
+            return _MIN_MOVE_SPEED; // * MoveMultiplier
+        }
+
+        var ret = _MIN_MOVE_SPEED + Speed / 75.0f * (_MAX_MOVE_SPEED - _MIN_MOVE_SPEED);
+
+        if (HasEffect(ConditionEffectIndex.Speedy)) {
+            Utils.Log("We are speedy!");
+            return ret * 1.5f;
+        }
+
+        //MoveMultiplier is 1 always??
+        //ret *= MoveMultiplier;
+
+        return ret;
+    }
     public override bool Tick() {
         return base.Tick();
     }
     public void OnMove() {
+        var tile = Map.Instance.GetTile((int)Position.x, (int)Position.y);
+        if (tile == null) {
+            Utils.Error("Tile at {0} {1} is null", Position.x, Position.y);
+            return;
+        }
+        if (tile.Descriptor.Sinking) {
+            SinkLevel = (int)Mathf.Min(SinkLevel + 1, _MAX_SINK_LEVEL);
+            MoveMultiplier = 0.1f + (1 - SinkLevel / _MAX_SINK_LEVEL) * (tile.Descriptor.Speed - 0.1f);
+        }
+        else
+        {
+            SinkLevel = 0;
+            MoveMultiplier = tile.Descriptor.Speed;
+        }
 
+        if (tile.Descriptor.Damage > 0 /* && !IsInvicible()*/) {
+            if (tile.StaticObject == null || !tile.StaticObject.Descriptor.ProtectFromGroundDamage) {
+                Damage(tile.Descriptor.Damage, new ConditionEffectDesc[0], null);
+                //TODO damage player
+            }
+        }
+
+        if (tile.Descriptor.Push) {
+            PushX = tile.Descriptor.DX;
+            PushX = tile.Descriptor.DY;
+        }
+        else {
+            PushX = 0;
+            PushY = 0;
+        }
     }
     public override void Dispose() {
         base.Dispose();

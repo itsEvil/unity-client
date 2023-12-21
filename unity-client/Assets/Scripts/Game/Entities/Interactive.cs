@@ -5,8 +5,8 @@ using UnityEngine;
 
 public sealed class Interactive : Entity
 {
-    public override void Init(ObjectDesc desc) {
-        base.Init(desc);
+    public override void Init(ObjectDesc desc, ObjectDefinition defi) {
+        base.Init(desc, defi);
         Type = GameObjectType.Interactive;
     }
     public override bool Tick() {

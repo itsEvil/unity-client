@@ -556,6 +556,10 @@ namespace Static {
     public readonly struct ObjectDefinition {
         public readonly ushort ObjectType;
         public readonly ObjectStatus ObjectStatus;
+        public ObjectDefinition(ushort type, ObjectStatus status) {
+            ObjectType = type;
+            ObjectStatus = status;
+        }
         public ObjectDefinition(Span<byte> buffer, ref int ptr, int len) {
             ObjectType = PacketUtils.ReadUShort(buffer, ref ptr, len);
             ObjectStatus = new ObjectStatus(buffer, ref ptr, len);
@@ -570,6 +574,11 @@ namespace Static {
         public readonly int Id;
         public readonly Vec2 Position;
         public readonly Dictionary<StatType, object> Stats;
+        public ObjectStatus(int id, Vec2 pos) {
+            Id = id;
+            Position = pos;
+            Stats = new(); //Empty
+        }
         public ObjectStatus(Span<byte> buffer, ref int ptr, int len) {
             Id = PacketUtils.ReadInt(buffer, ref ptr, len);
             Position = new Vec2() {
@@ -640,7 +649,7 @@ namespace Static {
                 or StatType.WisdomBoost or StatType.DexterityBoost or StatType.CharFame or StatType.NextClassQuestFame
                     => PacketUtils.ReadInt(buffer, ref ptr, len),
 
-                StatType.Condition => PacketUtils.ReadULong(buffer, ref ptr, len),
+                StatType.Condition => PacketUtils.ReadUInt(buffer, ref ptr, len),
                 StatType.Name => PacketUtils.ReadString(buffer, ref ptr, len),
                 StatType.MerchandiseType => PacketUtils.ReadUShort(buffer, ref ptr, len),
                 StatType.Active or StatType.HasBackpack or StatType.NameChosen => PacketUtils.ReadBool(buffer, ref ptr, len),

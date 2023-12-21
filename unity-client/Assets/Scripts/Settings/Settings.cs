@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class Settings
+public static partial class Settings
 {
     //Addresses
     public const string API_ADDRESS = "http://127.0.0.1:8080";

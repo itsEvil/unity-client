@@ -1,6 +1,7 @@
 using Game;
 using Static;
 using System;
+using UnityEngine;
 
 namespace Networking.Tcp
 {
@@ -104,30 +105,50 @@ namespace Networking.Tcp
                 var pos = Map.MyPlayer.GetPosition();
                 TcpTicker.Send(new Move(TickId, TickTime, pos.x, pos.y, PacketHandler.Instance.History));
             }
+
+            foreach(var objectStat in Statuses) {
+                var entity = Map.Instance.GetEntity(objectStat.Id);
+                if (entity == null)
+                    continue;
+                
+                bool isMyPlayer = PacketHandler.Instance.PlayerId == objectStat.Id;
+                entity.UpdateObjectStats(objectStat.Stats);
+                if (isMyPlayer)
+                    continue;
+
+                entity.OnNewTick(objectStat.Position);
+            }
         }
     }
     public readonly struct Update : IIncomingPacket {
         public S2CPacketId Id => S2CPacketId.Update;
-        public readonly TileData[] Tiles;
         public readonly ObjectDefinition[] Objects;
         public readonly ObjectDrop[] Drops;
+
+        public readonly ushort[] TileTypes;
+        public readonly Vector3Int[] TilePositions;
         public Update(Span<byte> buffer, ref int ptr, int len) {
             var tilesLength = PacketUtils.ReadUShort(buffer, ref ptr, len);
-            Tiles = new TileData[tilesLength];
-            Utils.Log("Tiles Length: {0}", tilesLength);
+            //Utils.Log("Tiles Length: {0}", tilesLength);
+            TileTypes = new ushort[tilesLength];
+            TilePositions = new Vector3Int[tilesLength];
             for(int i = 0; i <  tilesLength; i++) {
-                Tiles[i] = new TileData(buffer, ref ptr, len);
+                TilePositions[i] = new Vector3Int(
+                    PacketUtils.ReadShort(buffer, ref ptr, len), 
+                    PacketUtils.ReadShort(buffer, ref ptr, len)
+                );
+                TileTypes[i] = PacketUtils.ReadUShort(buffer, ref ptr, len);
             }
             var dropsLength = PacketUtils.ReadUShort(buffer, ref ptr, len);
             Drops = new ObjectDrop[dropsLength];
-            Utils.Log("Drops Length: {0}", dropsLength);
+            //Utils.Log("Drops Length: {0}", dropsLength);
             for(int i = 0; i < dropsLength; i++) {
                 Drops[i] = new ObjectDrop(buffer, ref ptr, len);
             }
             var objLength = PacketUtils.ReadUShort(buffer, ref ptr, len);
             Objects = new ObjectDefinition[objLength];
 
-            Utils.Log("Objects Length: {0}", objLength);
+            //Utils.Log("Objects Length: {0}", objLength);
             for(int i =0; i <  objLength; i++) {
                 Objects[i] = new ObjectDefinition(buffer, ref ptr, len);
             }
@@ -135,6 +156,14 @@ namespace Networking.Tcp
         }
         public void Handle() {
             TcpTicker.Send(new UpdateAck());
+
+            Span<ObjectDrop> drops = Drops.AsSpan();
+            for(int i = 0; i < drops.Length; i++) {
+                var drop = drops[i];
+                Map.Instance.RemoveEntity(drop.Id);
+            }
+
+            Map.Instance.SetTiles(TilePositions, TileTypes);
 
             Span<ObjectDefinition> objects = Objects.AsSpan();
             for(int i = 0; i < objects.Length; i++) {
@@ -145,6 +174,9 @@ namespace Networking.Tcp
 
                 //Prepares to add the entity to the world
                 Map.Instance.AddEntity(entity);
+
+                if (obj.ObjectStatus.Id == PacketHandler.Instance.PlayerId)
+                    Map.Instance.OnMyPlayerConnected(entity as Player);
             }
         }
     }

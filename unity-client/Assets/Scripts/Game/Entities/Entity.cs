@@ -1,14 +1,17 @@
 using Data;
 using Game;
+using Game.Controllers;
 using Static;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class Entity : MonoBehaviour, IDisposable {
     [SerializeField] protected SpriteRenderer Renderer;
     public GameObjectType Type = GameObjectType.Entity;
 
+    public string Name;
     public int Id;
     public bool Dead;
     public bool IsInteractive;
@@ -16,23 +19,82 @@ public class Entity : MonoBehaviour, IDisposable {
     protected int Hp;
     protected int MaxHp;
     protected int Size;
-    protected string Name;
     protected int SinkLevel;
     protected ushort[] Inventory;
-    protected ObjectDesc Desc;
-    public virtual void Init(ObjectDesc desc) {
-        Desc = desc;
+    public ObjectDesc Descriptor;
+    public Square Square;
+    protected IMoveController _moveController;
+    public virtual void Init(ObjectDesc desc, ObjectDefinition defi) {
+        Descriptor = desc;
+        Id = defi.ObjectStatus.Id;
+        Position = defi.ObjectStatus.Position;
         Inventory = new ushort[8];
         Renderer.sprite = desc.TextureData.GetTexture(0);
+
+        if (Id != PacketHandler.Instance.PlayerId)
+            _moveController = new EntityMoveController(this);
+
+        if (!Descriptor.DrawOnGround) {
+            CameraController.Instance.AddRotatingEntity(this);
+        }
     }
     public virtual void AddToWorld() {
         
     }
+    public void OnNewTick(Vec2 position) {
+        var movement = _moveController as EntityMoveController;
+        if (movement!.TargetPosition == position)
+            return;
+
+        movement.TargetPosition = position;
+        movement.Direction = (movement.TargetPosition - Position) / 127f;
+    }
     public virtual bool Tick() {
+        _moveController?.Tick(GameTime.DeltaTime);
+
         return !Dead;
+    }
+    public virtual void Damage(int damage, ConditionEffectDesc[] effects, Projectile projectile) { 
+        if(damage == 0 && effects.Length == 0) 
+            return;
+
+        if(effects != null && effects.Length > 0) {
+            AddStatusEffects(effects);
+        }
+
+        if(damage > 0) {
+            Dead = Hp <= 0 && !Descriptor.Static;
+
+            int lifeTimeMS = 1000;
+            Color color = Color.red;
+
+            //TODO add
+            //Map.AddDamageText(this, damage, color, lifeTimeMS);
+        }
+
+        if (Descriptor.Enemy) {
+            //TODO add
+            //Map.SetDamageCounter(this);
+        }
+    }
+    //TODO add
+    private void AddStatusEffects(ConditionEffectDesc[] effects) {
+        Utils.Log("Adding status effects ");
+    }
+
+    public virtual void Draw() {
+
     }
     public virtual void Dispose() {
 
+    }
+    public virtual bool MoveTo(Vec2 pos) {
+        Map.Instance.MoveEntity(this, pos);
+        return true;
+    }
+    //TODO add effects
+    public virtual bool HasEffect(ConditionEffectIndex effect) {
+        return false;
     }
     public void UpdateObjectStats(Dictionary<StatType, object> stats) {
         //Try automatically removed when game gets compiled
@@ -70,9 +132,9 @@ public class Entity : MonoBehaviour, IDisposable {
         }
     }
     public static Entity Resolve(ObjectDefinition definition) {
-        var desc = AssetLibrary.GetObjectDesc((ushort)definition.ObjectType);
+        var desc = AssetLibrary.GetObjectDesc(definition.ObjectType);
         var entity = Map.EntityPool.Get(desc.ObjectClass);
-        entity.Init(desc);
+        entity.Init(desc, definition);
         entity.UpdateObjectStats(definition.ObjectStatus.Stats);
 
         if (definition.ObjectStatus.Id == PacketHandler.Instance.PlayerId)

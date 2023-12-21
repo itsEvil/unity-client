@@ -183,11 +183,11 @@ namespace Networking {
                 return;
 
             //Debug data
-            StringBuilder sb = new();
-            for(int i = 0; i < len; i++)
-                sb.Append('[').Append(_Receive.PacketBytes[i]).Append(']');
-                            
-            Utils.Log("Received Packet | Length: {0} Bytes: {1}", len, sb.ToString());
+            //StringBuilder sb = new();
+            //for(int i = 0; i < len; i++)
+            //    sb.Append('[').Append(_Receive.PacketBytes[i]).Append(']');
+            //                
+            //Utils.Log("Received Packet | Length: {0} Bytes: {1}", len, sb.ToString());
             //End of Debug
 
             ProcessPacket(len);
@@ -209,7 +209,7 @@ namespace Networking {
                 //var nextPacketPtr = ptr + packetLen - 2;
 
                 var packetId = (S2CPacketId)PacketUtils.ReadByte(buffer[ptr..], ref ptr, len); //nextPacketPtr
-                Utils.Log("Received packet {0} {1}", packetId, buffer[LENGTH_PREFIX]);
+                //Utils.Log("Received packet {0} {1}", packetId, buffer[LENGTH_PREFIX]);
 
                 PacketHandler.Instance.ReadPacket(packetId, buffer, ref ptr, len); //nextPacketPtr
 

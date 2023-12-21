@@ -1,4 +1,5 @@
 using Data;
+using Static;
 using UnityEngine;
 
 namespace Game {
@@ -24,9 +25,10 @@ namespace Game {
 
         private void SpawnEntityTest() {
             foreach (var (id, desc) in AssetLibrary.Type2ObjectDesc) {
+                ObjectDefinition defi = new(desc.Type, new ObjectStatus(id, Vec2.zero));
                 Utils.Log("Spawning in: {0}", desc.DisplayId);
                 var entity = EntityPool.Get(desc.ObjectClass);
-                entity.Init(desc);
+                entity.Init(desc, defi);
                 AddEntity(entity);
             }
         }

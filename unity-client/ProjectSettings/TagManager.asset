@@ -41,3 +41,24 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: UI
+    uniqueID: 3947389583
+    locked: 0
+  - name: Overlay
+    uniqueID: 1989001085
+    locked: 0
+  - name: Player
+    uniqueID: 2043620669
+    locked: 0
+  - name: Static
+    uniqueID: 2754544309
+    locked: 0
+  - name: Entities
+    uniqueID: 1843256413
+    locked: 0
+  - name: DrawOnGround
+    uniqueID: 1363636077
+    locked: 0
+  - name: Ground
+    uniqueID: 3913362175
+    locked: 0

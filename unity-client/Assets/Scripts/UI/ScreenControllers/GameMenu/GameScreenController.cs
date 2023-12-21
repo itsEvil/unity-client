@@ -6,6 +6,7 @@ using UnityEngine.UI;
 namespace UI {
     public class GameScreenController : MonoBehaviour, IScreen {
         public static GameScreenController Instance { get; private set; }
+        public static bool DisablePlayerInput = false;
         [SerializeField] private StatsWidget _statsWidget;
         [SerializeField] private MinimapWidget _minimapWidget;
         public GameObject Object { get => gameObject; }

@@ -157,7 +157,7 @@ namespace Data {
             if (Id2ObjectDesc.TryGetValue(id, out ObjectDesc val)) {
                 return val;
             }
-            Debug.LogError($"Id {id} not found in gameData!\nUsing Pirate!");
+            Utils.Error("Id {0} not found in gameData! Using Pirate!", id);
             return Id2ObjectDesc["Pirate"];
         }
 
@@ -165,7 +165,7 @@ namespace Data {
             if (Type2TileDesc.TryGetValue(type, out TileDesc val)) {
                 return val;
             }
-            Debug.LogError($"Tile {type} not found in the gameData! Using grass tile!");
+            Utils.Error("Tile {0} not found in the gameData! Using grass tile!", type);
             return Type2TileDesc[0x46]; //Light grass
         }
 
@@ -173,7 +173,7 @@ namespace Data {
             if (Type2ItemDesc.TryGetValue(type, out ItemDesc val)) {
                 return val;
             }//
-            Debug.LogError($"Item {type} type not found in the game data! Using sword!");
+            Utils.Error("Item {0} type not found in the game data! Using sword!", type);
             return Type2ItemDesc[0xa00]; //basic sword
         }
 
@@ -181,6 +181,7 @@ namespace Data {
             if (Type2PlayerDesc.TryGetValue(type, out var desc)) {
                 return desc;
             }
+            Utils.Error("Class {0} not found in the game data! Using Rogue!", type);
             return Type2PlayerDesc[0x0300]; //rogue
         }
         public static int GetMatchingSlotIndex(ItemType slotType, Entity entity) {

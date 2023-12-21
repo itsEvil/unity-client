@@ -1,4 +1,5 @@
 using Data;
+using Game.Controllers;
 using Networking;
 using Networking.Tcp;
 using Static;
@@ -59,6 +60,8 @@ namespace Game {
         public void OnMyPlayerConnected(Player player) {
             MyPlayer = player;
             MyPlayer.OnMyPlayer();
+            Utils.Log("MyPlayerConnected! {0}", player.Name);
+            CameraController.Instance.SetFocus(MyPlayer.gameObject);
             //Hide preloader
         }
 
@@ -67,9 +70,37 @@ namespace Game {
             Tick();
             Remove();
         }
+        public Entity GetEntity(int id) {
+            if(Entities.TryGetValue(id, out var entity)) 
+                return entity;
+
+            return null;
+        }
+        private Square GetSquare(int x, int y) {
+            var tile = GetTile(x, y, true);
+            if(tile == null) {
+                var square = ScriptableObject.CreateInstance<Square>();
+                Tiles[x, y] = square;
+                return square;
+            }
+            return tile;
+        }
+        public void SetTiles(Vector3Int[] positions, ushort[] tileTypes) {
+            Square[] squares = new Square[tileTypes.Length];
+            for(int i = 0; i < tileTypes.Length; i++) {
+                var tile = tileTypes[i];
+                var pos = positions[i];
+                var square = GetSquare(pos.x, pos.y);
+                square.Init(AssetLibrary.GetTileDesc(tile), pos.x, pos.y);
+                squares[i] = square;
+            }
+
+            _tileMap.SetTiles(positions, squares);
+        }
         public void SetTile(TileData data) {
             var tile = ScriptableObject.CreateInstance<Square>();
             var tileDesc = AssetLibrary.GetTileDesc(data.TileType);
+            Utils.Log("Setting tile {0} at {1}:{2}", tileDesc.Id, data.X, data.Y);
             tile.Init(tileDesc, data.X, data.Y);
             Tiles[data.X, data.Y] = tile;
             _tileMap.SetTile(new Vector3Int(tile.X, tile.Y), tile);
@@ -85,6 +116,113 @@ namespace Game {
             }
 
             return Tiles[x, y];
+        }
+        public void MoveEntity(Entity entity, Vec2 position) {
+            var tile = GetTile((int)position.x, (int)position.y);
+            entity.SetPosition(position);
+
+            if (entity.Descriptor.Static) {
+                if (entity.Square != null) {
+                    entity.Square.StaticObject = null;
+                }
+
+                tile.StaticObject = entity;
+            }
+            entity.Square = tile;
+        }
+        public bool RegionUnblocked(float x, float y) {
+            if (TileIsWalkable(x, y))
+                return false;
+
+            var xFrac = x - (int)x;
+            var yFrac = y - (int)y;
+
+            if (xFrac < 0.5f) {
+                if (TileFullOccupied(x - 1, y))
+                    return false;
+
+                if (yFrac < 0.5f) {
+                    if (TileFullOccupied(x, y - 1) || TileFullOccupied(x - 1, y - 1))
+                        return false;
+                }
+                else {
+                    if (yFrac > 0.5f)
+                        if (TileFullOccupied(x, y + 1) || TileFullOccupied(x - 1, y + 1))
+                            return false;
+                }
+
+                return true;
+            }
+
+            if (xFrac > 0.5f) {
+                if (TileFullOccupied(x + 1, y))
+                    return false;
+
+                if (yFrac < 0.5) {
+                    if (TileFullOccupied(x, y - 1) || TileFullOccupied(x + 1, y - 1))
+                        return false;
+                }
+                else {
+                    if (yFrac > 0.5)
+                        if (TileFullOccupied(x, y + 1) || TileFullOccupied(x + 1, y + 1))
+                            return false;
+                }
+
+                return true;
+            }
+
+            if (yFrac < 0.5) {
+                if (TileFullOccupied(x, y - 1))
+                    return false;
+
+                return true;
+            }
+
+            if (yFrac > 0.5)
+                if (TileFullOccupied(x, y + 1))
+                    return false;
+
+            return true;
+        }
+
+        private bool TileIsWalkable(float x, float y) {
+            var tile = GetTile((int)x, (int)y);
+            if (tile == null)
+                return true;
+
+            if (tile.Descriptor.NoWalk)
+                return true;
+
+            if (tile.StaticObject != null) {
+                if (tile.StaticObject.Descriptor.OccupySquare)
+                    return true;
+            }
+
+            return false;
+        }
+
+        private bool TileFullOccupied(float x, float y) {
+            var tile = GetTile((int)x, (int)y);
+            if (tile == null)
+                return true;
+
+            if (tile.Type == 255)
+                return true;
+
+            if (tile.StaticObject != null) {
+                if (tile.StaticObject.Descriptor.FullOccupy)
+                    return true;
+            }
+
+            return false;
+        }
+        public void RemoveEntity(int id) {
+            if(Entities.TryGetValue(id, out var ent)) {
+                ToRemoveEntities.Add(ent);
+            }
+            else {
+                Utils.Warn("Entity with id {0} not found for removal", id);
+            }
         }
         public void AddEntity(Entity entity) {
             ToAddEntities.Add(entity);
@@ -164,6 +302,8 @@ namespace Game {
                 var ent = ToRemoveEntities[i];
 
                 Entities.Remove(ent.Id);
+                CameraController.Instance.RemoveRotatingEntity(ent);
+
                 if (ent.IsInteractive)
                     Interactives.Remove(ent.Id);
 
