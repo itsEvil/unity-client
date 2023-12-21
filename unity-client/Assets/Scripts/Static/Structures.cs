@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using System.Xml.Linq;
 using UnityEngine;
 using Networking.Tcp;
+using System.Text;
 
 namespace Static {
     public struct TextureSheetData {
@@ -517,9 +518,9 @@ namespace Static {
         }
     }
     public readonly struct TileData {
-        public readonly ushort TileType;
         public readonly short X;
         public readonly short Y;
+        public readonly ushort TileType;
         public TileData(Span<byte> buffer, ref int ptr, int len) {
             X = PacketUtils.ReadShort(buffer, ref ptr, len);
             Y = PacketUtils.ReadShort(buffer, ref ptr, len);
@@ -544,18 +545,19 @@ namespace Static {
     }
     public readonly struct ObjectDrop {
         public readonly int Id;
-        public readonly bool Explode;
+        //public readonly bool Explode;
         public ObjectDrop(Span<byte> buffer, ref int ptr, int len) {
             Id = PacketUtils.ReadInt(buffer, ref ptr, len);
-            Explode = PacketUtils.ReadBool(buffer, ref ptr, len);
+            //Explode = false;
+            //Explode = PacketUtils.ReadBool(buffer, ref ptr, len);
         }
     }
 
     public readonly struct ObjectDefinition {
-        public readonly int ObjectType;
+        public readonly ushort ObjectType;
         public readonly ObjectStatus ObjectStatus;
         public ObjectDefinition(Span<byte> buffer, ref int ptr, int len) {
-            ObjectType = PacketUtils.ReadInt(buffer, ref ptr, len);
+            ObjectType = PacketUtils.ReadUShort(buffer, ref ptr, len);
             ObjectStatus = new ObjectStatus(buffer, ref ptr, len);
         }
     }
@@ -566,34 +568,83 @@ namespace Static {
     }
     public readonly struct ObjectStatus {
         public readonly int Id;
-        public readonly Vector3 Position;
+        public readonly Vec2 Position;
         public readonly Dictionary<StatType, object> Stats;
         public ObjectStatus(Span<byte> buffer, ref int ptr, int len) {
             Id = PacketUtils.ReadInt(buffer, ref ptr, len);
-            Position = new Vector3() {
+            Position = new Vec2() {
                 x = PacketUtils.ReadFloat(buffer, ref ptr, len),
                 y = PacketUtils.ReadFloat(buffer, ref ptr, len),
-                z = 0
             };
 
-            var statsCount = PacketUtils.ReadByte(buffer, ref ptr, len);
+            var statsCount = PacketUtils.ReadUShort(buffer, ref ptr, len);
+            var statsByteLength = PacketUtils.ReadUShort(buffer, ref ptr, len);
+            var nextObjIdx = ptr + statsByteLength;
             Stats = new Dictionary<StatType, object>();
             for (var i = 0; i < statsCount; i++) {
-                var key = (StatType)PacketUtils.ReadByte(buffer, ref ptr, len);
-                if (IsStringStat(key)) {
-                    Stats[key] = PacketUtils.ReadString(buffer, ref ptr, len);
+                StatType key = (StatType)PacketUtils.ReadByte(buffer[ptr..], ref ptr, len);
+                //Utils.Log("Reading Stat {0} {1} {2}", key, statsCount, i);
+                if (!Enum.IsDefined(typeof(StatType), key)) {
+                    Utils.Error("Key not defined in enum {0}", key);
+                    ptr = nextObjIdx;
+                    continue;
                 }
-                else {
-                    Stats[key] = PacketUtils.ReadInt(buffer, ref ptr, len);
+
+                if (!ReadStat(key, buffer, ref ptr, len, out var data)) {
+                    Utils.Error("Stat data parsing for stat {0} failed, object: {1}", key, Id);
+                    ptr = nextObjIdx;
+                    continue;
                 }
+
+                Stats[key] = data;
+            }
+            //var newPtr = PacketUtils.ReadUShort(buffer, ref ptr, len);
+
+            //Debug
+            //StringBuilder sb = new();
+            //sb.Append($"Id: {Id} Position:[{Position.x}:{Position.y}] Stats {statsCount}:[");
+            //foreach(var (key, value) in Stats)
+            //    sb.Append($"|Key:{key} Value:{value}|");
+            //
+            //sb.Append($"]");
+            //Utils.Log("Object Status: {0}", sb.ToString());
+        }
+
+        private static bool ReadStat(StatType key, Span<byte> buffer, ref int ptr, int len, out object data) {
+            try {
+                data = ParseStatData(key, buffer, ref ptr, len);
+                return true;
+            } catch(Exception e) {
+                data = false;
+                Utils.Error("Parsing stat failed: {0}::{1}", e, e.StackTrace);
+                return false;
             }
         }
 
-        public static bool IsStringStat(StatType stat)
-        {
-            return stat switch
+        private static object ParseStatData(StatType key, Span<byte> buffer, ref int ptr, int len) {
+            return key switch
             {
-                StatType.Name or StatType.GuildName => true,
+                StatType.MaxHp or StatType.Hp or StatType.Size or StatType.MaxMp or StatType.Mp
+                or StatType.NextLevelExp or StatType.Exp or StatType.Level or StatType.Inventory0
+                or StatType.Inventory1 or StatType.Inventory2 or StatType.Inventory3 or StatType.Inventory4
+                or StatType.Inventory5 or StatType.Inventory6 or StatType.Inventory7 or StatType.Inventory8
+                or StatType.Inventory9 or StatType.Inventory10 or StatType.Inventory11 or StatType.Attack
+                or StatType.Defense or StatType.Speed or StatType.Vitality or StatType.Wisdom or StatType.Dexterity
+                or StatType.Backpack0 or StatType.Backpack1 or StatType.Backpack2 or StatType.Backpack3
+                or StatType.Backpack4 or StatType.Backpack5 or StatType.Backpack6 or StatType.Backpack7
+                or StatType.GuildRank or StatType.Breath or StatType.HealthPotionStack or StatType.MagicPotionStack
+                or StatType.NumStars or StatType.Tex1 or StatType.Tex2 or StatType.MerchandiseCount
+                or StatType.MerchandiseMinsLeft or StatType.MerchandiseRankReq or StatType.MerchandisePrice
+                or StatType.Credits or StatType.AccountId or StatType.Fame or StatType.MaxHpBoost or StatType.MaxMpBoost
+                or StatType.AttackBoost or StatType.DefenseBoost or StatType.SpeedBoost or StatType.VitalityBoost
+                or StatType.WisdomBoost or StatType.DexterityBoost or StatType.CharFame or StatType.NextClassQuestFame
+                    => PacketUtils.ReadInt(buffer, ref ptr, len),
+
+                StatType.Condition => PacketUtils.ReadULong(buffer, ref ptr, len),
+                StatType.Name => PacketUtils.ReadString(buffer, ref ptr, len),
+                StatType.MerchandiseType => PacketUtils.ReadUShort(buffer, ref ptr, len),
+                StatType.Active or StatType.HasBackpack or StatType.NameChosen => PacketUtils.ReadBool(buffer, ref ptr, len),
+                StatType.MerchandiseDiscount or StatType.MerchandiseCurrency => PacketUtils.ReadByte(buffer[ptr..], ref ptr, len),
                 _ => false,
             };
         }

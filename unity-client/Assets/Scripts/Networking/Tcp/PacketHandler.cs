@@ -10,6 +10,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using Ping = Networking.Tcp.Ping;
 
 public class PacketHandler {
     public static PacketHandler Instance { get; private set; }
@@ -77,6 +78,9 @@ public class PacketHandler {
     private IIncomingPacket CreatePacket(S2CPacketId id, Span<byte> data, ref int ptr, int len) {
         IIncomingPacket packet = null;
         switch (id) {
+            case S2CPacketId.Ping:
+                packet = new Ping(data, ref ptr, len);
+                break;
             case S2CPacketId.Failure:
                 packet = new Failure(data, ref ptr, len);
                 break;

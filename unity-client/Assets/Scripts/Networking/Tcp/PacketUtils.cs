@@ -101,29 +101,29 @@ namespace Networking.Tcp {
         }
 
         public static byte ReadByte(Span<byte> buffer, ref int ptr, int len) {
-            Utils.Log("Trying to read byte at {0}", ptr);
+            //Utils.Log("Trying to read byte at {0}", ptr);
 
             if (ptr + 1 > len) {
                 throw new Exception($"Receive buffer attempted to read out of bounds {ptr + 1}, {len}");
                 //Utils.Error("Receive buffer attempted to read out of bounds {0}, {1}", ptr + 1, len);
                 //return 0;
             }
-
+            var data = buffer[0];
             ptr++;
-            return buffer[0];
+            return data;
         }
         public static char ReadChar(Span<byte> buffer, ref int ptr, int len) {
-            Utils.Log("Trying to read char at {0}", ptr);
-            var data = ReadByte(buffer, ref ptr, len);
+            //Utils.Log("Trying to read char at {0}", ptr);
+            var data = ReadByte(buffer[ptr..], ref ptr, len);
             return Convert.ToChar(data);
         }
         public static bool ReadBool(Span<byte> buffer, ref int ptr, int len) {
-            Utils.Log("Trying to read bool at {0}", ptr);
-            var data = ReadByte(buffer, ref ptr, len);
+            //Utils.Log("Trying to read bool at {0}", ptr);
+            var data = ReadByte(buffer[ptr..], ref ptr, len);
             return Convert.ToBoolean(data);
         }
         public static short ReadShort(Span<byte> buffer, ref int ptr, int len) {
-            Utils.Log("Trying to read short at {0}", ptr);
+            //Utils.Log("Trying to read short at {0}", ptr);
 
             if (ptr + 2 > len) {
                 throw new Exception($"Receive buffer attempted to read out of bounds {ptr + 2}, {len}");
@@ -136,7 +136,7 @@ namespace Networking.Tcp {
             return data;
         }
         public static ushort ReadUShort(Span<byte> buffer, ref int ptr, int len) {
-            Utils.Log("Trying to read ushort at {0}", ptr);
+            //Utils.Log("Trying to read ushort at {0}", ptr);
 
             if (ptr + 2 > len) {
                 throw new Exception($"Receive buffer attempted to read out of bounds {ptr + 2}, {len}");
@@ -149,7 +149,7 @@ namespace Networking.Tcp {
             return data;
         }
         public static int ReadInt(Span<byte> buffer, ref int ptr, int len) {
-            Utils.Log("Trying to read int at {0}", ptr);
+            //Utils.Log("Trying to read int at {0}, {1}", ptr, len);
 
             if (ptr + 4 > len) {
                 throw new Exception($"Receive buffer attempted to read out of bounds {ptr + 4}, {len}");
@@ -162,7 +162,7 @@ namespace Networking.Tcp {
             return data;
         }
         public static uint ReadUInt(Span<byte> buffer, ref int ptr, int len) {
-            Utils.Log("Trying to read uint at {0}", ptr);
+            //Utils.Log("Trying to read uint at {0}", ptr);
 
             if (ptr + 4 > len) {
                 throw new Exception($"Receive buffer attempted to read out of bounds {ptr + 4}, {len}");
@@ -175,19 +175,16 @@ namespace Networking.Tcp {
             return data;
         }
         public static float ReadFloat(Span<byte> buffer, ref int ptr, int len) {
-            Utils.Log("Trying to read float at {0}", ptr);
-            if (ptr + 4 > len) {
+            //Utils.Log("Trying to read float at {0}, {1}", ptr, len);  
+            if (ptr + 4 > len) 
                 throw new Exception($"Receive buffer attempted to read out of bounds {ptr + 4}, {len}");
-                //Utils.Error("Receive buffer attempted to read out of bounds {0}, {1}", ptr + 4, len);
-                //return 0;
-            }
 
             float data = BitConverter.ToSingle(buffer[ptr..(ptr + 4)]);
             ptr += 4;
             return data;
         }
         public static long ReadLong(Span<byte> buffer, ref int ptr, int len) {
-            Utils.Log("Trying to read long at {0}", ptr);
+            //Utils.Log("Trying to read long at {0}", ptr);
 
             if (ptr + 8 > len) {
                 throw new Exception($"Receive buffer attempted to read out of bounds {ptr + 8}, {len}");
@@ -200,7 +197,7 @@ namespace Networking.Tcp {
             return data;
         }
         public static ulong ReadULong(Span<byte> buffer, ref int ptr, int len) {
-            Utils.Log("Trying to read ulong at {0}", ptr);
+            //Utils.Log("Trying to read ulong at {0}", ptr);
 
             if (ptr + 8 > len) {
                 throw new Exception($"Receive buffer attempted to read out of bounds {ptr + 8}, {len}");
@@ -213,19 +210,18 @@ namespace Networking.Tcp {
             return data;
         }
         public static string ReadString(Span<byte> buffer, ref int ptr, int len) {
-            Utils.Log("Trying to read string at {0}", ptr);
             ushort strLen = ReadUShort(buffer, ref ptr, len);
-            
+
             if(ptr + strLen > len) {
                 throw new Exception($"Receive buffer attempted to read out of bounds {ptr + strLen}, {len}");
-                //Utils.Error("Receive buffer attempted to read out of bounds {0}, {1}", ptr + strLen, len);
-                //return 0;
             }
-
             Span<byte> bytes = stackalloc byte[strLen];
-            buffer[ptr..strLen].CopyTo(bytes);
+            buffer[ptr..(ptr + strLen)].CopyTo(bytes);
             ptr += strLen;
-            return Encoding.ASCII.GetString(bytes);
+            var data = Encoding.ASCII.GetString(bytes);
+
+            Utils.Log("Read string '{0}'", data);
+            return data;
         }
     }
 }

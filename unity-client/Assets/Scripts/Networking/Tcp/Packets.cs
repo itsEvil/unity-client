@@ -95,8 +95,15 @@ namespace Networking.Tcp
             }
         }
         public void Handle() {
+            Utils.Log("Handling new tick!");
+
             PacketHandler.Instance.TickId = TickId;
             PacketHandler.Instance.TickTime = TickTime;
+
+            if(Map.MyPlayer != null) {
+                var pos = Map.MyPlayer.GetPosition();
+                TcpTicker.Send(new Move(TickId, TickTime, pos.x, pos.y, PacketHandler.Instance.History));
+            }
         }
     }
     public readonly struct Update : IIncomingPacket {
@@ -104,25 +111,30 @@ namespace Networking.Tcp
         public readonly TileData[] Tiles;
         public readonly ObjectDefinition[] Objects;
         public readonly ObjectDrop[] Drops;
-        public Update(Span<byte> buffer, ref int ptr, int len)
-        {
+        public Update(Span<byte> buffer, ref int ptr, int len) {
             var tilesLength = PacketUtils.ReadUShort(buffer, ref ptr, len);
             Tiles = new TileData[tilesLength];
+            Utils.Log("Tiles Length: {0}", tilesLength);
             for(int i = 0; i <  tilesLength; i++) {
                 Tiles[i] = new TileData(buffer, ref ptr, len);
             }
             var dropsLength = PacketUtils.ReadUShort(buffer, ref ptr, len);
             Drops = new ObjectDrop[dropsLength];
+            Utils.Log("Drops Length: {0}", dropsLength);
             for(int i = 0; i < dropsLength; i++) {
                 Drops[i] = new ObjectDrop(buffer, ref ptr, len);
             }
             var objLength = PacketUtils.ReadUShort(buffer, ref ptr, len);
             Objects = new ObjectDefinition[objLength];
+
+            Utils.Log("Objects Length: {0}", objLength);
             for(int i =0; i <  objLength; i++) {
                 Objects[i] = new ObjectDefinition(buffer, ref ptr, len);
             }
+
         }
         public void Handle() {
+            TcpTicker.Send(new UpdateAck());
 
             Span<ObjectDefinition> objects = Objects.AsSpan();
             for(int i = 0; i < objects.Length; i++) {
@@ -305,9 +317,20 @@ namespace Networking.Tcp
             LightColor = PacketUtils.ReadInt(buffer, ref ptr, len);
             LightIntensity = PacketUtils.ReadFloat(buffer, ref ptr, len);
             UseIntensity = PacketUtils.ReadBool(buffer, ref ptr, len);
-            DayLightIntensity = PacketUtils.ReadFloat(buffer, ref ptr, len);
-            NightLightIntensity = PacketUtils.ReadFloat(buffer, ref ptr, len);
-            TotalElapsedMicroSeconds = PacketUtils.ReadLong(buffer, ref ptr, len);
+
+            Utils.Log("MapInfo::UseIntensity::{0}", UseIntensity);
+            //UseIntensity is true even though it shouldnt be, heck?!
+            //TODO Still need to add lights
+            //if (UseIntensity) {
+            //    DayLightIntensity = PacketUtils.ReadFloat(buffer, ref ptr, len);
+            //    NightLightIntensity = PacketUtils.ReadFloat(buffer, ref ptr, len);
+            //    TotalElapsedMicroSeconds = PacketUtils.ReadLong(buffer, ref ptr, len);
+            //}
+            //else {
+                DayLightIntensity = 0;
+                NightLightIntensity = 0;
+                TotalElapsedMicroSeconds = 0;
+            //}
         }
         public void Handle() {
             Map.Instance.Init(this);
@@ -344,7 +367,10 @@ namespace Networking.Tcp
         public Ping(Span<byte> buffer, ref int ptr, int len) {
             Serial = PacketUtils.ReadInt(buffer, ref ptr, len);
         }
-        public void Handle() { }
+        public void Handle() {
+            Utils.Log("Handling Ping");
+            TcpTicker.Send(new Pong(Serial, GameTime.ElapsedMicroseconds));
+        }
     }
     public readonly struct PlaySound : IIncomingPacket {
         public S2CPacketId Id => S2CPacketId.PlaySound;
