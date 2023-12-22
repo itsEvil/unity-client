@@ -37,7 +37,7 @@ public class PacketHandler {
         TcpTicker.Start(this);
         TcpTicker.Send(
             new Hello(
-                Settings.MajorBuild, Settings.MinorBuild, Settings.NexusId, 
+                Settings.GameBuild, Settings.NexusId, 
                 AccountData.GetEmail(), AccountData.GetPassword(), 
                 InitData.CharId, InitData.NewCharacter, 
                 InitData.ClassType, InitData.SkinType));
@@ -49,7 +49,7 @@ public class PacketHandler {
 
     public void Tick() {
         while (_toBeHandled.TryDequeue(out var packet)) {
-            Utils.Log("Handing {0} packet", packet.Id);
+            //Utils.Log("Handing {0} packet", packet.Id);
 
             packet.Handle();
 
@@ -70,7 +70,7 @@ public class PacketHandler {
         if (packet == null)
             return;
 
-        Utils.Log("Read {0} packet", packet.Id);
+        //Utils.Log("Read {0} packet", packet.Id);
         
         AddPacket(packet);
     }

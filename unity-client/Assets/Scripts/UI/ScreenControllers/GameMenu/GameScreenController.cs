@@ -25,10 +25,12 @@ namespace UI {
             handler.Start();
         }
         public void OnMyPlayerConnected(Player myPlayer) {
-            _minimapWidget.Init();
             _statsWidget.Init(myPlayer);
-            _minimapWidget.gameObject.SetActive(true);
             _statsWidget.gameObject.SetActive(true);
+        }
+        public void OnMapInfo() {
+            //_minimapWidget.Init();
+            //_minimapWidget.gameObject.SetActive(true);
         }
         public void Hide() {
             PacketHandler.Instance?.Stop();
@@ -51,7 +53,7 @@ namespace UI {
                 return;
 
             _statsWidget.Tick();
-            _minimapWidget.Tick();
+            //_minimapWidget.Tick();
         }
 
         private void OnApplicationQuit() {

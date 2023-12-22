@@ -48,6 +48,9 @@ namespace UI {
         public void UpdateWisdomText()
             => _wisText.text = StringUtils.GetNumericString(_player.Wisdom);
         public void Tick() {
+            if (_player == null)
+                return;
+
             _hpBar.Tick(_player.GetHp(), _player.GetMaxHp());
             _mpBar.Tick(_player.Mp, _player.MaxMp);
 

@@ -1,3 +1,4 @@
+using Account;
 using Game;
 using Static;
 using System;
@@ -96,15 +97,11 @@ namespace Networking.Tcp
             }
         }
         public void Handle() {
-            Utils.Log("Handling new tick!");
 
             PacketHandler.Instance.TickId = TickId;
             PacketHandler.Instance.TickTime = TickTime;
 
-            if(Map.MyPlayer != null) {
-                var pos = Map.MyPlayer.GetPosition();
-                TcpTicker.Send(new Move(TickId, TickTime, pos.x, pos.y, PacketHandler.Instance.History));
-            }
+            Map.MovesRequested++;
 
             foreach(var objectStat in Statuses) {
                 var entity = Map.Instance.GetEntity(objectStat.Id);
@@ -123,47 +120,40 @@ namespace Networking.Tcp
     public readonly struct Update : IIncomingPacket {
         public S2CPacketId Id => S2CPacketId.Update;
         public readonly ObjectDefinition[] Objects;
-        public readonly ObjectDrop[] Drops;
-
-        public readonly ushort[] TileTypes;
-        public readonly Vector3Int[] TilePositions;
+        public readonly int[] Drops; //Removed entity id's 
+        public readonly ushort[] TileTypes; //New tiles
+        public readonly Vector3Int[] TilePositions; //New Tile positions
         public Update(Span<byte> buffer, ref int ptr, int len) {
+            
             var tilesLength = PacketUtils.ReadUShort(buffer, ref ptr, len);
-            //Utils.Log("Tiles Length: {0}", tilesLength);
             TileTypes = new ushort[tilesLength];
             TilePositions = new Vector3Int[tilesLength];
             for(int i = 0; i <  tilesLength; i++) {
                 TilePositions[i] = new Vector3Int(
                     PacketUtils.ReadShort(buffer, ref ptr, len), 
-                    PacketUtils.ReadShort(buffer, ref ptr, len)
-                );
+                    PacketUtils.ReadShort(buffer, ref ptr, len));
                 TileTypes[i] = PacketUtils.ReadUShort(buffer, ref ptr, len);
             }
+
             var dropsLength = PacketUtils.ReadUShort(buffer, ref ptr, len);
-            Drops = new ObjectDrop[dropsLength];
-            //Utils.Log("Drops Length: {0}", dropsLength);
+            Drops = new int[dropsLength];
             for(int i = 0; i < dropsLength; i++) {
-                Drops[i] = new ObjectDrop(buffer, ref ptr, len);
+                Drops[i] = PacketUtils.ReadInt(buffer, ref ptr, len);
             }
+
             var objLength = PacketUtils.ReadUShort(buffer, ref ptr, len);
             Objects = new ObjectDefinition[objLength];
-
-            //Utils.Log("Objects Length: {0}", objLength);
-            for(int i =0; i <  objLength; i++) {
+            for(int i =0; i < objLength; i++)
                 Objects[i] = new ObjectDefinition(buffer, ref ptr, len);
-            }
-
         }
         public void Handle() {
             TcpTicker.Send(new UpdateAck());
 
-            Span<ObjectDrop> drops = Drops.AsSpan();
-            for(int i = 0; i < drops.Length; i++) {
-                var drop = drops[i];
-                Map.Instance.RemoveEntity(drop.Id);
-            }
-
             Map.Instance.SetTiles(TilePositions, TileTypes);
+
+            Span<int> drops = Drops.AsSpan();
+            for(int i = 0; i < drops.Length; i++)
+                Map.Instance.RemoveEntity(drops[i]);
 
             Span<ObjectDefinition> objects = Objects.AsSpan();
             for(int i = 0; i < objects.Length; i++) {
@@ -182,11 +172,18 @@ namespace Networking.Tcp
     }
     public readonly struct AccountList : IIncomingPacket {
         public S2CPacketId Id => S2CPacketId.AccountList;
-        public AccountList(Span<byte> buffer, ref int ptr, int lenr)
-        {
-
+        public readonly int AccountListId;
+        public readonly int[] AccountIds;
+        public AccountList(Span<byte> buffer, ref int ptr, int len) {
+            AccountListId = PacketUtils.ReadInt(buffer, ref ptr, len);
+            var length = PacketUtils.ReadUShort(buffer, ref ptr, len);
+            AccountIds = new int[length];
+            for (int i = 0; i < AccountIds.Length; i++)
+                AccountIds[i] = PacketUtils.ReadInt(buffer, ref ptr, len);
         }
-        public void Handle() { }
+        public void Handle() {
+            Utils.Log("Handling AccountList {0} {1}", AccountListId, string.Join(',', AccountIds));
+        }
     }
     public readonly struct AllyShoot : IIncomingPacket {
         public S2CPacketId Id => S2CPacketId.AllyShoot;
@@ -234,7 +231,10 @@ namespace Networking.Tcp
             ObjectId = PacketUtils.ReadInt(buffer, ref ptr, len);
             CharacterId = PacketUtils.ReadInt(buffer, ref ptr, len);
         }
-        public void Handle() { }
+        public void Handle() { 
+            PacketHandler.Instance.PlayerId = ObjectId;
+            AccountData.CurrentCharId = CharacterId;
+        }
     }
     public readonly struct Damage : IIncomingPacket {
         public S2CPacketId Id => S2CPacketId.Damage;
@@ -268,7 +268,9 @@ namespace Networking.Tcp
             ErrorCode = PacketUtils.ReadInt(buffer, ref ptr, len);
             Description = PacketUtils.ReadString(buffer, ref ptr, len);
         }
-        public void Handle() { }
+        public void Handle() {
+            TcpTicker.Stop($"FailurePacket::Error::{ErrorCode}::Description::{Description}");
+        }
     }
     public readonly struct File : IIncomingPacket {
         public S2CPacketId Id => S2CPacketId.File;
@@ -350,9 +352,11 @@ namespace Networking.Tcp
             LightIntensity = PacketUtils.ReadFloat(buffer, ref ptr, len);
             UseIntensity = PacketUtils.ReadBool(buffer, ref ptr, len);
 
-            Utils.Log("MapInfo::UseIntensity::{0}", UseIntensity);
+            //Utils.Log("MapInfo::UseIntensity::{0}", UseIntensity);
+
             //UseIntensity is true even though it shouldnt be, heck?!
             //TODO Still need to add lights
+            
             //if (UseIntensity) {
             //    DayLightIntensity = PacketUtils.ReadFloat(buffer, ref ptr, len);
             //    NightLightIntensity = PacketUtils.ReadFloat(buffer, ref ptr, len);
@@ -367,6 +371,7 @@ namespace Networking.Tcp
         public void Handle() {
             Map.Instance.Init(this);
             PacketHandler.Instance.Random = new wRandom(Seed);
+            Utils.Log("Loading into {0}. Difficulty {1}", DisplayName, Difficulty);
         }
     }
     public readonly struct NameResult : IIncomingPacket {
@@ -486,12 +491,22 @@ namespace Networking.Tcp
     }
     public readonly struct Text : IIncomingPacket {
         public S2CPacketId Id => S2CPacketId.Text;
-        public Text(Span<byte> buffer, ref int ptr, int len)
-        {
-
+        public readonly string Name;
+        public readonly int ObjectId;
+        public readonly int NumStars;
+        public readonly byte BubbleTime;
+        public readonly string Recipient;
+        public readonly string Message;
+        public Text(Span<byte> buffer, ref int ptr, int len) {
+            Name = PacketUtils.ReadString(buffer, ref ptr, len);
+            ObjectId= PacketUtils.ReadInt(buffer, ref ptr, len);
+            NumStars = PacketUtils.ReadInt(buffer, ref ptr, len);
+            BubbleTime = PacketUtils.ReadByte(buffer, ref ptr, len);
+            Recipient = PacketUtils.ReadString(buffer, ref ptr, len);
+            Message = PacketUtils.ReadString(buffer, ref ptr, len);
         }
-        public void Handle() { 
-        
+        public void Handle() {
+            Utils.Log("Handling Text packet {0}, {1}", Name, Message);
         }
     }
     #endregion
@@ -616,24 +631,22 @@ namespace Networking.Tcp
         public readonly float X;
         public readonly float Y;
         public readonly MoveRecord[] History;
-        public Move(int tickId, long tickTime, float x, float y, MoveRecord[] history)
-        {
+        public Move(int tickId, long tickTime, float x, float y, MoveRecord[] history) {
             TickId = tickId;
             TickTime = tickTime;
             X = x;
             Y = y;
             History = history;
         }
-        public void Write(Span<byte> buffer, ref int ptr)
-        {
-            //wtr.Write(TickId);
-            //wtr.Write(TickTime);
-            //wtr.Write(X);
-            //wtr.Write(Y);
-            //wtr.Write((ushort)History.Length);
-            //for (int i = 0; i < History.Length; i++)
-            //    History[i].Write(wtr);
+        public void Write(Span<byte> buffer, ref int ptr) {
+            PacketUtils.WriteInt(buffer, TickId, ref ptr);
+            PacketUtils.WriteLong(buffer, TickTime, ref ptr);
+            PacketUtils.WriteFloat(buffer, X, ref ptr);
+            PacketUtils.WriteFloat(buffer, Y, ref ptr);
 
+            PacketUtils.WriteUShort(buffer, (ushort)History.Length, ref ptr);
+            for(int i =0;i < History.Length; i++)
+                History[i].Write(buffer, ref ptr);
         }
     }
     public readonly struct InvSwap : IOutgoingPacket
@@ -649,8 +662,9 @@ namespace Networking.Tcp
     public readonly struct Hello : IOutgoingPacket
     {
         public C2SPacketId Id => C2SPacketId.Hello;
-        public readonly ushort MajorVersion;
-        public readonly ushort MinorVersion;
+        public readonly string GameVersion;
+        //public readonly ushort MajorVersion;
+        //public readonly ushort MinorVersion;
         public readonly int WorldId;
         public readonly string Email;
         public readonly string Password;
@@ -658,10 +672,9 @@ namespace Networking.Tcp
         public readonly bool CreateChar;
         public readonly short CharType;
         public readonly short SkinType;
-        public Hello(ushort majorVersion, ushort minorVersion, int worldId, string email, string password, short charId, bool createChar, short charType, short skinType)
+        public Hello(string version, int worldId, string email, string password, short charId, bool createChar, short charType, short skinType)
         {
-            MajorVersion = majorVersion;
-            MinorVersion = minorVersion;
+            GameVersion = version;
             WorldId = worldId;
             Email = email;
             Password = password;
@@ -671,8 +684,7 @@ namespace Networking.Tcp
             SkinType = skinType;
         }
         public void Write(Span<byte> buffer, ref int ptr) {
-            PacketUtils.WriteUShort(buffer, MajorVersion, ref ptr);
-            PacketUtils.WriteUShort(buffer, MinorVersion, ref ptr);
+            PacketUtils.WriteString(buffer, GameVersion, ref ptr);
             PacketUtils.WriteInt(buffer, WorldId, ref ptr);
             PacketUtils.WriteString(buffer, Email, ref ptr);
             PacketUtils.WriteString(buffer, Password, ref ptr);

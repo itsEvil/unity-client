@@ -124,7 +124,7 @@ namespace Networking {
                     if (!_socket.Connected)
                         return;
 
-                    Utils.Log("TcpTicker::Tick");
+                    //Utils.Log("TcpTicker::Tick");
 
                     StartSend();
                     StartReceive();
@@ -148,7 +148,7 @@ namespace Networking {
                     _Send.PacketLength = ptr;
 
                     Utils.Log($"Sending packet {(C2SPacketId)_Send.Data[LENGTH_PREFIX]} {_Send.Data[LENGTH_PREFIX]} {_Send.PacketLength}");                    
-                    BinaryPrimitives.WriteUInt16LittleEndian(_Send.Data.AsSpan()[0..], (ushort)_Send.PacketLength); //Length
+                    BinaryPrimitives.WriteUInt16LittleEndian(_Send.Data.AsSpan()[0..], (ushort)(_Send.PacketLength - LENGTH_PREFIX)); //Length
                         
                     //Debug data
                     //StringBuilder sb = new();
@@ -179,7 +179,7 @@ namespace Networking {
             if (len == 0)
                 throw new Exception("Data received length is zero");
             
-            if (len < 0)
+            if (len < LENGTH_PREFIX)
                 return;
 
             //Debug data
@@ -193,12 +193,10 @@ namespace Networking {
             ProcessPacket(len);
         }
         private static void ProcessPacket(int len) {
-            try
-            {
+            try {
                 int ptr = 0;
                 var buffer = _Receive.PacketBytes.AsSpan();
 
-                //while(ptr < len && !_tokenSource.IsCancellationRequested) {
                 var packetLen = PacketUtils.ReadUShort(buffer, ref ptr, len);
 
                 if(len != packetLen + LENGTH_PREFIX) {
@@ -206,24 +204,18 @@ namespace Networking {
                     return;
                 }
 
-                //var nextPacketPtr = ptr + packetLen - 2;
+                //StringBuilder sb = new();
+                //for (int i = 0; i < len; i++)
+                //    sb.Append('[').Append(_Receive.PacketBytes[i]).Append(']');
 
                 var packetId = (S2CPacketId)PacketUtils.ReadByte(buffer[ptr..], ref ptr, len); //nextPacketPtr
-                //Utils.Log("Received packet {0} {1}", packetId, buffer[LENGTH_PREFIX]);
+                //Utils.Log("Received Packet {2} | Length: {0} Bytes: {1}", len, sb.ToString(), packetId);
 
                 PacketHandler.Instance.ReadPacket(packetId, buffer, ref ptr, len); //nextPacketPtr
-
-                //ptr = nextPacketPtr;
-
-                //}
             }
             catch(Exception e) {
                 throw e;
-                //Utils.Error("Read exception {0}::{1}", e.Message, e.StackTrace);
-                //Stop(nameof(ProcessPacket));
             }
-
-            return;
         }
         private class ReceiveState {
             public int PacketLength;

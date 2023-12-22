@@ -5,6 +5,7 @@ using Networking.Tcp;
 using Static;
 using System;
 using System.Collections.Generic;
+using UI;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using TileData = Static.TileData;
@@ -55,6 +56,7 @@ namespace Game {
         public void Init(MapInfo mapInfo) {
             MapInfo = mapInfo;
             Tiles = new Square[MapInfo.Width, MapInfo.Height];
+            GameScreenController.Instance.OnMapInfo();
         }
         
         public void OnMyPlayerConnected(Player player) {
@@ -62,6 +64,7 @@ namespace Game {
             MyPlayer.OnMyPlayer();
             Utils.Log("MyPlayerConnected! {0}", player.Name);
             CameraController.Instance.SetFocus(MyPlayer.gameObject);
+            GameScreenController.Instance.OnMyPlayerConnected(MyPlayer);
             //Hide preloader
         }
 
@@ -87,9 +90,11 @@ namespace Game {
         }
         public void SetTiles(Vector3Int[] positions, ushort[] tileTypes) {
             Square[] squares = new Square[tileTypes.Length];
+            Span<Vector3Int> positionSpan = positions.AsSpan();
+            Span<ushort> tileTypeSpan = tileTypes.AsSpan();
             for(int i = 0; i < tileTypes.Length; i++) {
-                var tile = tileTypes[i];
-                var pos = positions[i];
+                var tile = tileTypeSpan[i];
+                var pos = positionSpan[i];
                 var square = GetSquare(pos.x, pos.y);
                 square.Init(AssetLibrary.GetTileDesc(tile), pos.x, pos.y);
                 squares[i] = square;

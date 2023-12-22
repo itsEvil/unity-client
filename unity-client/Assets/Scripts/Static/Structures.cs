@@ -527,20 +527,19 @@ namespace Static {
             TileType = PacketUtils.ReadUShort(buffer, ref ptr, len);
         }
     }
-    public struct MoveRecord
-    {
-        public long Time;
-        public float X;
-        public float Y;
+    public readonly struct MoveRecord {
+        public readonly long Time;
+        public readonly float X;
+        public readonly float Y;
         public MoveRecord(long time, float x, float y) {
             Time = time;
             X = x;
             Y = y;
         }
-        public readonly void Write(PacketWriter wtr) {
-            wtr.Write(Time);
-            wtr.Write(X);
-            wtr.Write(Y);
+        public readonly void Write(Span<byte> buffer, ref int ptr) {
+            PacketUtils.WriteLong(buffer, Time, ref ptr);
+            PacketUtils.WriteFloat(buffer, X, ref ptr);
+            PacketUtils.WriteFloat(buffer, Y, ref ptr);
         }
     }
     public readonly struct ObjectDrop {
@@ -585,38 +584,23 @@ namespace Static {
                 x = PacketUtils.ReadFloat(buffer, ref ptr, len),
                 y = PacketUtils.ReadFloat(buffer, ref ptr, len),
             };
-
-            var statsCount = PacketUtils.ReadUShort(buffer, ref ptr, len);
-            var statsByteLength = PacketUtils.ReadUShort(buffer, ref ptr, len);
-            var nextObjIdx = ptr + statsByteLength;
+            var statsCount = PacketUtils.ReadByte(buffer[ptr..], ref ptr, len);
             Stats = new Dictionary<StatType, object>();
             for (var i = 0; i < statsCount; i++) {
                 StatType key = (StatType)PacketUtils.ReadByte(buffer[ptr..], ref ptr, len);
                 //Utils.Log("Reading Stat {0} {1} {2}", key, statsCount, i);
                 if (!Enum.IsDefined(typeof(StatType), key)) {
                     Utils.Error("Key not defined in enum {0}", key);
-                    ptr = nextObjIdx;
                     continue;
                 }
 
                 if (!ReadStat(key, buffer, ref ptr, len, out var data)) {
                     Utils.Error("Stat data parsing for stat {0} failed, object: {1}", key, Id);
-                    ptr = nextObjIdx;
                     continue;
                 }
 
                 Stats[key] = data;
             }
-            //var newPtr = PacketUtils.ReadUShort(buffer, ref ptr, len);
-
-            //Debug
-            //StringBuilder sb = new();
-            //sb.Append($"Id: {Id} Position:[{Position.x}:{Position.y}] Stats {statsCount}:[");
-            //foreach(var (key, value) in Stats)
-            //    sb.Append($"|Key:{key} Value:{value}|");
-            //
-            //sb.Append($"]");
-            //Utils.Log("Object Status: {0}", sb.ToString());
         }
 
         private static bool ReadStat(StatType key, Span<byte> buffer, ref int ptr, int len, out object data) {
@@ -631,30 +615,9 @@ namespace Static {
         }
 
         private static object ParseStatData(StatType key, Span<byte> buffer, ref int ptr, int len) {
-            return key switch
-            {
-                StatType.MaxHp or StatType.Hp or StatType.Size or StatType.MaxMp or StatType.Mp
-                or StatType.NextLevelExp or StatType.Exp or StatType.Level or StatType.Inventory0
-                or StatType.Inventory1 or StatType.Inventory2 or StatType.Inventory3 or StatType.Inventory4
-                or StatType.Inventory5 or StatType.Inventory6 or StatType.Inventory7 or StatType.Inventory8
-                or StatType.Inventory9 or StatType.Inventory10 or StatType.Inventory11 or StatType.Attack
-                or StatType.Defense or StatType.Speed or StatType.Vitality or StatType.Wisdom or StatType.Dexterity
-                or StatType.Backpack0 or StatType.Backpack1 or StatType.Backpack2 or StatType.Backpack3
-                or StatType.Backpack4 or StatType.Backpack5 or StatType.Backpack6 or StatType.Backpack7
-                or StatType.GuildRank or StatType.Breath or StatType.HealthPotionStack or StatType.MagicPotionStack
-                or StatType.NumStars or StatType.Tex1 or StatType.Tex2 or StatType.MerchandiseCount
-                or StatType.MerchandiseMinsLeft or StatType.MerchandiseRankReq or StatType.MerchandisePrice
-                or StatType.Credits or StatType.AccountId or StatType.Fame or StatType.MaxHpBoost or StatType.MaxMpBoost
-                or StatType.AttackBoost or StatType.DefenseBoost or StatType.SpeedBoost or StatType.VitalityBoost
-                or StatType.WisdomBoost or StatType.DexterityBoost or StatType.CharFame or StatType.NextClassQuestFame
-                    => PacketUtils.ReadInt(buffer, ref ptr, len),
-
-                StatType.Condition => PacketUtils.ReadUInt(buffer, ref ptr, len),
-                StatType.Name => PacketUtils.ReadString(buffer, ref ptr, len),
-                StatType.MerchandiseType => PacketUtils.ReadUShort(buffer, ref ptr, len),
-                StatType.Active or StatType.HasBackpack or StatType.NameChosen => PacketUtils.ReadBool(buffer, ref ptr, len),
-                StatType.MerchandiseDiscount or StatType.MerchandiseCurrency => PacketUtils.ReadByte(buffer[ptr..], ref ptr, len),
-                _ => false,
+            return key switch {
+                StatType.Name or StatType.GuildName => PacketUtils.ReadString(buffer, ref ptr, len),
+                _ => PacketUtils.ReadInt(buffer, ref ptr, len)
             };
         }
     }

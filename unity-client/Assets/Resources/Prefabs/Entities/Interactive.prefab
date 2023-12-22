@@ -48,9 +48,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Renderer: {fileID: 1268893023593391328}
   Type: 2
+  Name: 
   Id: 0
   Dead: 0
   IsInteractive: 0
+  Z: 0
+  Square: {fileID: 0}
 --- !u!1 &4671789077408090441
 GameObject:
   m_ObjectHideFlags: 0
@@ -205,8 +208,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 1843256413
+  m_SortingLayer: 3
   m_SortingOrder: 0
   m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}

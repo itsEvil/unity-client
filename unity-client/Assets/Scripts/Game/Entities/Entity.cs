@@ -15,7 +15,14 @@ public class Entity : MonoBehaviour, IDisposable {
     public int Id;
     public bool Dead;
     public bool IsInteractive;
-    protected Vec2 Position;
+    protected Vec2 Position {
+        get => new(transform.position.x, transform.position.y);
+        set {
+            var yOffset = Descriptor.DrawOnGround ? -0.5f : 0f;
+            transform.position = new Vector3(value.x, value.y + yOffset, -Z);
+        }
+    }
+    public float Z;
     protected int Hp;
     protected int MaxHp;
     protected int Size;
@@ -114,10 +121,10 @@ public class Entity : MonoBehaviour, IDisposable {
     }
     public virtual void UpdateStat(StatType stat, object value) {
         switch (stat) {
-            case StatType.MaxHp:
+            case StatType.MaximumHP:
                 MaxHp = (int)value;
                 return;
-            case StatType.Hp:
+            case StatType.HP:
                 Hp = (int)value;
                 return;
             case StatType.Size:

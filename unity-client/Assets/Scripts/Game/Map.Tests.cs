@@ -4,10 +4,13 @@ using UnityEngine;
 
 namespace Game {
     public partial class Map : MonoBehaviour {
+        private void Start() {
+            //SpawnTilesTest();
+        }
         private void SpawnTilesTest() {
             short x = 0;
             short y = 0;
-            Utils.Log("Map::TileTest::{0}", AssetLibrary.Type2TileDesc.Count);
+            //Utils.Log("Map::TileTest::{0}", AssetLibrary.Type2TileDesc.Count);
             foreach(var (id, desc) in AssetLibrary.Type2TileDesc) {
                 x++;
                 if(x > 10) {
@@ -15,7 +18,7 @@ namespace Game {
                     x = 0;
                 }
 
-                Utils.Log("Map::TileTest::SpawningTile::{0}::At-X:{1}-Y:{2}", desc.Id, x,y);
+                //Utils.Log("Map::TileTest::SpawningTile::{0}::At-X:{1}-Y:{2}", desc.Id, x,y);
 
                 var tile = ScriptableObject.CreateInstance<Square>();
                 tile.Init(desc, x, y);

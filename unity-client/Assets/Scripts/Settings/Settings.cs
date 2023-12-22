@@ -10,8 +10,7 @@ public static partial class Settings
     public const int GAME_PORT = 2050;
 
     //Game Version
-    public const ushort MajorBuild = 0;
-    public const ushort MinorBuild = 0;
+    public const string GameBuild = "0.1";
 
     //World Ids
     public const int NexusId = -1;

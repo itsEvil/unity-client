@@ -56,6 +56,16 @@ namespace Networking.Tcp {
             BinaryPrimitives.WriteInt32LittleEndian(buffer[ptr..], value);
             ptr += 4;
         }
+        public static void WriteFloat(Span<byte> buffer, float value, ref int ptr) {
+            if (ptr + 4 > buffer.Length) {
+                Utils.Error("Send buffer attempted to write out of bounds {0}, {1}", ptr + 4, buffer.Length);
+                return;
+            }
+
+            var bytes = BitConverter.GetBytes(value);
+            bytes.CopyTo(buffer[ptr..]);
+            ptr += 4;
+        }
         public static void WriteUInt(Span<byte> buffer, uint value, ref int ptr) {
             //Utils.Log("Trying to write uint {0} at {1}", value, ptr);
             if (ptr + 4 > buffer.Length) {
@@ -220,7 +230,7 @@ namespace Networking.Tcp {
             ptr += strLen;
             var data = Encoding.ASCII.GetString(bytes);
 
-            Utils.Log("Read string '{0}'", data);
+            //Utils.Log("Read string '{0}'", data);
             return data;
         }
     }

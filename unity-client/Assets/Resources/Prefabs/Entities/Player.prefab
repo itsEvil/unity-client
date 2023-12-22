@@ -48,15 +48,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Renderer: {fileID: 1268893023593391328}
   Type: 4
+  Name: 
   Id: 0
   Dead: 0
   IsInteractive: 0
-  Hp: 0
-  MaxHp: 0
-  Size: 0
-  Name: 
-  SinkLevel: 0
-  Inventory: 
+  Z: 0
+  Square: {fileID: 0}
+  MoveMultiplier: 1
+  PushX: 0
+  PushY: 0
+  IsMyPlayer: 0
   CurrentExp: 0
   NextLevelExp: 0
   Level: 0
@@ -232,8 +233,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 1843256413
+  m_SortingLayer: 3
   m_SortingOrder: 0
   m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}

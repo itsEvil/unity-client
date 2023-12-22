@@ -14,6 +14,8 @@ namespace UI {
         public GameObject Object { get => gameObject; }
         private void Awake() => Instance = this;
         public void Reset(object data = null) {
+            Application.targetFrameRate = 120;
+
             ViewManager.SetBackgroundVisiblity(true);
             _playButton.onClick.AddListener(OnPlay);
 

@@ -17,7 +17,7 @@ namespace UI {
         /// </summary>
         public void Tick(int current, int max) {
             if (_player == null || _player.Dead) {
-                Destroy(gameObject);
+                //Destroy(gameObject);
                 return;
             }
 

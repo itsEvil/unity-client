@@ -55,23 +55,26 @@ public sealed class Player : Entity {
         IsMyPlayer = false;
         SlotTypes = new ItemType[Inventory.Length];
         Type = GameObjectType.Player;
+
+        Renderer.sortingLayerID = SortingLayer.GetLayerValueFromName("Entities");
     }
     /// <summary>
     /// Only called when our player connects
     /// </summary>
     public void OnMyPlayer() {
+        Renderer.sortingLayerID = SortingLayer.GetLayerValueFromName("Player");
         _moveController = new PlayerMoveController(this);
-        var charStats = AccountData.Characters[AccountData.CurrentCharId];
-        Inventory = charStats.Inventory;
+        //var charStats = AccountData.Characters[AccountData.CurrentCharId];
+        //Inventory = charStats.Inventory;
         IsMyPlayer = true;
     }
     public override void UpdateStat(StatType stat, object value) {
         base.UpdateStat(stat, value);
         switch (stat) {
-            case StatType.Exp:
+            case StatType.Experience:
                 CurrentExp = (int)value;
                 return;
-            case StatType.NextLevelExp:
+            case StatType.ExperienceGoal:
                 NextLevelExp = (int)value;
                 return;
             case StatType.Level:
@@ -81,7 +84,7 @@ public sealed class Player : Entity {
                 //account fame ?
                 Fame = (int) value;
                 return;
-            case StatType.NumStars:
+            case StatType.Stars:
                 NumStars = (int)value;
                 return;
             case StatType.GuildName:
@@ -96,10 +99,10 @@ public sealed class Player : Entity {
             case StatType.HasBackpack:
                 HasBackpack = (int)value == 1;
                 return;
-            case StatType.Mp:
+            case StatType.MP:
                 Mp = (int)value;
                 return;
-            case StatType.MaxMp:
+            case StatType.MaximumMP:
                 MaxMp = (int)value;
                 return;
             case StatType.Attack:

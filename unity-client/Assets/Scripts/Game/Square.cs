@@ -28,6 +28,9 @@ namespace Game
             }
 
             sprite = desc.TextureData.GetTexture(Hash(x, y));
+
+            if (sprite == null)
+                Utils.Error("Square {0} sprite is null!", desc.Id);
         }
         private static int Hash(int x, int y) {
             var l = LookUp[(x + y) % LookUp.Length];

@@ -5,13 +5,13 @@ using UnityEngine;
 namespace Game.Controllers {
     internal class CameraController : MonoBehaviour {
         public static CameraController Instance { get; private set; }
-
+        //
         [SerializeField]
         private float Angle = 180.0f;
         [SerializeField]
         private float ZScale = 1;
         [SerializeField]
-        private float ZOffset;
+        private float ZOffset = -10;
 
         public Camera Camera { get; private set; }
 
@@ -83,6 +83,7 @@ namespace Game.Controllers {
 
         public void SetFocus(GameObject focus) {
             _focus = focus;
+            Utils.Log("Set focus to {0}", focus.name);
         }
 
         public void AddRotatingEntity(Entity entity) {
