@@ -268,8 +268,8 @@ namespace Game {
 
             TickInteractives();
 
-            if(MyPlayer != null) {
-                TickMyPlayer();
+            if (MyPlayer != null) {
+                MyPlayer.OnMove();
             }
         }
 
@@ -287,32 +287,17 @@ namespace Game {
             //TODO Get nearest interactive entity and enable its UI if its close enough
         }
 
-        private void TickMyPlayer() {
-            //while (GotosRequested > 0) {
-            //    TcpTicker.Send(new GotoAck(GameTime.Time));
-            //    GotosRequested--;
-            //}
-
-            while (MovesRequested > 0) {
-                var pos = MyPlayer.GetPosition();
-                TcpTicker.Send(new Move(GameTime.Time, PacketHandler.Instance.TickTime, pos.x, pos.y, PacketHandler.Instance.History));
-                MyPlayer.OnMove();
-                MovesRequested--;
-            }
-        }
-
         private void Remove() {
             for (int i = 0; i < ToRemoveEntities.Count; i++) {
 
                 var ent = ToRemoveEntities[i];
 
+                EntityPool.Return(ent);
                 Entities.Remove(ent.Id);
                 CameraController.Instance.RemoveRotatingEntity(ent);
 
                 if (ent.IsInteractive)
                     Interactives.Remove(ent.Id);
-
-                //TODO Return Entity to Pool
             }
 
             for (int i = 0; i < ToRemoveTimers.Count; i++) {

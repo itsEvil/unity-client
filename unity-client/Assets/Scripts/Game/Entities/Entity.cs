@@ -31,12 +31,13 @@ public class Entity : MonoBehaviour, IDisposable {
     public ObjectDesc Descriptor;
     public Square Square;
     protected IMoveController _moveController;
-    public virtual void Init(ObjectDesc desc, ObjectDefinition defi) {
-        Descriptor = desc;
-        Id = defi.ObjectStatus.Id;
-        Position = defi.ObjectStatus.Position;
+    public virtual void Init(ObjectDesc descriptor, ObjectDefinition definition) {
+        Descriptor = descriptor;
+        Name = Descriptor.DisplayId;
+        Id = definition.ObjectStatus.Id;
+        Position = definition.ObjectStatus.Position;
         Inventory = new ushort[8];
-        Renderer.sprite = desc.TextureData.GetTexture(0);
+        Renderer.sprite = SpriteUtils.Redraw(descriptor.TextureData.GetTexture(0), 100);
 
         if (Id != PacketHandler.Instance.PlayerId)
             _moveController = new EntityMoveController(this);
@@ -46,7 +47,7 @@ public class Entity : MonoBehaviour, IDisposable {
         }
     }
     public virtual void AddToWorld() {
-        
+        gameObject.SetActive(true);
     }
     public void OnNewTick(Vec2 position) {
         var movement = _moveController as EntityMoveController;
@@ -93,7 +94,7 @@ public class Entity : MonoBehaviour, IDisposable {
 
     }
     public virtual void Dispose() {
-
+        gameObject.SetActive(true);
     }
     public virtual bool MoveTo(Vec2 pos) {
         Map.Instance.MoveEntity(this, pos);

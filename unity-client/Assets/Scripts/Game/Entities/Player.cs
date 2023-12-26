@@ -56,13 +56,13 @@ public sealed class Player : Entity {
         SlotTypes = new ItemType[Inventory.Length];
         Type = GameObjectType.Player;
 
-        Renderer.sortingLayerID = SortingLayer.GetLayerValueFromName("Entities");
+        //Renderer.sortingLayerID = SortingLayer.GetLayerValueFromName("Entities");
     }
     /// <summary>
     /// Only called when our player connects
     /// </summary>
     public void OnMyPlayer() {
-        Renderer.sortingLayerID = SortingLayer.GetLayerValueFromName("Player");
+        //Renderer.sortingLayerID = SortingLayer.GetLayerValueFromName("Player");
         _moveController = new PlayerMoveController(this);
         //var charStats = AccountData.Characters[AccountData.CurrentCharId];
         //Inventory = charStats.Inventory;

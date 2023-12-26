@@ -1,5 +1,6 @@
 ﻿using Static;
 using System.Collections.Generic;
+using UnityEditorInternal.Profiling.Memory.Experimental.FileFormat;
 using UnityEngine;
 
 namespace Game {
@@ -32,6 +33,7 @@ namespace Game {
         }
 
         public void Return(Entity entity) {
+            Debug.Log($"Returning object [{entity.Type}] [{entity.Id}:{entity.Name}]");
             if (entity == null) {
                 Debug.LogWarning("CAN NOT RETURN NULL WRAPPER");
                 return;

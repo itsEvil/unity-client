@@ -12,7 +12,11 @@ public static partial class Settings
     public static KeyCode MoveLeft = KeyCode.A;
 
     public static KeyCode RotateRight = KeyCode.Q;
-    public static KeyCode RotateLeft = KeyCode.R;
+    public static KeyCode RotateLeft = KeyCode.E;
+
+    public static KeyCode Interact = KeyCode.F;
+    public static KeyCode EscapeToNexus = KeyCode.R;
+
 
     public static KeyCode ResetRotation = KeyCode.LeftShift;
 }

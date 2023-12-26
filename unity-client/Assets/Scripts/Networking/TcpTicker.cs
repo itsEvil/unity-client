@@ -147,7 +147,7 @@ namespace Networking {
                     packet.Write(_Send.Data.AsSpan()[(ptr - 3)..], ref ptr);
                     _Send.PacketLength = ptr;
 
-                    Utils.Log($"Sending packet {(C2SPacketId)_Send.Data[LENGTH_PREFIX]} {_Send.Data[LENGTH_PREFIX]} {_Send.PacketLength}");                    
+                    //Utils.Log($"Sending packet {(C2SPacketId)_Send.Data[LENGTH_PREFIX]} {_Send.Data[LENGTH_PREFIX]} {_Send.PacketLength}");                    
                     BinaryPrimitives.WriteUInt16LittleEndian(_Send.Data.AsSpan()[0..], (ushort)(_Send.PacketLength - LENGTH_PREFIX)); //Length
                         
                     //Debug data
@@ -200,7 +200,14 @@ namespace Networking {
                 var packetLen = PacketUtils.ReadUShort(buffer, ref ptr, len);
 
                 if(len != packetLen + LENGTH_PREFIX) {
-                    Utils.Warn("Packet length miss match {0} != {1}, Ignoring!", len, packetLen + LENGTH_PREFIX);
+                    if(len >= LENGTH_PREFIX) {
+                        var packetId2 = (S2CPacketId)PacketUtils.ReadByte(buffer[ptr..], ref ptr, len);
+                        Utils.Warn("Packet length miss match {0} != {1}, Ignoring {2}!", len, packetLen + LENGTH_PREFIX, packetId2);
+                    }
+                    else {
+                        Utils.Warn("Packet length miss match {0} != {1}, Ignoring!", len, packetLen + LENGTH_PREFIX);
+                    }
+
                     return;
                 }
 

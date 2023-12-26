@@ -3,6 +3,7 @@ using Game;
 using Static;
 using System;
 using UnityEngine;
+using static UnityEditor.PlayerSettings;
 
 namespace Networking.Tcp
 {
@@ -95,13 +96,13 @@ namespace Networking.Tcp
             for(int i = 0; i < length; i++) {
                 Statuses[i] = new ObjectStatus(buffer, ref ptr, len);
             }
+
+            //Utils.Log("Read NewTick Id:{0} Time:{1}", TickId, TickTime);
         }
         public void Handle() {
-
-            PacketHandler.Instance.TickId = TickId;
-            PacketHandler.Instance.TickTime = TickTime;
-
-            Map.MovesRequested++;
+            //Utils.Log("Handling NewTick Id:{0} Time:{1}", TickId, TickTime);
+            var pos = Map.MyPlayer.GetPosition();
+            TcpTicker.Send(new Move(TickId, TickTime, pos.x, pos.y, PacketHandler.Instance.History));
 
             foreach(var objectStat in Statuses) {
                 var entity = Map.Instance.GetEntity(objectStat.Id);
@@ -369,6 +370,8 @@ namespace Networking.Tcp
             //}
         }
         public void Handle() {
+            TcpTicker.Send(new UpdateAck()); //Hack but should fix 'Connection Timeout (UpdateAck);'
+
             Map.Instance.Init(this);
             PacketHandler.Instance.Random = new wRandom(Seed);
             Utils.Log("Loading into {0}. Difficulty {1}", DisplayName, Difficulty);
