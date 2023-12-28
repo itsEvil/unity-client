@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.U2D;
 
 public static class SpriteUtils {
     public const int PIXELS_PER_UNIT = 8;
@@ -349,7 +350,6 @@ public static class SpriteUtils {
 
         return true;
     }
-
     public static bool IsTransparent(Texture2D texture, Rect rect)
     {
         for (var y = rect.y; y < rect.yMax; y++)

@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Game.Controllers {
     internal class CameraController : MonoBehaviour {
         public static CameraController Instance { get; private set; }
-        //
+        
         [SerializeField]
         private float Angle = 180.0f;
         [SerializeField]

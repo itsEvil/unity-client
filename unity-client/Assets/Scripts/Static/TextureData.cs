@@ -63,14 +63,13 @@ namespace Static {
             return AltTextures?[id];
         }
         private void Parse(XElement textureXml) {
+            TextureName = GetTextureName(textureXml);
             switch (textureXml.Name.ToString()) {
                 case "Texture":
                     Texture = GetTexture(textureXml);
-                    TextureName = GetTextureName(textureXml);
                     break;
                 case "AnimatedTexture":
                     Animation = GetAnimatedTexture(textureXml);//, m_Type);
-                    TextureName = GetTextureName(textureXml);
                     Texture = Animation.ImageFromAngle(0, Action.Stand, 0);
                     break;
                 case "RandomTexture":
@@ -83,17 +82,21 @@ namespace Static {
         private static Sprite GetTexture(XElement textureXml) {
             var sheetName = textureXml.ParseString("File");
             var index = textureXml.ParseUshort("Index");
-            return AssetLibrary.GetImage(sheetName, index);
+
+            if (sheetName.Contains("invisible", StringComparison.InvariantCultureIgnoreCase))
+                return null;
+
+            return SpriteAtlasCreator.GetSprite(sheetName, index);
         }
 
         private static string GetTextureName(XElement textureXml) {
-            return textureXml.ParseString("File");
+            return textureXml.ParseString("File", string.Empty);
         }
 
         private static CharacterAnimation GetAnimatedTexture(XElement textureXml) {
             var sheetName = textureXml.ParseString("File");
             var index = textureXml.ParseUshort("Index");
-            return AssetLibrary.GetAnimation(sheetName, index);
+            return SpriteAtlasCreator.GetCharacterAnimation(sheetName, index);
         }
 
         private static TextureData[] GetRandomTexture(XElement textureXml) {

@@ -1,5 +1,6 @@
 ﻿using Data;
 using Game;
+using Static;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -58,17 +59,16 @@ public static class TileRedrawer
         if (_TileCache.TryGetValue(square.Type, out var sprite))
             return sprite;
 
-        var orig = AssetLibrary.GetTileImage(square.Type);
+        var orig = AssetLibrary.GetTileImage(square);
         Texture2D texture;
 
-        if (originalBackground)
-        {
+        if (originalBackground) {
             texture = SpriteUtils.CreateTexture(orig);
         }
-        else
-        {
-            texture = new Texture2D(8, 8);
-            texture.filterMode = FilterMode.Point;
+        else {
+            texture = new(8, 8) {
+                filterMode = FilterMode.Point
+            };
         }
 
         texture.Apply();
@@ -79,28 +79,19 @@ public static class TileRedrawer
     }
     public static Sprite Redraw(Square square, bool originalBackground)
     {
-        //Debug.Log($"Type: {square.Type}");
         object[] sig;
         if (square.Type == 253)
-        {
             sig = GetCompositeSig(square);
-        }
         else if (square.Descriptor.HasEdge)
-        {
             sig = GetEdgeSig(square);
-        }
         else
-        {
             sig = GetSig(square);
-        }
-
-        //Debug.Log($"SigIsNull::{sig == null}");
+        
 
         if (sig == null)
             return null;
 
         byte index = FPMathUtils.RandomRef(ref _bytes, ref _byteIndex);
-        //Debug.Log($"CacheIndex:{index}::{sig}");
         var cache = _Caches[index];
 
         if (cache.TryGetValue(sig, out var sprite))
@@ -108,18 +99,18 @@ public static class TileRedrawer
 
         if (square.Type == 253)
         {
-            //var newSprite = BuildComposite(sig);
-            //_Cache[sig] = newSprite;
-            return null;
-            //return newSprite;
+            var newSprite = BuildComposite(sig);
+            cache[sig] = newSprite;
+            _Caches[index] = cache;
+            return newSprite;
         }
 
         if (square.Descriptor.HasEdge)
         {
-            //var newSprite = DrawEdges(sig);
-            //_Cache[sig] = newSprite;
-            return null;
-            //return null;//newSprite;
+            var newSprite = DrawEdges(sig);
+            cache[sig] = newSprite;
+            _Caches[index] = cache;
+            return newSprite;
         }
 
         var redraw0 = false;
@@ -191,18 +182,18 @@ public static class TileRedrawer
         }
 
         //Todo add masks
-        //if (redraw0) {
-        //    RedrawRect(texture, Rect0, _MaskLists[0], s4, s3, s0, s1);
-        //}
-        //if (redraw1) {
-        //    RedrawRect(texture, Rect1, _MaskLists[1], s4, s1, s2, s5);
-        //}
-        //if (redraw2) {
-        //    RedrawRect(texture, Rect2, _MaskLists[2], s4, s7, s6, s3);
-        //}
-        //if (redraw3) {
-        //    RedrawRect(texture, Rect3, _MaskLists[3], s4, s5, s8, s7);
-        //}
+        if (redraw0) {
+            RedrawRect(texture, Rect0, _MaskLists, s4, s3, s0, s1);
+        }
+        if (redraw1) {
+            RedrawRect(texture, Rect1, _MaskLists, s4, s1, s2, s5);
+        }
+        if (redraw2) {
+            RedrawRect(texture, Rect2, _MaskLists, s4, s7, s6, s3);
+        }
+        if (redraw3) {
+            RedrawRect(texture, Rect3, _MaskLists, s4, s5, s8, s7);
+        }
 
         texture.Apply();
         sprite = Sprite.Create(texture, TextureRect8, SpriteUtils.Pivot, SpriteUtils.PIXELS_PER_UNIT);
@@ -213,11 +204,11 @@ public static class TileRedrawer
         return sprite;
     }
 
-    private static void RedrawRect(Texture2D texture, RectInt rect, List<List<Sprite>> masks, ushort b, ushort n0, ushort n1, ushort n2) {
+    private static void RedrawRect(Texture2D texture, RectInt rect, List<Sprite> masks, ushort b, ushort n0, ushort n1, ushort n2) {
         Sprite mask;
         Sprite blend;
         if (b == n0 && b == n2) {
-            mask = masks[_OUTER].Random();
+            mask = masks[_OUTER];
             blend = AssetLibrary.GetTileImage(n1);
         }
         else if (b != n0 && b != n2)
@@ -226,22 +217,22 @@ public static class TileRedrawer
             {
                 var n0Image = SpriteUtils.CreateTexture(AssetLibrary.GetTileImage(n0));
                 var n2Image = SpriteUtils.CreateTexture(AssetLibrary.GetTileImage(n2));
-                texture.CopyPixels(n0Image, rect, masks[_INNER_P2].Random());
-                texture.CopyPixels(n2Image, rect, masks[_INNER_P1].Random());
+                texture.CopyPixels(n0Image, rect, masks[_INNER_P2]);
+                texture.CopyPixels(n2Image, rect, masks[_INNER_P1]);
                 return;
             }
 
-            mask = masks[_INNER].Random();
+            mask = masks[_INNER];
             blend = AssetLibrary.GetTileImage(n0);
         }
         else if (b != n0)
         {
-            mask = masks[_SIDE0].Random();
+            mask = masks[_SIDE0];
             blend = AssetLibrary.GetTileImage(n0);
         }
         else
         {
-            mask = masks[_SIDE1].Random();
+            mask = masks[_SIDE1];
             blend = AssetLibrary.GetTileImage(n2);
         }
 

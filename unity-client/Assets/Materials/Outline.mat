@@ -33,7 +33,7 @@ Material:
     - _GlowWidth: 1
     - _OutlineThickness: 1
     - _OutlineWidth: 1
-    - _Size: 1
+    - _Size: 0.2
     - _YOffset: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}

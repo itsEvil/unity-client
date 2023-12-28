@@ -101,7 +101,7 @@ namespace Networking.Tcp
         }
         public void Handle() {
             //Utils.Log("Handling NewTick Id:{0} Time:{1}", TickId, TickTime);
-            var pos = Map.MyPlayer.GetPosition();
+            var pos = Map.MyPlayer.Position;
             TcpTicker.Send(new Move(TickId, TickTime, pos.x, pos.y, PacketHandler.Instance.History));
 
             foreach(var objectStat in Statuses) {
@@ -165,9 +165,6 @@ namespace Networking.Tcp
 
                 //Prepares to add the entity to the world
                 Map.Instance.AddEntity(entity);
-
-                if (obj.ObjectStatus.Id == PacketHandler.Instance.PlayerId)
-                    Map.Instance.OnMyPlayerConnected(entity as Player);
             }
         }
     }
@@ -232,9 +229,10 @@ namespace Networking.Tcp
             ObjectId = PacketUtils.ReadInt(buffer, ref ptr, len);
             CharacterId = PacketUtils.ReadInt(buffer, ref ptr, len);
         }
-        public void Handle() { 
+        public void Handle() {
             PacketHandler.Instance.PlayerId = ObjectId;
             AccountData.CurrentCharId = CharacterId;
+            Map.Instance.OnCreateSuccess(this);
         }
     }
     public readonly struct Damage : IIncomingPacket {

@@ -147,7 +147,7 @@ namespace Networking {
                     packet.Write(_Send.Data.AsSpan()[(ptr - 3)..], ref ptr);
                     _Send.PacketLength = ptr;
 
-                    //Utils.Log($"Sending packet {(C2SPacketId)_Send.Data[LENGTH_PREFIX]} {_Send.Data[LENGTH_PREFIX]} {_Send.PacketLength}");                    
+                    Utils.Log($"Sending packet {(C2SPacketId)_Send.Data[LENGTH_PREFIX]} {_Send.Data[LENGTH_PREFIX]} {_Send.PacketLength}");                    
                     BinaryPrimitives.WriteUInt16LittleEndian(_Send.Data.AsSpan()[0..], (ushort)(_Send.PacketLength - LENGTH_PREFIX)); //Length
                         
                     //Debug data
@@ -180,7 +180,7 @@ namespace Networking {
                 throw new Exception("Data received length is zero");
             
             if (len < LENGTH_PREFIX)
-                return;
+                throw new Exception("Data received length is less then LENGTH_PREFIX");
 
             //Debug data
             //StringBuilder sb = new();
@@ -199,24 +199,24 @@ namespace Networking {
 
                 var packetLen = PacketUtils.ReadUShort(buffer, ref ptr, len);
 
-                if(len != packetLen + LENGTH_PREFIX) {
-                    if(len >= LENGTH_PREFIX) {
-                        var packetId2 = (S2CPacketId)PacketUtils.ReadByte(buffer[ptr..], ref ptr, len);
-                        Utils.Warn("Packet length miss match {0} != {1}, Ignoring {2}!", len, packetLen + LENGTH_PREFIX, packetId2);
-                    }
-                    else {
-                        Utils.Warn("Packet length miss match {0} != {1}, Ignoring!", len, packetLen + LENGTH_PREFIX);
-                    }
-
-                    return;
-                }
+                //if(len != packetLen + LENGTH_PREFIX) {
+                //    if(len >= LENGTH_PREFIX) {
+                //        var packetId2 = (S2CPacketId)PacketUtils.ReadByte(buffer[ptr..], ref ptr, len);
+                //        Utils.Warn("Packet length miss match {0} != {1}, Ignoring {2}!", len, packetLen + LENGTH_PREFIX, packetId2);
+                //    }
+                //    else {
+                //        Utils.Warn("Packet length miss match {0} != {1}, Ignoring!", len, packetLen + LENGTH_PREFIX);
+                //    }
+                //
+                //    return;
+                //}
 
                 //StringBuilder sb = new();
                 //for (int i = 0; i < len; i++)
                 //    sb.Append('[').Append(_Receive.PacketBytes[i]).Append(']');
 
                 var packetId = (S2CPacketId)PacketUtils.ReadByte(buffer[ptr..], ref ptr, len); //nextPacketPtr
-                //Utils.Log("Received Packet {2} | Length: {0} Bytes: {1}", len, sb.ToString(), packetId);
+                Utils.Log("Received Packet {1} | Length: {0}", len, packetId);
 
                 PacketHandler.Instance.ReadPacket(packetId, buffer, ref ptr, len); //nextPacketPtr
             }

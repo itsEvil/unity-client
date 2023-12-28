@@ -1,4 +1,6 @@
-﻿using Static;
+﻿using Game;
+using Microsoft.Unity.VisualStudio.Editor;
+using Static;
 using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
@@ -20,25 +22,26 @@ namespace Data {
         public static readonly Dictionary<ushort, ObjectDesc> Type2ProjectileDesc = new();
         public static readonly Dictionary<string, ObjectDesc> Id2ProjectileDesc = new();
         public static readonly Dictionary<ushort, SkinDesc> Type2SkinDesc = new();
-        public static void AddAnimations(Texture2D texture, SpriteSheetData data) {
-            if (!Animations.ContainsKey(data.Id))
-                Animations[data.Id] = new List<CharacterAnimation>();
+        //public static void AddAnimations(Texture2D texture, SpriteSheetData data) {
+        //    if (!Animations.ContainsKey(data.Id))
+        //        Animations[data.Id] = new List<CharacterAnimation>();
+        //
+        //    try {
+        //        for (var y = texture.height; y >= 0; y -= data.AnimationHeight) {
+        //            for (var x = 0; x < data.AnimationWidth; x += data.AnimationWidth) {
+        //                var rect = new Rect(x, y, data.AnimationWidth, data.AnimationHeight);
+        //                var frames = SpriteUtils.CreateSprites(texture, rect, data.ImageWidth, data.ImageHeight);
+        //                var animation = new CharacterAnimation(frames, data.StartFacing);
+        //    
+        //                Animations[data.Id].Add(animation);
+        //            }
+        //        }
+        //    }
+        //    catch(Exception e) {
+        //        Utils.Error(e.Message + "\n" + e.StackTrace);
+        //    }
+        //}
 
-            try {
-                for (var y = texture.height; y >= 0; y -= data.AnimationHeight) {
-                    for (var x = 0; x < data.AnimationWidth; x += data.AnimationWidth) {
-                        var rect = new Rect(x, y, data.AnimationWidth, data.AnimationHeight);
-                        var frames = SpriteUtils.CreateSprites(texture, rect, data.ImageWidth, data.ImageHeight);
-                        var animation = new CharacterAnimation(frames, data.StartFacing);
-            
-                        Animations[data.Id].Add(animation);
-                    }
-                }
-            }
-            catch(Exception e) {
-                Utils.Error(e.Message + "\n" + e.StackTrace);
-            }
-        }
         public static void AddImages(Texture2D texture, SpriteSheetData data) {
             if (!Images.ContainsKey(data.Id))
                 Images[data.Id] = new List<Sprite>();
@@ -99,9 +102,11 @@ namespace Data {
             return color;
         }
 
-        public static Sprite GetTileImage(ushort type) {
-            return Type2TileDesc[type].TextureData.GetTexture();
-        }
+        public static Sprite GetTileImage(ushort type)
+            => Type2TileDesc[type].TextureData.GetTexture();
+        
+        public static Sprite GetTileImage(Square square) 
+            => square.Descriptor.TextureData.GetTexture();
 
         public static List<Sprite> GetImageSet(string sheetName) {
             return Images[sheetName];
@@ -110,12 +115,12 @@ namespace Data {
         public static Sprite GetImage(string sheetName, int index) {
             if(!Images.TryGetValue(sheetName, out var list)) {
                 Utils.Error("Sheet name {0} not found", sheetName);
-                return Images["ErrorTexture"][0];
+                return GetErrorSprite();
             }
 
             if(index > list.Count) {
                 Utils.Error("{0} is out of bounds {1}", index, list.Count);
-                return Images["ErrorTexture"][0];
+                return GetErrorSprite();
             }
 
             return list[index];
@@ -124,12 +129,12 @@ namespace Data {
         public static CharacterAnimation GetAnimation(string sheetName, int index) {
             if(!Animations.TryGetValue(sheetName, out var list)) {
                 Utils.Error("{0} not found", sheetName);
-                return Animations["ErrorAnimation"][0];
+                return GetErrorAnimation();
             }
 
             if(index > list.Count) {
                 Utils.Error("{0} is out of bounds {1}", index, list.Count);
-                return Animations["ErrorAnimation"][0];
+                return GetErrorAnimation();
             }
 
             return list[index];
@@ -153,6 +158,12 @@ namespace Data {
             return Id2ObjectDesc["Pirate"];
         }
 
+        public static Sprite GetErrorSprite() {
+            return Images["ErrorTexture"][0];
+        }
+        public static CharacterAnimation GetErrorAnimation() {
+            return Animations["ErrorAnimation"][0];
+        }
         public static ObjectDesc GetObjectDesc(string id) {
             if (Id2ObjectDesc.TryGetValue(id, out ObjectDesc val)) {
                 return val;

@@ -99,7 +99,7 @@ namespace UI {
 
             if (_zoomIndex == 0)
             {
-                var arrowPos = Map.MyPlayer.GetPosition();
+                var arrowPos = Map.MyPlayer.Position;
                 arrowPos *= _zoomLevels[_zoomIndex];
                 arrowPos += new Vec2(-96, -96);
                 _playerIcon.rectTransform.anchoredPosition = arrowPos.ToVector2();
@@ -108,7 +108,7 @@ namespace UI {
             }
 
             _playerIcon.rectTransform.anchoredPosition = Vector2.zero;
-            var pos = -Map.MyPlayer.GetPosition();
+            var pos = -Map.MyPlayer.Position;
             pos *= _zoomLevels[_zoomIndex];
             pos += new Vec2(96, -96);
             _chunkLayer.localPosition = pos.ToVector2();

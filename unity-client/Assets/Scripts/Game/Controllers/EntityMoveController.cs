@@ -19,7 +19,7 @@ namespace Game.Controllers {
         public void Tick(float deltaTime) {
             var moving = false;
             if (Direction != Vec2.zero) {
-                var position = _entity.GetPosition();
+                var position = _entity.Position;
 
                 var direction = Direction;
                 var dx = direction.x * deltaTime;

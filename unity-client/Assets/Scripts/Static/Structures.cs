@@ -20,6 +20,8 @@ namespace Static {
         public readonly string SheetName;
         public readonly int AnimationWidth;
         public readonly int AnimationHeight;
+        public readonly int FrameCount;
+        public readonly int RowCount;
         public readonly Facing StartFacing;
         public readonly int ImageWidth;
         public readonly int ImageHeight;
@@ -36,6 +38,8 @@ namespace Static {
             var imageSize = xml.ParseIntArray("ImageSize", "x", new[] { 0, 0 });
             ImageWidth = imageSize[0];
             ImageHeight = imageSize[1];
+            FrameCount = animationSize[0] / imageSize[0];
+            RowCount = animationSize[1] / imageSize[1];
         }
 
         public bool IsAnimation() {

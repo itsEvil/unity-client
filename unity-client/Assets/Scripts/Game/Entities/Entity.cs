@@ -15,7 +15,7 @@ public class Entity : MonoBehaviour, IDisposable {
     public int Id;
     public bool Dead;
     public bool IsInteractive;
-    protected Vec2 Position {
+    public Vec2 Position {
         get => new(transform.position.x, transform.position.y);
         set {
             var yOffset = Descriptor.DrawOnGround ? -0.5f : 0f;
@@ -37,7 +37,7 @@ public class Entity : MonoBehaviour, IDisposable {
         Id = definition.ObjectStatus.Id;
         Position = definition.ObjectStatus.Position;
         Inventory = new ushort[8];
-        Renderer.sprite = SpriteUtils.Redraw(descriptor.TextureData.GetTexture(0), 100);
+        Renderer.sprite = descriptor.TextureData.GetTexture(0);
 
         if (Id != PacketHandler.Instance.PlayerId)
             _moveController = new EntityMoveController(this);
@@ -141,12 +141,17 @@ public class Entity : MonoBehaviour, IDisposable {
     }
     public static Entity Resolve(ObjectDefinition definition) {
         var desc = AssetLibrary.GetObjectDesc(definition.ObjectType);
-        var entity = Map.EntityPool.Get(desc.ObjectClass);
+        
+        if (definition.ObjectStatus.Id == PacketHandler.Instance.PlayerId) {
+            Map.MyPlayer.Init(desc, definition);
+            Map.MyPlayer.UpdateObjectStats(definition.ObjectStatus.Stats);
+            Map.Instance.OnMyPlayerConnected();
+            return Map.MyPlayer;
+        }
+
+        var entity = Map.Instance.EntityPool.Get(desc.ObjectClass);
         entity.Init(desc, definition);
         entity.UpdateObjectStats(definition.ObjectStatus.Stats);
-
-        if (definition.ObjectStatus.Id == PacketHandler.Instance.PlayerId)
-            Map.Instance.OnMyPlayerConnected(entity as Player);
 
         return entity;
     }
@@ -154,5 +159,4 @@ public class Entity : MonoBehaviour, IDisposable {
     public int GetHp() => Hp;
     public int GetMaxHp() => MaxHp;
     public void SetPosition(Vec2 position) => Position = position;
-    public Vec2 GetPosition() => Position;
 }

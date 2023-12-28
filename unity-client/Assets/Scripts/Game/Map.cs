@@ -19,6 +19,7 @@ namespace Game {
 
         [SerializeField] private Tilemap _tileMap;
         [SerializeField] private Transform _entityContainer;
+        [SerializeField] public EntityPool EntityPool;
 
         public static Map Instance;
         public static MapInfo MapInfo;
@@ -38,16 +39,8 @@ namespace Game {
         public static List<FPTimer> ToAddTimers = new(BUFFER_SIZE_SMALL);
         public static List<FPTimer> ToRemoveTimers = new(BUFFER_SIZE_SMALL);
 
-        public static EntityPool EntityPool;
         public void Awake() {
             Instance = this;
-
-            var prefabs = new Dictionary<GameObjectType, Entity>();
-            foreach (var entity in Resources.LoadAll<Entity>("Prefabs/Entities")) {
-                Utils.Log("Loaded prefab: {0}", entity.name);
-                prefabs[Enum.Parse<GameObjectType>(entity.name)] = entity;
-            }
-            EntityPool = new(prefabs, _entityContainer);
         }
         public void OnEnable() {
             Dispose();
@@ -58,11 +51,15 @@ namespace Game {
             Tiles = new Square[MapInfo.Width, MapInfo.Height];
             GameScreenController.Instance.OnMapInfo();
         }
-        
-        public void OnMyPlayerConnected(Player player) {
-            MyPlayer = player;
+        public void OnCreateSuccess(CreateSuccess create)
+        {
+            var plr = EntityPool.Get(GameObjectType.Player) as Player;
+            plr.Id = create.ObjectId;
+            MyPlayer = plr; 
+        }
+        public void OnMyPlayerConnected() {
             MyPlayer.OnMyPlayer();
-            Utils.Log("MyPlayerConnected! {0}", player.Name);
+            Utils.Log("MyPlayerConnected! {0}", MyPlayer.Name);
             CameraController.Instance.SetFocus(MyPlayer.gameObject);
             GameScreenController.Instance.OnMyPlayerConnected(MyPlayer);
             //Hide preloader

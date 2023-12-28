@@ -7,7 +7,7 @@ Shader "Unlit/Outline Shader"
         [HDR] _GradientColor ("GradientColor", Color) = (0,0,0,1)
         _BlurAmount ("Blur", Range(1,10)) = 0
         _YOffset ("YOffset", Range(0,1)) = 0
-        _Size ("Size", Range(1,4)) = 1
+        _Size ("Size", Range(0.1,4)) = 0.1
     }
 
     SubShader
@@ -63,9 +63,9 @@ Shader "Unlit/Outline Shader"
             fixed _YOffset;
             fixed _Size;
             
-            half4 frag (v2f IN) : SV_Target
+            fixed4 frag (v2f IN) : SV_Target
             {
-                const half4 tex_color = tex2D(_MainTex, IN.uv + float2(0, _YOffset));
+                const fixed4 tex_color = tex2D(_MainTex, IN.uv + float2(0, _YOffset));
                 float4 col = lerp(tex_color * _GradientColor, tex_color, IN.uv.y);
 
                 if (IN.uv.y > 1 - _YOffset)
@@ -76,19 +76,43 @@ Shader "Unlit/Outline Shader"
                 
                 if (col.a == 0)
                 {
-                    half4 pix_color = tex2D(_MainTex, IN.uv + float2(-_Size * _MainTex_TexelSize.x, -_Size * _MainTex_TexelSize.y) + float2(0, _YOffset));
+                    //Down Left
+                    fixed4 pix_color = tex2D(_MainTex, IN.uv + float2(-_Size * _MainTex_TexelSize.x, -_Size * _MainTex_TexelSize.y) + float2(0, _YOffset));
                     if (pix_color.a != 0)
                         return _OutlineColor;
 
+                    //Down Right
                     pix_color = tex2D(_MainTex, IN.uv + float2(_Size * _MainTex_TexelSize.x, -_Size * _MainTex_TexelSize.y) + float2(0, _YOffset));
                     if (pix_color.a != 0)
                         return _OutlineColor;
 
+                    //Up left
                     pix_color = tex2D(_MainTex, IN.uv + float2(-_Size * _MainTex_TexelSize.x, _Size * _MainTex_TexelSize.y) + float2(0, _YOffset));
                     if (pix_color.a != 0)
                         return _OutlineColor;
 
+                    //Up Right
                     pix_color = tex2D(_MainTex, IN.uv + float2(_Size * _MainTex_TexelSize.x, _Size * _MainTex_TexelSize.y) + float2(0, _YOffset));
+                    if (pix_color.a != 0)
+                        return _OutlineColor;
+
+                    //Right
+                    pix_color = tex2D(_MainTex, IN.uv + float2(_Size * _MainTex_TexelSize.x, 0 * _MainTex_TexelSize.y) + float2(0, _YOffset));
+                    if (pix_color.a != 0)
+                        return _OutlineColor;
+
+                    //Left
+                    pix_color = tex2D(_MainTex, IN.uv + float2(-_Size * _MainTex_TexelSize.x, 0 * _MainTex_TexelSize.y) + float2(0, _YOffset));
+                    if (pix_color.a != 0)
+                        return _OutlineColor;
+
+                    //Up
+                    pix_color = tex2D(_MainTex, IN.uv + float2(0 * _MainTex_TexelSize.x, _Size * _MainTex_TexelSize.y) + float2(0, _YOffset));
+                    if (pix_color.a != 0)
+                        return _OutlineColor;
+
+                    //Down
+                    pix_color = tex2D(_MainTex, IN.uv + float2(0 * _MainTex_TexelSize.x, -_Size * _MainTex_TexelSize.y) + float2(0, _YOffset));
                     if (pix_color.a != 0)
                         return _OutlineColor;
                 }

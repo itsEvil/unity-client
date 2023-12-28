@@ -26,9 +26,8 @@ namespace Game
             if(desc.Sinking){
               SinkLevel = 12;
             }
-
-            sprite = desc.TextureData.GetTexture(Hash(x, y));
-
+            
+            sprite = desc.TextureData.GetTexture(0); //TileRedrawer.RedrawSigless(this, true);
             if (sprite == null)
                 Utils.Error("Square {0} sprite is null!", desc.Id);
         }

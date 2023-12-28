@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace Data {
     internal class AssetLoader : MonoBehaviour {
+        [SerializeField] private Texture2D AtlasTexture;
         public void Awake() {
             try {
                 LoadSpriteSheets();
@@ -26,21 +27,14 @@ namespace Data {
 
             foreach (var sheetXml in spritesXml.Elements("Sheet")) {
                 var sheetData = new SpriteSheetData(sheetXml);
-                Utils.Log("Adding sheet {0}, {1}", sheetData.Id, sheetData.SheetName);
-
                 var texture = Resources.Load<Texture2D>($"SpriteSheets/{sheetData.SheetName}");
+                if(sheetData.IsAnimation())
+                    SpriteAtlasCreator.AddAnimations(texture, sheetData);
+                else 
+                    SpriteAtlasCreator.AddImages(texture, sheetData);
 
-                try {
-                    if (sheetData.IsAnimation()) {
-                        AssetLibrary.AddAnimations(texture, sheetData);
-                    }
-                    else {
-                        AssetLibrary.AddImages(texture, sheetData);
-                    }
-                }
-                catch (Exception e) {
-                    Utils.Warn($"Unable to add {sheetData.Id}");
-                    Utils.Error(e.Message+"\n"+e.StackTrace);
+                if(sheetData.Id == "ErrorTexture") {
+                    SpriteAtlasCreator.InitErrorTexture();
                 }
             }
         }

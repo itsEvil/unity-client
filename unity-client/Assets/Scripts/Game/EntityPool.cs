@@ -1,18 +1,23 @@
 ﻿using Static;
+using System;
 using System.Collections.Generic;
-using UnityEditorInternal.Profiling.Memory.Experimental.FileFormat;
 using UnityEngine;
 
 namespace Game {
-    public class EntityPool {
-        private readonly Dictionary<GameObjectType, Queue<Entity>> _entityPool;
-        private readonly Dictionary<GameObjectType, Entity> _entityPrefabs;
-        private readonly Transform _wrapperParent;
-
-        public EntityPool(Dictionary<GameObjectType, Entity> prefabs, Transform wrapperParent) {
+    public class EntityPool : MonoBehaviour {
+        [SerializeField] private Transform _wrapperParent;
+        private Dictionary<GameObjectType, Queue<Entity>> _entityPool;
+        private Dictionary<GameObjectType, Entity> _entityPrefabs;
+        private void Awake() {
+            DontDestroyOnLoad(this);
+            var prefabs = new Dictionary<GameObjectType, Entity>();
+            foreach (var entity in Resources.LoadAll<Entity>("Prefabs/Entities"))
+            {
+                Utils.Log("Loaded prefab: {0}", entity.name);
+                prefabs[Enum.Parse<GameObjectType>(entity.name)] = entity;
+            }
             _entityPool = new Dictionary<GameObjectType, Queue<Entity>>();
             _entityPrefabs = prefabs;
-            _wrapperParent = wrapperParent;
         }
 
         public Entity Get(GameObjectType type) {
@@ -28,7 +33,7 @@ namespace Game {
                 return queue.Dequeue();
 
             Debug.Log($"Instantiating object [{type}]");
-            var entity = Object.Instantiate(_entityPrefabs[type], _wrapperParent);
+            var entity = Instantiate(_entityPrefabs[type], _wrapperParent);
             return entity;
         }
 

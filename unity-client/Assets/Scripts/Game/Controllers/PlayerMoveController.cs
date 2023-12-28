@@ -54,7 +54,7 @@ namespace Game.Controllers {
             //}
 
             Direction = direction;
-            ValidateAndMove(_player.GetPosition() + deltaTime * direction);
+            ValidateAndMove(_player.Position + deltaTime * direction);
         }
 
         private void ValidateAndMove(Vec2 pos) {
@@ -65,7 +65,7 @@ namespace Game.Controllers {
         private Vec2 ResolveNewLocation(Vec2 pos) {
             //Debug.Log($"Player has paralyze? {_player.HasConditionEffect(ConditionEffect.Paralyzed)}");
 
-            var plrPos = _player.GetPosition();
+            var plrPos = _player.Position;
 
             var dx = pos.x - plrPos.x;
             var dy = pos.y - plrPos.y;
@@ -80,7 +80,7 @@ namespace Game.Controllers {
             var ds = _MOVE_THRESHOLD / Math.Max(Math.Abs(dx), Math.Abs(dy));
             var tds = 0f;
 
-            pos = _player.GetPosition();
+            pos = _player.Position;
             var done = false;
             while (!done) {
                 if (tds + ds >= 1) {
@@ -96,7 +96,7 @@ namespace Game.Controllers {
         }
 
         private Vec2 CalcNewLocation(Vec2 pos) {
-            var plrPos = _player.GetPosition();
+            var plrPos = _player.Position;
 
             var fx = 0f;
             var fy = 0f;
