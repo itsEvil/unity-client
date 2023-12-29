@@ -6,13 +6,14 @@ using UnityEngine.UI;
 namespace UI {
     public class GameScreenController : MonoBehaviour, IScreen {
         public static GameScreenController Instance { get; private set; }
-        public static bool DisablePlayerInput = false;
         [SerializeField] private StatsWidget _statsWidget;
         [SerializeField] private MinimapWidget _minimapWidget;
+        [SerializeField] private PortalWidget _portalWidget;
         public GameObject Object { get => gameObject; }
         private void Awake() => Instance = this;
         public void Reset(object data = null) {
             ViewManager.SetBackgroundVisiblity(false);
+            SetPortalVisiblity(false);
 
             if(data == null) {
                 ViewManager.ChangeView(View.Menu);
@@ -33,10 +34,15 @@ namespace UI {
             //_minimapWidget.gameObject.SetActive(true);
         }
         public void Hide() {
+            Map.Instance.Dispose();
+            SetAllOptionalWidgetVisibility(false);
             PacketHandler.Instance?.Stop();
-            _minimapWidget.gameObject.SetActive(false);
-            _statsWidget.gameObject.SetActive(false);
         }
+
+        public void SetAllOptionalWidgetVisibility(bool value) {
+            _portalWidget.gameObject.SetActive(value);
+        }
+
         private void OnMenu() {
             ViewManager.ChangeView(View.Menu);
         }
@@ -61,6 +67,12 @@ namespace UI {
         }
         private void OnDisable() {
             Hide();
+        }
+        public void InitPortalWidget(Interactive entity) {
+             _portalWidget.Init(entity);
+        }
+        public void SetPortalVisiblity(bool value) {
+            _portalWidget.gameObject.SetActive(value);
         }
     }
 }

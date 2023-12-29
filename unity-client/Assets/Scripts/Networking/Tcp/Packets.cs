@@ -101,8 +101,11 @@ namespace Networking.Tcp
         }
         public void Handle() {
             //Utils.Log("Handling NewTick Id:{0} Time:{1}", TickId, TickTime);
+
             var pos = Map.MyPlayer.Position;
-            TcpTicker.Send(new Move(TickId, TickTime, pos.x, pos.y, PacketHandler.Instance.History));
+            var tile = Map.Instance.GetTile((int)pos.x, (int)pos.y, true);
+            if(tile != null)
+                TcpTicker.Send(new Move(TickId, TickTime, pos.x, pos.y, PacketHandler.Instance.History));
 
             foreach(var objectStat in Statuses) {
                 var entity = Map.Instance.GetEntity(objectStat.Id);
@@ -154,7 +157,7 @@ namespace Networking.Tcp
 
             Span<int> drops = Drops.AsSpan();
             for(int i = 0; i < drops.Length; i++)
-                Map.Instance.RemoveEntity(drops[i]);
+                Map.Instance.PrepareRemoveEntity(drops[i]);
 
             Span<ObjectDefinition> objects = Objects.AsSpan();
             for(int i = 0; i < objects.Length; i++) {
@@ -372,7 +375,7 @@ namespace Networking.Tcp
 
             Map.Instance.Init(this);
             PacketHandler.Instance.Random = new wRandom(Seed);
-            Utils.Log("Loading into {0}. Difficulty {1}", DisplayName, Difficulty);
+            //Utils.Log("Loading into {0}. Difficulty {1}", DisplayName, Difficulty);
         }
     }
     public readonly struct NameResult : IIncomingPacket {
@@ -406,7 +409,7 @@ namespace Networking.Tcp
             Serial = PacketUtils.ReadInt(buffer, ref ptr, len);
         }
         public void Handle() {
-            Utils.Log("Handling Ping");
+            //Utils.Log("Handling Ping");
             TcpTicker.Send(new Pong(Serial, GameTime.ElapsedMicroseconds));
         }
     }
@@ -527,12 +530,14 @@ namespace Networking.Tcp
 
         }
     }
-    public readonly struct UsePortal : IOutgoingPacket
-    {
+    public readonly struct UsePortal : IOutgoingPacket {
         public C2SPacketId Id => C2SPacketId.UsePortal;
-        public void Write(Span<byte> buffer, ref int ptr)
-        {
-
+        public readonly int ObjectId;
+        public UsePortal(int objectId) {
+            ObjectId = objectId;
+        }
+        public void Write(Span<byte> buffer, ref int ptr) {
+            PacketUtils.WriteInt(buffer, ObjectId, ref ptr);
         }
     }
     public readonly struct UseItem : IOutgoingPacket

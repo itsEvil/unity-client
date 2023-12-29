@@ -53,8 +53,9 @@ namespace Game.Controllers {
             Camera.transparencySortMode = TransparencySortMode.CustomAxis;
             Camera.transparencySortAxis = transform.up;
 
-            foreach (var entity in _rotatingEntities)
-            {
+            foreach (var entity in _rotatingEntities) {
+                if (Map.TokenSource.IsCancellationRequested)
+                    return;
                 //entity.Rotation = transform.rotation.eulerAngles.z * Mathf.Deg2Rad;
 
                 entity.transform.rotation = Quaternion.LookRotation(Camera.main.transform.up, -Camera.main.transform.forward);
@@ -67,23 +68,15 @@ namespace Game.Controllers {
 
         private void CheckForInputs() {
             //If movement is disabled so are all inputs
-            if (MyPlayer == null || GameScreenController.DisablePlayerInput)
+            if (MyPlayer == null || !PlayerInputController.InputEnabled)
                 return;
 
-            //Offset kinda bad ngl
-            //if (Input.GetKeyDown(Settings.OffsetCamera)) {
-            //    _offset = !_offset;
-            //    Settings.CameraOffset = _offset;
-            //}
-
-            if (Input.GetKeyDown(Settings.ResetRotation)) {
+            if (Input.GetKeyDown(Settings.ResetRotation))
                 Settings.CameraAngle = 0;
-            }
         }
 
         public void SetFocus(GameObject focus) {
             _focus = focus;
-            Utils.Log("Set focus to {0}", focus.name);
         }
 
         public void AddRotatingEntity(Entity entity) {

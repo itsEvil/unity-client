@@ -11,8 +11,7 @@ namespace Game {
         private void Awake() {
             DontDestroyOnLoad(this);
             var prefabs = new Dictionary<GameObjectType, Entity>();
-            foreach (var entity in Resources.LoadAll<Entity>("Prefabs/Entities"))
-            {
+            foreach (var entity in Resources.LoadAll<Entity>("Prefabs/Entities")) {
                 Utils.Log("Loaded prefab: {0}", entity.name);
                 prefabs[Enum.Parse<GameObjectType>(entity.name)] = entity;
             }
@@ -32,13 +31,13 @@ namespace Game {
             if (queue.Count > 0)
                 return queue.Dequeue();
 
-            Debug.Log($"Instantiating object [{type}]");
+            //Debug.Log($"Instantiating object [{type}]");
             var entity = Instantiate(_entityPrefabs[type], _wrapperParent);
             return entity;
         }
 
         public void Return(Entity entity) {
-            Debug.Log($"Returning object [{entity.Type}] [{entity.Id}:{entity.Name}]");
+            //Debug.Log($"Returning object [{entity.Type}] [{entity.Id}:{entity.Name}]");
             if (entity == null) {
                 Debug.LogWarning("CAN NOT RETURN NULL WRAPPER");
                 return;
@@ -49,10 +48,14 @@ namespace Game {
             _entityPool[entity.Type].Enqueue(entity);
         }
 
-        public void Clean() {
+        public void Clear() {
             foreach (var queue in _entityPool.Values) {
                 queue.Clear();
             }
+
+            var childCount = _wrapperParent.childCount;
+            for(int i = 0; i < childCount; i++)
+                Destroy(_wrapperParent.GetChild(i).gameObject);
         }
     }
 }

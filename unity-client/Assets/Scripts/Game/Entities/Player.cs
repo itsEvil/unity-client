@@ -47,6 +47,9 @@ public sealed class Player : Entity {
     public int Dexterity;
     public int Vitality;
     public int Wisdom;
+
+    private PlayerInputController InputController;
+
     /// <summary>
     /// Runs when any player gets initalized
     /// </summary>
@@ -67,6 +70,7 @@ public sealed class Player : Entity {
         //var charStats = AccountData.Characters[AccountData.CurrentCharId];
         //Inventory = charStats.Inventory;
         IsMyPlayer = true;
+        InputController = new();
     }
     public override void UpdateStat(StatType stat, object value) {
         base.UpdateStat(stat, value);

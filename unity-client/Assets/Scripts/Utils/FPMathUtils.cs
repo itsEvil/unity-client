@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Static;
+using System.Collections.Generic;
 using UnityEngine;
 public static class FPMathUtils
 {
@@ -49,8 +50,11 @@ public static class FPMathUtils
         return dx * dx + dy * dy;
     }
 
-    public static float DistanceSquared(Vector3 from, Vector3 to)
-    {
+    public static float DistanceSquared(Vector3 from, Vector3 to) {
+        float v1 = from.x - to.x, v2 = from.y - to.y;
+        return v1 * v1 + v2 * v2;
+    }
+    public static float DistanceSquared(Vec2 from, Vec2 to) {
         float v1 = from.x - to.x, v2 = from.y - to.y;
         return v1 * v1 + v2 * v2;
     }

@@ -18,7 +18,7 @@ namespace Game.Controllers {
             var rotate = 0;
             var xVelocity = 0;
             var yVelocity = 0;
-            if (!GameScreenController.DisablePlayerInput) {
+            if (PlayerInputController.InputEnabled) {
                 rotate = KeyToInt(Settings.RotateRight) - KeyToInt(Settings.RotateLeft);
                 xVelocity = KeyToInt(Settings.MoveRight) - KeyToInt(Settings.MoveLeft);
                 yVelocity = KeyToInt(Settings.MoveUp) - KeyToInt(Settings.MoveDown);

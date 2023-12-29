@@ -5,8 +5,11 @@ using Networking.Tcp;
 using Static;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using UI;
+using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
+using UnityEngine.Analytics;
 using UnityEngine.Tilemaps;
 using TileData = Static.TileData;
 
@@ -16,6 +19,8 @@ namespace Game {
         private const int BUFFER_SIZE_MED = 32;
         private const int BUFFER_SIZE_BIG = 64;
         private const int BUFFER_SIZE_LARGE = 128;
+        private const int INTERACTIVE_UPDATE_INTERVAL = 50;
+        private const float MAXIMUM_INTERACTION_DISTANCE = 1f;
 
         [SerializeField] private Tilemap _tileMap;
         [SerializeField] private Transform _entityContainer;
@@ -31,13 +36,18 @@ namespace Game {
         public static int MovesRequested;
 
         public static List<Entity> ToAddEntities = new(BUFFER_SIZE_MED);
-        public static List<Entity> ToRemoveEntities = new(BUFFER_SIZE_MED);
+        public static List<int> ToRemoveEntities = new(BUFFER_SIZE_MED);
         public static Dictionary<int, Entity> Entities = new(BUFFER_SIZE_LARGE);
         public static Dictionary<int, Interactive> Interactives = new(BUFFER_SIZE_MED);
         
         public static List<FPTimer> Timers = new(BUFFER_SIZE_MED);
         public static List<FPTimer> ToAddTimers = new(BUFFER_SIZE_SMALL);
         public static List<FPTimer> ToRemoveTimers = new(BUFFER_SIZE_SMALL);
+        public static CancellationTokenSource TokenSource;
+
+        private static List<Interactive> NearbyInteractives = new(BUFFER_SIZE_SMALL);
+        private static Interactive NearestInteractive;
+        private static int LastInteractiveUpdateTime;
 
         public void Awake() {
             Instance = this;
@@ -45,8 +55,11 @@ namespace Game {
         public void OnEnable() {
             Dispose();
         }
-
+        public void OnDisable() {
+            Dispose();
+        }
         public void Init(MapInfo mapInfo) {
+            Dispose();
             MapInfo = mapInfo;
             Tiles = new Square[MapInfo.Width, MapInfo.Height];
             GameScreenController.Instance.OnMapInfo();
@@ -218,13 +231,11 @@ namespace Game {
 
             return false;
         }
-        public void RemoveEntity(int id) {
-            if(Entities.TryGetValue(id, out var ent)) {
-                ToRemoveEntities.Add(ent);
-            }
-            else {
-                Utils.Warn("Entity with id {0} not found for removal", id);
-            }
+        public void PrepareRemoveEntity(Entity ent) {
+            ToRemoveEntities.Add(ent.Id);
+        }
+        public void PrepareRemoveEntity(int id) {
+            ToRemoveEntities.Add(id);
         }
         public void AddEntity(Entity entity) {
             ToAddEntities.Add(entity);
@@ -234,25 +245,52 @@ namespace Game {
                 var ent = ToAddEntities[i];
                 ent.AddToWorld();
                 Entities[ent.Id] = ent;
+
+                if (ent.IsInteractive)
+                    Interactives.Add(ent.Id, ent as Interactive);
+
             }
 
-            for(int i = 0; i < ToAddTimers.Count; i++) {
+            for(int i = 0; i < ToAddTimers.Count; i++)
                 Timers.Add(ToAddTimers[i]);
-            }
 
             ToAddEntities.Clear();
             ToAddTimers.Clear();
         }
+        private void Remove() {
+            for (int i = 0; i < ToRemoveEntities.Count; i++) {
+                var objectId = ToRemoveEntities[i];
+                if(!Entities.TryGetValue(objectId, out var ent))
+                    continue;
+
+                CameraController.Instance.RemoveRotatingEntity(ent);
+
+                if (ent.IsInteractive)
+                    Interactives.Remove(objectId);
+
+                EntityPool.Return(ent);
+                Entities.Remove(objectId);
+            }
+
+            for (int i = 0; i < ToRemoveTimers.Count; i++)
+                Timers.Remove(ToRemoveTimers[i]);
+            
+
+            ToRemoveTimers.Clear();
+            ToRemoveEntities.Clear();
+        }
         private void Tick() {
-            foreach(var (id, ent) in Entities) {
+            foreach(var (_, ent) in Entities) {
+                if (TokenSource.IsCancellationRequested)
+                    return;
+
                 if (ent == null || !ent.Tick())
-                    ToRemoveEntities.Add(ent);
+                    PrepareRemoveEntity(ent.Id);
             }
 
             foreach (var timer in Timers) {
-                //TODO Add Token source
-                //if (_tokenSource.IsCancellationRequested)
-                //    return;
+                if (TokenSource.IsCancellationRequested)
+                    return;
 
                 if (timer.TimeMS <= 0) {
                     timer.Action();
@@ -270,39 +308,111 @@ namespace Game {
             }
         }
 
-        private void Dispose() {
-            foreach(var (id, ent) in Entities) {
-                Destroy(ent);
+        public void Dispose() {
+            TokenSource?.Cancel();
+            GameScreenController.Instance.SetAllOptionalWidgetVisibility(false);
+            _tileMap.ClearAllTiles();
+            CameraController.Instance.Clear();
+            foreach (var (_, ent) in Entities) {
+                Destroy(ent.gameObject);
             }
 
+            TokenSource = new();
+            EntityPool.Clear();
             Entities.Clear();
             Interactives.Clear();
-            
+            ToAddEntities.Clear();
+            ToRemoveEntities.Clear();
         }
 
         private void TickInteractives() {
             //TODO Get nearest interactive entity and enable its UI if its close enough
+            if (GameTime.Time - LastInteractiveUpdateTime >= INTERACTIVE_UPDATE_INTERVAL && MyPlayer != null) {
+                //Utils.Log("Ticking interactives {0} {1}", Interactives.Count, TokenSource.IsCancellationRequested);
+                UpdateNearestInteractive();
+                LastInteractiveUpdateTime = GameTime.Time;
+            }
         }
 
-        private void Remove() {
-            for (int i = 0; i < ToRemoveEntities.Count; i++) {
+        private void UpdateNearestInteractive() {
+            var minDistSqr = MAXIMUM_INTERACTION_DISTANCE * MAXIMUM_INTERACTION_DISTANCE;
+            var playerX = MyPlayer.Position.x;
+            var playerY = MyPlayer.Position.y;
+            Interactive closestInteractive = null;
+            NearbyInteractives.Clear();
+            int count = 0;
 
-                var ent = ToRemoveEntities[i];
+            foreach (var (_, obj) in Interactives) {
+                if (TokenSource.IsCancellationRequested) {
+                    if(NearestInteractive != null)
+                        NearestInteractive.SetWidgetVisibility(false);
+                    
+                    return;
+                }
 
-                EntityPool.Return(ent);
-                Entities.Remove(ent.Id);
-                CameraController.Instance.RemoveRotatingEntity(ent);
-
-                if (ent.IsInteractive)
-                    Interactives.Remove(ent.Id);
+                var objX = obj.transform.position.x;
+                var objY = obj.transform.position.y;
+                if (Mathf.Abs(playerX - objX) < MAXIMUM_INTERACTION_DISTANCE &&
+                    Mathf.Abs(playerY - objY) < MAXIMUM_INTERACTION_DISTANCE) {
+                    NearbyInteractives.Add(obj);
+                }
             }
 
-            for (int i = 0; i < ToRemoveTimers.Count; i++) {
-                Timers.Remove(ToRemoveTimers[i]);
+            foreach (var obj in NearbyInteractives) {
+                if (TokenSource.IsCancellationRequested) {
+                    if(NearestInteractive != null)
+                        NearestInteractive.SetWidgetVisibility(false);
+                    
+                    return;
+                }
+
+                count++;
+                var objX = obj.transform.position.x;
+                var objY = obj.transform.position.y;
+                if (Mathf.Abs(playerX - objX) < MAXIMUM_INTERACTION_DISTANCE &&
+                    Mathf.Abs(playerY - objY) < MAXIMUM_INTERACTION_DISTANCE)
+                {
+                    var distSqr = FPMathUtils.DistanceSquared(MyPlayer.Position, obj.Position);
+                    if (distSqr < minDistSqr) {
+                        minDistSqr = distSqr;
+                        closestInteractive = obj;
+                    }
+                }
+
             }
 
-            ToRemoveTimers.Clear();
-            ToRemoveEntities.Clear();
+            //If we dont have any close interactives clear current
+            if (closestInteractive == null) {
+                if (NearestInteractive != null)
+                    NearestInteractive.SetWidgetVisibility(false);
+                
+                NearestInteractive = null;
+                return;
+            }
+
+            //If its the same entity dont do anythin
+            if (NearestInteractive != null && closestInteractive != null)
+                if (NearestInteractive.Id == closestInteractive.Id)
+                    return;
+
+            //Else turn current off and replace it with closest if available
+            if (NearestInteractive != null)
+                NearestInteractive.SetWidgetVisibility(false);
+
+            NearestInteractive = closestInteractive;
+
+            Utils.Log("Finished ticking interactives");
+            
+            if (NearestInteractive != null) {
+                //Utils.Log("Nearest Interactive is {0}", NearestInteractive.Name);
+                NearestInteractive.SetWidgetVisibility(true);
+            }            
+        }
+
+        public void InteractWithNearby()
+        {
+            if (NearestInteractive != null)
+                NearestInteractive.Interact();
         }
     }
 }

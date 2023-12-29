@@ -74,8 +74,18 @@ namespace Networking {
         public static void Stop(string msg) {
             Utils.Log("Trying to disconnect tcp from {0}", msg);
 
-            _tokenSource.Cancel();
-            _tickingTask.Wait(50);
+            try {
+                _tokenSource?.Cancel();
+            }catch(Exception e) {
+                Utils.Error("{0}\n{1}", e.Message, e.StackTrace);
+            }
+
+            try
+            {
+                _tickingTask.Wait(50);
+            } catch(Exception e) {
+                Utils.Error("{0}\n{1}", e.Message, e.StackTrace);
+            }
 
             //if (!Running && !_crashed)
             //    return;
@@ -97,8 +107,8 @@ namespace Networking {
             _Send.Reset();
             _Receive.Reset();
 
-            _tokenSource.Dispose();
-            _tickingTask.Dispose();
+            //_tokenSource.Dispose();
+            //_tickingTask.Dispose();
             
             _tickingTask = null;
             _crashed = false;
@@ -216,7 +226,7 @@ namespace Networking {
                 //    sb.Append('[').Append(_Receive.PacketBytes[i]).Append(']');
 
                 var packetId = (S2CPacketId)PacketUtils.ReadByte(buffer[ptr..], ref ptr, len); //nextPacketPtr
-                Utils.Log("Received Packet {1} | Length: {0}", len, packetId);
+                //Utils.Log("Received Packet {1} | Length: {0}", len, packetId);
 
                 PacketHandler.Instance.ReadPacket(packetId, buffer, ref ptr, len); //nextPacketPtr
             }
