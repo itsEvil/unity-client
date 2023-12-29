@@ -12,8 +12,10 @@ namespace UI {
         [SerializeField] private Button _button;
         private int _id;        
         public void Init(CharacterStats stats) {
-            _id = stats.Id;
+
             var desc = AssetLibrary.GetPlayerDesc((ushort)stats.ClassType);
+            Utils.Log("Created character rect {0} : {1}", desc.DisplayId, desc.Type);
+            _id = stats.Id;
             _charImage.sprite = desc.TextureData.GetTexture(0);
             _nameText.text = desc.DisplayId;
 

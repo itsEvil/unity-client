@@ -17,16 +17,16 @@ namespace Data {
         private static readonly Dictionary<string, SpriteSheetData> IdToSheetData = new();
         private static int _atlasX, _atlasY;
         static SpriteAtlasCreator() {
-            var atlas8x8 = new Texture2D(AtlasSize, AtlasSize) {
+            var atlas = new Texture2D(AtlasSize, AtlasSize) {
                 filterMode = FilterMode.Point
             };
 
             for (int x = 0; x < AtlasSize; x++)
                 for(int y = 0; y < AtlasSize; y++)
-                    atlas8x8.SetPixel(x, y, Color.clear);
+                    atlas.SetPixel(x, y, Color.clear);
 
-            atlas8x8.Apply();
-            _atlases[0] = atlas8x8;
+            atlas.Apply();
+            _atlases[0] = atlas;
         }
         /// <summary>
         /// Returns a sprite at the given index from the texture atlas
@@ -109,22 +109,24 @@ namespace Data {
         }
 
         public static void AddAnimations(Texture2D texture, SpriteSheetData sheetData) {
-            //Utils.Warn("Parsing {0}|{1} animation", sheetData.Id, sheetData.SheetName);
+            Utils.Warn("Parsing {0}|{1} animation", sheetData.Id, sheetData.SheetName);
             IdToSheetData[sheetData.Id] = sheetData;
             var animationIndex = 0;
             var imageIndex = 0;
             var atlas = _atlases[0];
             var imageHeight = sheetData.ImageHeight;
             var imageWidth = sheetData.ImageWidth;
+            bool isPlayers = sheetData.Id.Equals("players");
 
             if (!Images.TryGetValue(sheetData.SheetName, out var sheetSprites))
                 sheetSprites = new();
 
-            for(var y = 0; y < texture.height; y+= sheetData.AnimationHeight) {
+            for(var y = texture.height - sheetData.ImageHeight; y >= 0; y -= sheetData.AnimationHeight) {
+            //for(var y = 0; y < texture.height; y+= sheetData.AnimationHeight) {
                 List<Sprite> frames = new();
                 for(int i = 0; i < sheetData.RowCount; i++) {
                     for (var x = 0; x < sheetData.AnimationWidth; x += sheetData.ImageWidth) {
-                        var rect = CopyTexture(texture, atlas, imageHeight, imageWidth, y + (i * sheetData.ImageHeight), x);
+                        var rect = CopyTexture(texture, atlas, imageHeight, imageWidth, y - (i * sheetData.ImageHeight), x);
                         var sprite = Sprite.Create(atlas, rect, new Vector2(0.5f, 0), 8);
                         sheetSprites[imageIndex++] = sprite;
                         frames.Add(sprite);
@@ -134,6 +136,9 @@ namespace Data {
                 var animation = new CharacterAnimation(frames, sheetData.StartFacing);
                 if(!Animations.TryGetValue(sheetData.SheetName, out var dict))
                     dict = new();
+
+                if (isPlayers)
+                    Utils.Log("Added Players animation index {0}", animationIndex);
 
                 dict[animationIndex++] = animation;
                 Animations[sheetData.SheetName] = dict;
@@ -158,7 +163,7 @@ namespace Data {
                 _atlasX += imageWidth + 4;
                 return CopyTexture(texture, atlas, imageHeight, imageWidth, y, x, counter++);
             }
-
+            Utils.Log("Getting pixels x:{0} y:{1} w:{2} h:{3} | texture w:{4} h:{5}", x,y,imageWidth, imageHeight, texture.width, texture.height);
             var colours = texture.GetPixels(x, y, imageWidth, imageHeight, 0);
             atlas.SetPixels(_atlasX + 2, _atlasY + 2, imageWidth, imageHeight, colours);
 

@@ -14,9 +14,9 @@ namespace Tests
         public void Awake()
         {
             AssetLoader_LoadSpriteSheets();
-            AssetLoader_LoadXmls();
+            //AssetLoader_LoadXmls();
 
-            CreateObjects();
+            //CreateObjects();
         }
 
         private void CreateObjects()
