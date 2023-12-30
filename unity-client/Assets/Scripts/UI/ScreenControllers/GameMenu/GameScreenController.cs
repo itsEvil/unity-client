@@ -1,4 +1,5 @@
 using Game;
+using Game.Entities;
 using Static;
 using UnityEngine;
 using UnityEngine.UI;

@@ -1,4 +1,5 @@
-﻿using Static;
+﻿using Game.Entities;
+using Static;
 using System;
 
 namespace Game.Controllers {

@@ -4,175 +4,198 @@ using Game.Controllers;
 using Static;
 using System;
 using UnityEngine;
-public sealed class Player : Entity {
-
-    private const float _MIN_MOVE_SPEED = 0.004f;
-    private const float _MAX_MOVE_SPEED = 0.0096f;
-    private const float _MIN_ATTACK_FREQ = 0.0015f;
-    private const float _MAX_ATTACK_FREQ = 0.008f;
-    private const float _MIN_ATTACK_MULT = 0.5f;
-    private const float _MAX_ATTACK_MULT = 2f;
-    private const float _MAX_SINK_LEVEL = 18f;
-    public float MoveMultiplier = 1f;
-    public float PushX;
-    public float PushY;
+namespace Game.Entities
+{
 
 
-    public const int MaxLevel = 20;
+    public sealed class Player : Entity
+    {
 
-    public bool IsMyPlayer = false;
+        private const float _MIN_MOVE_SPEED = 0.004f;
+        private const float _MAX_MOVE_SPEED = 0.0096f;
+        private const float _MIN_ATTACK_FREQ = 0.0015f;
+        private const float _MAX_ATTACK_FREQ = 0.008f;
+        private const float _MIN_ATTACK_MULT = 0.5f;
+        private const float _MAX_ATTACK_MULT = 2f;
+        private const float _MAX_SINK_LEVEL = 18f;
+        public float MoveMultiplier = 1f;
+        public float PushX;
+        public float PushY;
 
-    public int CurrentExp;
-    public int NextLevelExp;
-    public int Level;
 
-    public int CurrentFame;
-    public int NextFameGoal;
+        public const int MaxLevel = 20;
 
-    public int Fame;
-    public int Credits;
-    public int NumStars;
-    public string GuildName = string.Empty;
-    public int GuildRank;
-    public bool HasBackpack;
-    public short SkinType;
-    public ItemType[] SlotTypes;
-    
-    //Stats
-    public int Mp;
-    public int MaxMp;
-    public int Attack;
-    public int Defense;
-    public int Speed;
-    public int Dexterity;
-    public int Vitality;
-    public int Wisdom;
+        public bool IsMyPlayer = false;
 
-    private PlayerInputController InputController;
+        public int CurrentExp;
+        public int NextLevelExp;
+        public int Level;
 
-    /// <summary>
-    /// Runs when any player gets initalized
-    /// </summary>
-    public override void Init(ObjectDesc desc, ObjectDefinition defi) {
-        base.Init(desc, defi);
-        IsMyPlayer = false;
-        SlotTypes = new ItemType[Inventory.Length];
-        Type = GameObjectType.Player;
+        public int CurrentFame;
+        public int NextFameGoal;
 
-        //Renderer.sortingLayerID = SortingLayer.GetLayerValueFromName("Entities");
-    }
-    /// <summary>
-    /// Only called when our player connects
-    /// </summary>
-    public void OnMyPlayer() {
-        //Renderer.sortingLayerID = SortingLayer.GetLayerValueFromName("Player");
-        _moveController = new PlayerMoveController(this);
-        //var charStats = AccountData.Characters[AccountData.CurrentCharId];
-        //Inventory = charStats.Inventory;
-        IsMyPlayer = true;
-        InputController = new();
-    }
-    public override void UpdateStat(StatType stat, object value) {
-        base.UpdateStat(stat, value);
-        switch (stat) {
-            case StatType.Experience:
-                CurrentExp = (int)value;
-                return;
-            case StatType.ExperienceGoal:
-                NextLevelExp = (int)value;
-                return;
-            case StatType.Level:
-                Level = (int)value;
-                return;
-            case StatType.Fame:
-                //account fame ?
-                Fame = (int) value;
-                return;
-            case StatType.Stars:
-                NumStars = (int)value;
-                return;
-            case StatType.GuildName:
-                GuildName = (string)value;
-                return;
-            case StatType.GuildRank:
-                GuildRank = (int)value;
-                return;
-            case StatType.Credits:
-                Credits = (int)value;
-                return;
-            case StatType.HasBackpack:
-                HasBackpack = (int)value == 1;
-                return;
-            case StatType.MP:
-                Mp = (int)value;
-                return;
-            case StatType.MaximumMP:
-                MaxMp = (int)value;
-                return;
-            case StatType.Attack:
-                Attack = (int)value;
-                return;
-        }
-    }
-    public float GetMovementSpeed() {
-        if (HasEffect(ConditionEffectIndex.Paralyzed)) {
-            Utils.Log("We are paralyzed!");
-            return 0;
-        }
+        public int Fame;
+        public int Credits;
+        public int NumStars;
+        public string GuildName = string.Empty;
+        public int GuildRank;
+        public bool HasBackpack;
+        public short SkinType;
+        public ItemType[] SlotTypes;
 
-        if (HasEffect(ConditionEffectIndex.Slowed)) {
-            Utils.Log("We are slowed!");
-            return _MIN_MOVE_SPEED; // * MoveMultiplier
-        }
+        //Stats
+        public int Mp;
+        public int MaxMp;
+        public int Attack;
+        public int Defense;
+        public int Speed;
+        public int Dexterity;
+        public int Vitality;
+        public int Wisdom;
 
-        var ret = _MIN_MOVE_SPEED + Speed / 75.0f * (_MAX_MOVE_SPEED - _MIN_MOVE_SPEED);
+        private PlayerInputController InputController;
 
-        if (HasEffect(ConditionEffectIndex.Speedy)) {
-            Utils.Log("We are speedy!");
-            return ret * 1.5f;
-        }
-
-        //MoveMultiplier is 1 always??
-        //ret *= MoveMultiplier;
-
-        return ret;
-    }
-    public override bool Tick() {
-        return base.Tick();
-    }
-    public void OnMove() {
-        var tile = Map.Instance.GetTile((int)Position.x, (int)Position.y);
-        if (tile == null) {
-            Utils.Error("Tile at {0} {1} is null", Position.x, Position.y);
-            return;
-        }
-        if (tile.Descriptor.Sinking) {
-            SinkLevel = (int)Mathf.Min(SinkLevel + 1, _MAX_SINK_LEVEL);
-            MoveMultiplier = 0.1f + (1 - SinkLevel / _MAX_SINK_LEVEL) * (tile.Descriptor.Speed - 0.1f);
-        }
-        else
+        /// <summary>
+        /// Runs when any player gets initalized
+        /// </summary>
+        public override void Init(ObjectDesc desc, ObjectDefinition defi)
         {
-            SinkLevel = 0;
-            MoveMultiplier = tile.Descriptor.Speed;
-        }
+            base.Init(desc, defi);
+            IsMyPlayer = false;
+            SlotTypes = new ItemType[Inventory.Length];
+            Type = GameObjectType.Player;
 
-        if (tile.Descriptor.Damage > 0 /* && !IsInvicible()*/) {
-            if (tile.StaticObject == null || !tile.StaticObject.Descriptor.ProtectFromGroundDamage) {
-                Damage(tile.Descriptor.Damage, new ConditionEffectDesc[0], null);
-                //TODO damage player
+            //Renderer.sortingLayerID = SortingLayer.GetLayerValueFromName("Entities");
+        }
+        /// <summary>
+        /// Only called when our player connects
+        /// </summary>
+        public void OnMyPlayer()
+        {
+            //Renderer.sortingLayerID = SortingLayer.GetLayerValueFromName("Player");
+            _moveController = new PlayerMoveController(this);
+            //var charStats = AccountData.Characters[AccountData.CurrentCharId];
+            //Inventory = charStats.Inventory;
+            IsMyPlayer = true;
+            InputController = new();
+        }
+        public override void UpdateStat(StatType stat, object value)
+        {
+            base.UpdateStat(stat, value);
+            switch (stat)
+            {
+                case StatType.Experience:
+                    CurrentExp = (int)value;
+                    return;
+                case StatType.ExperienceGoal:
+                    NextLevelExp = (int)value;
+                    return;
+                case StatType.Level:
+                    Level = (int)value;
+                    return;
+                case StatType.Fame:
+                    //account fame ?
+                    Fame = (int)value;
+                    return;
+                case StatType.Stars:
+                    NumStars = (int)value;
+                    return;
+                case StatType.GuildName:
+                    GuildName = (string)value;
+                    return;
+                case StatType.GuildRank:
+                    GuildRank = (int)value;
+                    return;
+                case StatType.Credits:
+                    Credits = (int)value;
+                    return;
+                case StatType.HasBackpack:
+                    HasBackpack = (int)value == 1;
+                    return;
+                case StatType.MP:
+                    Mp = (int)value;
+                    return;
+                case StatType.MaximumMP:
+                    MaxMp = (int)value;
+                    return;
+                case StatType.Attack:
+                    Attack = (int)value;
+                    return;
             }
         }
+        public float GetMovementSpeed()
+        {
+            if (HasEffect(ConditionEffectIndex.Paralyzed))
+            {
+                Utils.Log("We are paralyzed!");
+                return 0;
+            }
 
-        if (tile.Descriptor.Push) {
-            PushX = tile.Descriptor.DX;
-            PushX = tile.Descriptor.DY;
+            if (HasEffect(ConditionEffectIndex.Slowed))
+            {
+                Utils.Log("We are slowed!");
+                return _MIN_MOVE_SPEED; // * MoveMultiplier
+            }
+
+            var ret = _MIN_MOVE_SPEED + Speed / 75.0f * (_MAX_MOVE_SPEED - _MIN_MOVE_SPEED);
+
+            if (HasEffect(ConditionEffectIndex.Speedy))
+            {
+                Utils.Log("We are speedy!");
+                return ret * 1.5f;
+            }
+
+            //MoveMultiplier is 1 always??
+            //ret *= MoveMultiplier;
+
+            return ret;
         }
-        else {
-            PushX = 0;
-            PushY = 0;
+        public override bool Tick()
+        {
+            return base.Tick();
         }
-    }
-    public override void Dispose() {
-        base.Dispose();
+        public void OnMove()
+        {
+            var tile = Map.Instance.GetTile((int)Position.x, (int)Position.y);
+            if (tile == null)
+            {
+                Utils.Error("Tile at {0} {1} is null", Position.x, Position.y);
+                return;
+            }
+            if (tile.Descriptor.Sinking)
+            {
+                SinkLevel = (int)Mathf.Min(SinkLevel + 1, _MAX_SINK_LEVEL);
+                MoveMultiplier = 0.1f + (1 - SinkLevel / _MAX_SINK_LEVEL) * (tile.Descriptor.Speed - 0.1f);
+            }
+            else
+            {
+                SinkLevel = 0;
+                MoveMultiplier = tile.Descriptor.Speed;
+            }
+
+            if (tile.Descriptor.Damage > 0 /* && !IsInvicible()*/)
+            {
+                if (tile.StaticObject == null || !tile.StaticObject.Descriptor.ProtectFromGroundDamage)
+                {
+                    Damage(tile.Descriptor.Damage, new ConditionEffectDesc[0], null);
+                    //TODO damage player
+                }
+            }
+
+            if (tile.Descriptor.Push)
+            {
+                PushX = tile.Descriptor.DX;
+                PushX = tile.Descriptor.DY;
+            }
+            else
+            {
+                PushX = 0;
+                PushY = 0;
+            }
+        }
+        public override void Dispose()
+        {
+            base.Dispose();
+        }
     }
 }

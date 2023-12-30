@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Game.Entities;
+using System.Collections.Generic;
 using UI;
 using UnityEngine;
 
@@ -58,7 +59,7 @@ namespace Game.Controllers {
                     return;
                 //entity.Rotation = transform.rotation.eulerAngles.z * Mathf.Deg2Rad;
 
-                entity.transform.rotation = Quaternion.LookRotation(Camera.main.transform.up, -Camera.main.transform.forward);
+                entity.Transform.rotation = Quaternion.LookRotation(Camera.main.transform.up, -Camera.main.transform.forward);
             }
         }
 
@@ -72,7 +73,7 @@ namespace Game.Controllers {
                 return;
 
             if (Input.GetKeyDown(Settings.ResetRotation))
-                Settings.CameraAngle = 0;
+                Settings.CameraAngle = 180 * Mathf.Deg2Rad;
         }
 
         public void SetFocus(GameObject focus) {

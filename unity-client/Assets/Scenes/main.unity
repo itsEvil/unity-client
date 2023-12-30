@@ -1859,6 +1859,7 @@ MonoBehaviour:
   _tileMap: {fileID: 642001501}
   _entityContainer: {fileID: 629520377}
   EntityPool: {fileID: 904824505}
+  _wallPrefab: {fileID: 6349278949749634995, guid: 9c901239955de32459b61930ee48b785, type: 3}
 --- !u!1 &585164105
 GameObject:
   m_ObjectHideFlags: 0

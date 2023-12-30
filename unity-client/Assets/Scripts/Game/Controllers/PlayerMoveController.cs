@@ -1,4 +1,5 @@
-﻿using Static;
+﻿using Game.Entities;
+using Static;
 using System;
 using UI;
 using UnityEngine;
@@ -9,11 +10,12 @@ namespace Game.Controllers {
         public Vec2 Direction { get; private set; }
 
         private readonly Player _player;
+        private Player player;
+
         private static Map _map => Map.Instance;
         public PlayerMoveController(Player player) {
             _player = player;
         }
-
         public void Tick(float deltaTime) {
             var rotate = 0;
             var xVelocity = 0;

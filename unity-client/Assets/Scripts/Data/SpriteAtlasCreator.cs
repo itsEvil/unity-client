@@ -39,6 +39,7 @@ namespace Data {
                 Utils.Error("Sprite not found in Image database {0}:{1}", fileName, index);
                 return GetSprite("ErrorTexture", 0);
             }
+            
 
             if(!dict.TryGetValue(index, out var sprite)) {
                 Utils.Error("Index not found in Images database {0}:{1}", fileName, index);
@@ -95,9 +96,8 @@ namespace Data {
                     try {
 
                         var rect = CopyTexture(texture, atlas, imageHeight, imageWidth, (int)y, (int)x);
-                        sheetSprites[index++] = Sprite.Create(atlas, rect, new Vector2(0.5f, 0), 8);
+                        sheetSprites[index++] = Sprite.Create(atlas, rect, new Vector2(0.5f, 0.5f), 8);
                         Images[sheetData.SheetName] = sheetSprites;
-
                     }
                     catch(Exception e) {
                         Utils.Error("{0}\n{1}", e.Message, e.StackTrace);
@@ -116,7 +116,7 @@ namespace Data {
             var atlas = _atlases[0];
             var imageHeight = sheetData.ImageHeight;
             var imageWidth = sheetData.ImageWidth;
-            bool isPlayers = sheetData.Id.Equals("players");
+            //bool isPlayers = sheetData.Id.Equals("players");
 
             if (!Images.TryGetValue(sheetData.SheetName, out var sheetSprites))
                 sheetSprites = new();
@@ -127,7 +127,7 @@ namespace Data {
                 for(int i = 0; i < sheetData.RowCount; i++) {
                     for (var x = 0; x < sheetData.AnimationWidth; x += sheetData.ImageWidth) {
                         var rect = CopyTexture(texture, atlas, imageHeight, imageWidth, y - (i * sheetData.ImageHeight), x);
-                        var sprite = Sprite.Create(atlas, rect, new Vector2(0.5f, 0), 8);
+                        var sprite = Sprite.Create(atlas, rect, new Vector2(0.5f, 0.5f), 8);
                         sheetSprites[imageIndex++] = sprite;
                         frames.Add(sprite);
                     }
@@ -137,8 +137,8 @@ namespace Data {
                 if(!Animations.TryGetValue(sheetData.SheetName, out var dict))
                     dict = new();
 
-                if (isPlayers)
-                    Utils.Log("Added Players animation index {0}", animationIndex);
+                //if (isPlayers)
+                //    Utils.Log("Added Players animation index {0}", animationIndex);
 
                 dict[animationIndex++] = animation;
                 Animations[sheetData.SheetName] = dict;
@@ -163,7 +163,7 @@ namespace Data {
                 _atlasX += imageWidth + 4;
                 return CopyTexture(texture, atlas, imageHeight, imageWidth, y, x, counter++);
             }
-            Utils.Log("Getting pixels x:{0} y:{1} w:{2} h:{3} | texture w:{4} h:{5}", x,y,imageWidth, imageHeight, texture.width, texture.height);
+            //Utils.Log("Getting pixels x:{0} y:{1} w:{2} h:{3} | texture w:{4} h:{5}", x,y,imageWidth, imageHeight, texture.width, texture.height);
             var colours = texture.GetPixels(x, y, imageWidth, imageHeight, 0);
             atlas.SetPixels(_atlasX + 2, _atlasY + 2, imageWidth, imageHeight, colours);
 

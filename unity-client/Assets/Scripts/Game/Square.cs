@@ -1,4 +1,5 @@
-﻿using Static;
+﻿using Game.Entities;
+using Static;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -12,24 +13,24 @@ namespace Game
 
         public ushort Type;
         public int SinkLevel;
-        public Entity StaticObject;
+        public StaticEntity StaticObject;
         public int X;
         public int Y;
 
         public TileDesc Descriptor;
-        public void Init(TileDesc desc, int x, int y) {
+        public void Init(TileDesc descriptor, int x, int y) {
             X = x;
             Y = y;
-            Descriptor = desc;
-            Type = desc.Type;
+            Descriptor = descriptor;
+            Type = descriptor.Type;
 
-            if(desc.Sinking){
+            if(descriptor.Sinking){
               SinkLevel = 12;
             }
             
-            sprite = desc.TextureData.GetTexture(0); //TileRedrawer.RedrawSigless(this, true);
+            sprite = descriptor.TextureData.GetTexture(Hash(x,y));
             if (sprite == null)
-                Utils.Error("Square {0} sprite is null!", desc.Id);
+                Utils.Error("Square {0} sprite is null!", descriptor.Id);
         }
         private static int Hash(int x, int y) {
             var l = LookUp[(x + y) % LookUp.Length];

@@ -1,4 +1,5 @@
-﻿using Static;
+﻿using Game.Entities;
+using Static;
 using System;
 using System.Collections.Generic;
 using UnityEngine;

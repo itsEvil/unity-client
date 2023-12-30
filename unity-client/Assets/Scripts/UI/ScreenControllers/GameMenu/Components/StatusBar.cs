@@ -1,3 +1,4 @@
+using Game.Entities;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;

@@ -1,5 +1,7 @@
 using Data;
 using Game.Controllers;
+using Game.Entities;
+using Game.Models;
 using Networking;
 using Networking.Tcp;
 using Static;
@@ -11,6 +13,7 @@ using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
 using UnityEngine.Analytics;
 using UnityEngine.Tilemaps;
+using static UnityEngine.EventSystems.EventTrigger;
 using TileData = Static.TileData;
 
 namespace Game {
@@ -25,7 +28,7 @@ namespace Game {
         [SerializeField] private Tilemap _tileMap;
         [SerializeField] private Transform _entityContainer;
         [SerializeField] public EntityPool EntityPool;
-
+        [SerializeField] private Wall _wallPrefab; 
         public static Map Instance;
         public static MapInfo MapInfo;
 
@@ -141,7 +144,7 @@ namespace Game {
                     entity.Square.StaticObject = null;
                 }
 
-                tile.StaticObject = entity;
+                tile.StaticObject = entity as StaticEntity;
             }
             entity.Square = tile;
         }
@@ -249,6 +252,13 @@ namespace Game {
                 if (ent.IsInteractive)
                     Interactives.Add(ent.Id, ent as Interactive);
 
+                if (ent.Descriptor.Static) {
+                    var tile = GetTile((int)ent.Position.x, (int)ent.Position.y, true);
+                    if (tile == null)
+                        continue;
+
+                    tile.StaticObject = ent as StaticEntity;
+                }
             }
 
             for(int i = 0; i < ToAddTimers.Count; i++)
@@ -267,6 +277,14 @@ namespace Game {
 
                 if (ent.IsInteractive)
                     Interactives.Remove(objectId);
+
+                if (ent.Descriptor.Static) {
+                    var tile = GetTile((int)ent.Position.x, (int)ent.Position.y, true);
+                    if (tile == null)
+                        continue;
+
+                    tile.StaticObject = null;
+                }
 
                 EntityPool.Return(ent);
                 Entities.Remove(objectId);
@@ -409,10 +427,17 @@ namespace Game {
             }            
         }
 
-        public void InteractWithNearby()
-        {
+        public void InteractWithNearby() {
             if (NearestInteractive != null)
                 NearestInteractive.Interact();
+        }
+
+        public Wall GetWall(Entity entity, ObjectDesc descriptor) {
+            var wall = Instantiate(_wallPrefab, entity.Transform);
+            var pos = entity.Transform.position;
+            wall.transform.position = new Vector3(pos.x, pos.y - 0.5f, -1f);
+            wall.Init(descriptor); 
+            return wall;
         }
     }
 }

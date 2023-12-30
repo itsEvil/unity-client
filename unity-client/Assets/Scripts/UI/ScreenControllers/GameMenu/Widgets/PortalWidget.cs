@@ -1,3 +1,4 @@
+using Game.Entities;
 using Networking;
 using Networking.Tcp;
 using TMPro;

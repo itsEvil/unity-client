@@ -19,6 +19,7 @@ namespace Static
         public readonly ObjectType Class;
         public readonly GameObjectType ObjectClass;
         public readonly bool BlocksSight;
+        public readonly string ModelName;
 
         public readonly bool OccupySquare;
         public readonly bool FullOccupy;
@@ -73,11 +74,11 @@ namespace Static
 
             DisplayId = e.ParseString("DisplayId", Id);
             Group = e.ParseString("Group");
-
-            Static = e.ParseBool("Static");
-
+            ModelName = e.ParseString("Model");
             Class = e.ParseEnum("Class", ObjectType.GameObject);
             ObjectClass = ParseObjectClass(Class);
+            Static = e.ParseBool("Static") || ObjectClass == GameObjectType.Static;
+
 
             BlocksSight = e.ParseBool("BlocksSight");
 
@@ -125,6 +126,8 @@ namespace Static
             Flying = e.ParseBool("Flying");
             Z = e.ParseFloat("Z");
             NoMiniMap = e.ParseBool("NoMiniMap");
+
+            var isModel = !string.IsNullOrEmpty(ModelName) || Class == ObjectType.Wall;
 
             TextureData = new TextureData(e);
 
@@ -261,34 +264,34 @@ namespace Static
 
         public static string StatIndexToName(int index)
         {
-            switch (index)
+            return index switch
             {
-                case 0: return "MaxHitPoints";
-                case 1: return "MaxMagicPoints";
-                case 2: return "Attack";
-                case 3: return "Defense";
-                case 4: return "Speed";
-                case 5: return "Dexterity";
-                case 6: return "HpRegen";
-                case 7: return "MpRegen";
-            }
-            return null;
+                0 => "MaxHitPoints",
+                1 => "MaxMagicPoints",
+                2 => "Attack",
+                3 => "Defense",
+                4 => "Speed",
+                5 => "Dexterity",
+                6 => "HpRegen",
+                7 => "MpRegen",
+                _ => null,
+            };
         }
 
         public static int StatNameToIndex(string name)
         {
-            switch (name)
+            return name switch
             {
-                case "MaxHitPoints": return 0;
-                case "MaxMagicPoints": return 1;
-                case "Attack": return 2;
-                case "Defense": return 3;
-                case "Speed": return 4;
-                case "Dexterity": return 5;
-                case "HpRegen": return 6;
-                case "MpRegen": return 7;
-            }
-            return -1;
+                "MaxHitPoints" => 0,
+                "MaxMagicPoints" => 1,
+                "Attack" => 2,
+                "Defense" => 3,
+                "Speed" => 4,
+                "Dexterity" => 5,
+                "HpRegen" => 6,
+                "MpRegen" => 7,
+                _ => -1,
+            };
         }
     }
 
