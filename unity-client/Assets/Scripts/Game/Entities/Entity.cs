@@ -50,7 +50,7 @@ namespace Game.Entities {
             Inventory = new ushort[8];
 
             Renderer.gameObject.SetActive(true);
-            Renderer.transform.localPosition = new Vector3(0f, 0f, 0.5f);
+            //Renderer.transform.localPosition = new Vector3(0f, 0f, 0.5f);
             Renderer.sprite = descriptor.TextureData.GetTexture(0);
 
             if (Id != PacketHandler.Instance.PlayerId)
@@ -162,6 +162,14 @@ namespace Game.Entities {
                 Map.MyPlayer.UpdateObjectStats(definition.ObjectStatus.Stats);
                 Map.Instance.OnMyPlayerConnected();
                 return Map.MyPlayer;
+            }
+
+            if(descriptor.ModelType != ModelType.None) {
+                var model = Map.Instance.EntityPool.Get(GameObjectType.Model) as Model;
+                model.Init(descriptor, definition);
+                model.Transform.SetPositionAndRotation(new Vector3(definition.ObjectStatus.Position.x, definition.ObjectStatus.Position.y, -0.5f), Quaternion.Euler(0, 180, 0));
+                model.Transform.localScale = new Vector3(50, 50, 50);
+                return model;
             }
 
             var entity = Map.Instance.EntityPool.Get(descriptor.ObjectClass);
