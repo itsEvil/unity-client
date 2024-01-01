@@ -86,7 +86,11 @@ public static class ParseUtils
     {
         var value = name[0].Equals('@') ? element.Attribute(name.Remove(0, 1))?.Value : element.Element(name)?.Value;
         if (string.IsNullOrWhiteSpace(value)) return undefined;
-        return (T)Enum.Parse(typeof(T), value.Replace(" ", ""));
+
+        if (!Enum.TryParse(typeof(T), value.Replace(" ", ""), true, out var result))
+            return undefined;
+
+        return (T)result;
     }
 
     public static ConditionEffectIndex ParseConditionEffect(this XElement element, string name, ConditionEffectIndex undefined = ConditionEffectIndex.Nothing)

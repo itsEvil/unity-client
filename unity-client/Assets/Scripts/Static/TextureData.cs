@@ -16,6 +16,7 @@ namespace Static {
         public string TextureName = "None";
         public bool Invisible = false;
         public float Chance;
+        public ushort Index;
         public TextureData(XElement xml) {
             if (xml.Element("Texture") != null) {
                 Parse(xml.Element("Texture"));
@@ -63,10 +64,12 @@ namespace Static {
             return AltTextures?[id];
         }
         private void Parse(XElement textureXml) {
-            TextureName = GetTextureName(textureXml);
             switch (textureXml.Name.ToString()) {
                 case "Texture":
-                    Texture = GetTexture(textureXml);
+                    TextureName = textureXml.ParseString("File");
+                    Index = textureXml.ParseUshort("Index");
+
+                    Texture = GetTexture(TextureName, Index);
                     break;
                 case "AnimatedTexture":
                     Animation = GetAnimatedTexture(textureXml);//, m_Type);
@@ -79,20 +82,12 @@ namespace Static {
             }
         }
 
-        private static Sprite GetTexture(XElement textureXml) {
-            var sheetName = textureXml.ParseString("File");
-            var index = textureXml.ParseUshort("Index");
-
+        private static Sprite GetTexture(string sheetName, ushort index) {
             if (sheetName.Contains("invisible", StringComparison.InvariantCultureIgnoreCase))
                 return null;
 
             return SpriteAtlasCreator.GetSprite(sheetName, index);
         }
-
-        private static string GetTextureName(XElement textureXml) {
-            return textureXml.ParseString("File", string.Empty);
-        }
-
         private static CharacterAnimation GetAnimatedTexture(XElement textureXml) {
             var sheetName = textureXml.ParseString("File");
             var index = textureXml.ParseUshort("Index");

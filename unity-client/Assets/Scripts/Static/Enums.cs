@@ -15,6 +15,36 @@ namespace Static
         Left,
         Right
     }
+    public enum ModelType {
+        None,
+        Wall,
+        //GasEmitter,
+        //Tower,
+        //Web,
+        //Cube,
+        //BigCube,
+        //Ico,
+        //Octa,
+        //Pyramid,
+        //Tetra,
+        //Dodec,
+        //Pillar,
+        //BrokenPillar,
+        //Table,
+        //Sign,
+        //TableEdge,
+        //Tesla,
+        //CloningVat,
+        //MosterTank1,
+        //MosterTank2,
+        //MosterTank3,
+        //MosterTank4,
+        //CandyColBroken,
+        //CandyColWhole,
+        //CandyDoughnut1,
+        //CandyDoughnut2,
+        //CandyDoughnut3,
+    }
     public enum GameObjectType
     {
         Entity,
@@ -22,6 +52,7 @@ namespace Static
         Interactive,
         Projectile,
         Player,
+        Model,
     }
     public enum ObjectType
     {

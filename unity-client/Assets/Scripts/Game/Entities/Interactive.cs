@@ -1,35 +1,23 @@
 using Networking.Tcp;
 using Networking;
 using Static;
-using System.Collections;
-using System.Collections.Generic;
 using UI;
-using UnityEngine;
 
-namespace Game.Entities
-{
-
-
-    public sealed class Interactive : Entity
-    {
-        public override void Init(ObjectDesc desc, ObjectDefinition defi)
-        {
-            base.Init(desc, defi);
+namespace Game.Entities {
+    public sealed class Interactive : Entity {
+        public override void Init(ObjectDesc descriptor, ObjectDefinition definition) {
+            base.Init(descriptor, definition);
             Type = GameObjectType.Interactive;
             IsInteractive = true;
         }
-        public override bool Tick()
-        {
+        public override bool Tick() {
             return base.Tick();
         }
-        public override void Dispose()
-        {
+        public override void Dispose() {
             base.Dispose();
         }
-        public void Interact()
-        {
-            switch (Descriptor.Class)
-            {
+        public void Interact() {
+            switch (Descriptor.Class) {
                 case ObjectType.CharacterChanger:
                     break;
                 case ObjectType.ConnectedWall:
@@ -71,8 +59,7 @@ namespace Game.Entities
                     break;
             }
         }
-        public void SetWidgetVisibility(bool value)
-        {
+        public void SetWidgetVisibility(bool value) {
             Utils.Log("Setting visibility to {0} for object class {1}", value, Descriptor.Class);
             switch (Descriptor.Class)
             {
@@ -120,5 +107,4 @@ namespace Game.Entities
             }
         }
     }
-
 }

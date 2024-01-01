@@ -1,15 +1,8 @@
 using Static;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace Game.Entities
-{
-
-    public sealed class Projectile : Entity
-    {
-        public override void Init(ObjectDesc desc, ObjectDefinition defi) {
-            base.Init(desc, defi);
+namespace Game.Entities {
+    public sealed class Projectile : Entity {
+        public override void Init(ObjectDesc descriptor, ObjectDefinition definition) {
+            base.Init(descriptor, definition);
             Type = GameObjectType.Projectile;
         }
         public override bool Tick() {
@@ -19,5 +12,4 @@ namespace Game.Entities
             base.Dispose();
         }
     }
-
 }

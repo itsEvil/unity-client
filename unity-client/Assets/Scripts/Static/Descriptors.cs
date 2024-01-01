@@ -19,7 +19,7 @@ namespace Static
         public readonly ObjectType Class;
         public readonly GameObjectType ObjectClass;
         public readonly bool BlocksSight;
-        public readonly string ModelName;
+        public readonly ModelType ModelType;
 
         public readonly bool OccupySquare;
         public readonly bool FullOccupy;
@@ -74,8 +74,11 @@ namespace Static
 
             DisplayId = e.ParseString("DisplayId", Id);
             Group = e.ParseString("Group");
-            ModelName = e.ParseString("Model");
+            ModelType = e.ParseEnum("Model", ModelType.None);
             Class = e.ParseEnum("Class", ObjectType.GameObject);
+            if (ModelType == ModelType.None)
+                ModelType = ParseClassForModelTypes(Class);
+
             ObjectClass = ParseObjectClass(Class);
             Static = e.ParseBool("Static") || ObjectClass == GameObjectType.Static;
 
@@ -127,7 +130,8 @@ namespace Static
             Z = e.ParseFloat("Z");
             NoMiniMap = e.ParseBool("NoMiniMap");
 
-            var isModel = !string.IsNullOrEmpty(ModelName) || Class == ObjectType.Wall;
+            
+            var isModel = ModelType != ModelType.None || Class == ObjectType.Wall;
 
             TextureData = new TextureData(e);
 
@@ -155,6 +159,13 @@ namespace Static
 #endif
                 Projectiles[desc.BulletType] = desc;
             }*/
+        }
+
+        private static ModelType ParseClassForModelTypes(ObjectType objectType) {
+            return objectType switch {
+                ObjectType.Wall => ModelType.Wall,
+                _ => ModelType.None,
+            };
         }
 
         public GameObjectType ParseObjectClass(ObjectType type)

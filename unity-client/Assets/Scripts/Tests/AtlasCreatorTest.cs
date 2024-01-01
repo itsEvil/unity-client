@@ -13,10 +13,15 @@ namespace Tests
         [SerializeField] private SpriteRenderer Renderer;
         public void Awake()
         {
-            AssetLoader_LoadSpriteSheets();
+            //AssetLoader_LoadSpriteSheets();
             //AssetLoader_LoadXmls();
 
             //CreateObjects();
+        }
+
+        private void Start() {
+            AtlasTexture = SpriteAtlasCreator.GetAtlasTexture(0);
+            Renderer.sprite = Sprite.Create(AtlasTexture, new Rect(0, 0, AtlasTexture.width, AtlasTexture.height), Vector2.zero);
         }
 
         private void CreateObjects()

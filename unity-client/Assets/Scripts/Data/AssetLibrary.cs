@@ -23,6 +23,7 @@ namespace Data {
         public static readonly Dictionary<ushort, ObjectDesc> Type2ProjectileDesc = new();
         public static readonly Dictionary<string, ObjectDesc> Id2ProjectileDesc = new();
         public static readonly Dictionary<ushort, SkinDesc> Type2SkinDesc = new();
+        public static readonly HashSet<ObjectDesc> ModelsToPreload = new();
         //public static void AddAnimations(Texture2D texture, SpriteSheetData data) {
         //    if (!Animations.ContainsKey(data.Id))
         //        Animations[data.Id] = new List<CharacterAnimation>();
@@ -76,7 +77,10 @@ namespace Data {
                         Type2ItemDesc[type] = new ItemDesc(objectXml, id, type);
                         break;
                 }
-               Id2ObjectDesc[id] = Type2ObjectDesc[type] = new ObjectDesc(objectXml, id, type);
+                var descriptor = Id2ObjectDesc[id] = Type2ObjectDesc[type] = new ObjectDesc(objectXml, id, type);
+
+                if(descriptor.ModelType != ModelType.None)
+                    ModelsToPreload.Add(descriptor);
             }
 
             foreach (var skinList in ClassType2Skins.Values) {

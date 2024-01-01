@@ -1,20 +1,17 @@
 ﻿using Static;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.U2D;
 
 namespace Data {
     public class SpriteAtlasCreator {
-        private const int AtlasSize = 4096;
+        public const int AtlasSize = 4096;
         private static readonly Dictionary<int, Texture2D> _atlases = new();
         private static readonly Dictionary<string, Dictionary<int, Sprite>> Images = new();
+        private static readonly Dictionary<string, Dictionary<int, Vec2>> IndexToPosition = new();
         private static readonly Dictionary<string, Dictionary<int, CharacterAnimation>> Animations = new();
         private static readonly Dictionary<string, SpriteSheetData> IdToSheetData = new();
+        private static readonly Dictionary<string, SpriteSheetData> SheetNameToSheetData = new();
         private static int _atlasX, _atlasY;
         static SpriteAtlasCreator() {
             var atlas = new Texture2D(AtlasSize, AtlasSize) {
@@ -28,6 +25,33 @@ namespace Data {
             atlas.Apply();
             _atlases[0] = atlas;
         }
+        public static Vec2 GetAtlasIndex(string fileName, int index) {
+            if(!IndexToPosition.TryGetValue(fileName, out var dict)) {
+                if (IdToSheetData.TryGetValue(fileName, out var data))
+                    return GetAtlasIndex(data.SheetName, index);
+
+                Utils.Warn("{0} Dict not found Returning Vec2.Zero", fileName);
+                return Vec2.zero;
+            }
+            
+            if(!dict.TryGetValue(index, out var position)) {
+                Utils.Warn("Index {0} not found Returning Vec2.Zero", index);
+                return Vec2.zero;
+            }
+
+            return position;
+        }
+        public static SpriteSheetData GetSheetData(string fileName) {
+            if(SheetNameToSheetData.TryGetValue(fileName, out var sheetData))
+                return sheetData;
+
+            if (IdToSheetData.TryGetValue(fileName, out var idData))
+                return idData;
+
+            Utils.Warn("Returning Error SheetData");
+            return GetSheetData("ErrorTexture");
+        }
+
         /// <summary>
         /// Returns a sprite at the given index from the texture atlas
         /// </summary>
@@ -78,12 +102,15 @@ namespace Data {
         public static void AddImages(Texture2D texture, SpriteSheetData sheetData) {
             //Utils.Log("Parsing {0} | Height: {1} | Width: {2} | X: {3} | Y: {4}", sheetData.Id, sheetData.ImageHeight, sheetData.ImageWidth, _atlasX, _atlasY);
             IdToSheetData[sheetData.Id] = sheetData;
+            SheetNameToSheetData[sheetData.SheetName] = sheetData;
             var index = 0;
             var atlas = _atlases[0];
             var imageHeight = sheetData.ImageHeight;
             var imageWidth = sheetData.ImageWidth;
             var targetRect = new Rect(0, texture.height, texture.width, texture.height);
             //loop over all sprites in the texture
+            if (!IndexToPosition.TryGetValue(sheetData.SheetName, out var sheetIndexes))
+                sheetIndexes = new();
 
             if (!Images.TryGetValue(sheetData.SheetName, out var sheetSprites))
                 sheetSprites = new();
@@ -96,6 +123,7 @@ namespace Data {
                     try {
 
                         var rect = CopyTexture(texture, atlas, imageHeight, imageWidth, (int)y, (int)x);
+                        sheetIndexes[index] = new Vec2(rect.x, rect.y);
                         sheetSprites[index++] = Sprite.Create(atlas, rect, new Vector2(0.5f, 0.5f), 8);
                         Images[sheetData.SheetName] = sheetSprites;
                     }
@@ -104,13 +132,14 @@ namespace Data {
                     }
                 }
             }
-
+            IndexToPosition[sheetData.SheetName] = sheetIndexes;
             atlas.Apply();
         }
 
         public static void AddAnimations(Texture2D texture, SpriteSheetData sheetData) {
-            Utils.Warn("Parsing {0}|{1} animation", sheetData.Id, sheetData.SheetName);
+            //Utils.Warn("Parsing {0}|{1} animation", sheetData.Id, sheetData.SheetName);
             IdToSheetData[sheetData.Id] = sheetData;
+            SheetNameToSheetData[sheetData.SheetName] = sheetData;
             var animationIndex = 0;
             var imageIndex = 0;
             var atlas = _atlases[0];
@@ -182,7 +211,7 @@ namespace Data {
             var dict = Animations["ErrorAnimation"] = new Dictionary<int, CharacterAnimation>();
             dict[0] = new CharacterAnimation(sprites, Facing.Right);
             
-            Utils.Log("Loaded Error Animation");
+            //Utils.Log("Loaded Error Animation");
         }
         //Test stuff
         public static Texture2D GetAtlasTexture(int index = 0) => _atlases[index];

@@ -4,13 +4,8 @@ using Game.Controllers;
 using Static;
 using System;
 using UnityEngine;
-namespace Game.Entities
-{
-
-
-    public sealed class Player : Entity
-    {
-
+namespace Game.Entities {
+    public sealed class Player : Entity {
         private const float _MIN_MOVE_SPEED = 0.004f;
         private const float _MAX_MOVE_SPEED = 0.0096f;
         private const float _MIN_ATTACK_FREQ = 0.0015f;
@@ -58,32 +53,25 @@ namespace Game.Entities
         /// <summary>
         /// Runs when any player gets initalized
         /// </summary>
-        public override void Init(ObjectDesc desc, ObjectDefinition defi)
-        {
-            base.Init(desc, defi);
+        public override void Init(ObjectDesc descriptor, ObjectDefinition definition) {
+            base.Init(descriptor, definition);
             IsMyPlayer = false;
             SlotTypes = new ItemType[Inventory.Length];
             Type = GameObjectType.Player;
-
-            //Renderer.sortingLayerID = SortingLayer.GetLayerValueFromName("Entities");
         }
         /// <summary>
         /// Only called when our player connects
         /// </summary>
-        public void OnMyPlayer()
-        {
-            //Renderer.sortingLayerID = SortingLayer.GetLayerValueFromName("Player");
+        public void OnMyPlayer() { 
             _moveController = new PlayerMoveController(this);
             //var charStats = AccountData.Characters[AccountData.CurrentCharId];
             //Inventory = charStats.Inventory;
             IsMyPlayer = true;
             InputController = new();
         }
-        public override void UpdateStat(StatType stat, object value)
-        {
+        public override void UpdateStat(StatType stat, object value) {
             base.UpdateStat(stat, value);
-            switch (stat)
-            {
+            switch (stat) {
                 case StatType.Experience:
                     CurrentExp = (int)value;
                     return;
@@ -123,24 +111,20 @@ namespace Game.Entities
                     return;
             }
         }
-        public float GetMovementSpeed()
-        {
-            if (HasEffect(ConditionEffectIndex.Paralyzed))
-            {
+        public float GetMovementSpeed() {
+            if (HasEffect(ConditionEffectIndex.Paralyzed)) {
                 Utils.Log("We are paralyzed!");
                 return 0;
             }
 
-            if (HasEffect(ConditionEffectIndex.Slowed))
-            {
+            if (HasEffect(ConditionEffectIndex.Slowed)) {
                 Utils.Log("We are slowed!");
                 return _MIN_MOVE_SPEED; // * MoveMultiplier
             }
 
             var ret = _MIN_MOVE_SPEED + Speed / 75.0f * (_MAX_MOVE_SPEED - _MIN_MOVE_SPEED);
 
-            if (HasEffect(ConditionEffectIndex.Speedy))
-            {
+            if (HasEffect(ConditionEffectIndex.Speedy)) {
                 Utils.Log("We are speedy!");
                 return ret * 1.5f;
             }
@@ -150,51 +134,41 @@ namespace Game.Entities
 
             return ret;
         }
-        public override bool Tick()
-        {
+        public override bool Tick() {
             return base.Tick();
         }
-        public void OnMove()
-        {
+        public void OnMove() {
             var tile = Map.Instance.GetTile((int)Position.x, (int)Position.y);
-            if (tile == null)
-            {
+            if (tile == null) {
                 Utils.Error("Tile at {0} {1} is null", Position.x, Position.y);
                 return;
             }
-            if (tile.Descriptor.Sinking)
-            {
+            if (tile.Descriptor.Sinking) {
                 SinkLevel = (int)Mathf.Min(SinkLevel + 1, _MAX_SINK_LEVEL);
                 MoveMultiplier = 0.1f + (1 - SinkLevel / _MAX_SINK_LEVEL) * (tile.Descriptor.Speed - 0.1f);
             }
-            else
-            {
+            else {
                 SinkLevel = 0;
                 MoveMultiplier = tile.Descriptor.Speed;
             }
 
-            if (tile.Descriptor.Damage > 0 /* && !IsInvicible()*/)
-            {
-                if (tile.StaticObject == null || !tile.StaticObject.Descriptor.ProtectFromGroundDamage)
-                {
+            if (tile.Descriptor.Damage > 0 /* && !IsInvicible()*/) {
+                if (tile.StaticObject == null || !tile.StaticObject.Descriptor.ProtectFromGroundDamage) {
                     Damage(tile.Descriptor.Damage, new ConditionEffectDesc[0], null);
                     //TODO damage player
                 }
             }
 
-            if (tile.Descriptor.Push)
-            {
+            if (tile.Descriptor.Push) {
                 PushX = tile.Descriptor.DX;
                 PushX = tile.Descriptor.DY;
             }
-            else
-            {
+            else {
                 PushX = 0;
                 PushY = 0;
             }
         }
-        public override void Dispose()
-        {
+        public override void Dispose() {
             base.Dispose();
         }
     }

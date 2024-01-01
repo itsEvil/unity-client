@@ -1,19 +1,13 @@
 ﻿using Game.Entities;
 using System.Collections.Generic;
-using UI;
 using UnityEngine;
 
 namespace Game.Controllers {
     internal class CameraController : MonoBehaviour {
         public static CameraController Instance { get; private set; }
-        
-        [SerializeField]
-        private float Angle = 180.0f;
-        [SerializeField]
-        private float ZScale = 1;
-        [SerializeField]
-        private float ZOffset = -10;
-
+        [SerializeField] private float Angle = 180.0f;
+        [SerializeField] private float ZScale = 1;
+        [SerializeField] private float ZOffset = -10;
         public Camera Camera { get; private set; }
 
         private GameObject _focus;

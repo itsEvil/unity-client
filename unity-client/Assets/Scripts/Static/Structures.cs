@@ -25,7 +25,7 @@ namespace Static {
         public readonly Facing StartFacing;
         public readonly int ImageWidth;
         public readonly int ImageHeight;
-
+        public readonly bool IsEmpty;
         public SpriteSheetData(XElement xml) {
             Id = xml.ParseString("@id");
             SheetName = xml.ParseString("@sheetName", Id);
@@ -40,6 +40,7 @@ namespace Static {
             ImageHeight = imageSize[1];
             FrameCount = animationSize[0] / imageSize[0];
             RowCount = animationSize[1] / imageSize[1];
+            IsEmpty = false;
         }
 
         public bool IsAnimation() {

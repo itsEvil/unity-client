@@ -9,19 +9,16 @@ namespace Data {
         public void Awake() {
             try {
                 LoadSpriteSheets();
-            }
-            catch(Exception e) {
+            } catch(Exception e) {
                 Utils.Error("Load sprite sheet exception {0}::{1}", e.Message, e.StackTrace);
             }
             try {
                 LoadXmls();
-            }
-            catch(Exception e) {
+            } catch(Exception e) {
                 Utils.Error("Load xml data exception {0}::{1}", e.Message, e.StackTrace);
             }
             Destroy(gameObject);
         }
-
         private void LoadSpriteSheets() {
             var spritesXml = XElement.Parse(Resources.Load<TextAsset>("SpriteSheets/SpriteSheets").text);
 
@@ -42,7 +39,7 @@ namespace Data {
         private void LoadXmls() {
             var xmlAssets = Resources.LoadAll<TextAsset>("Xmls");
             foreach (var xmlAsset in xmlAssets) {
-                Utils.Log("Parsing {0} xml", xmlAsset.name);
+                //Utils.Log("Parsing {0} xml", xmlAsset.name);
                 var xml = XElement.Parse(xmlAsset.text);
                 AssetLibrary.ParseXml(xml);
             }

@@ -5,19 +5,14 @@ using Static;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
 
-namespace Game.Entities
-{
-
-
+namespace Game.Entities {
     public class Entity : MonoBehaviour, IDisposable
     {
         //Cache Transform as its an Extern call which is slow
         private Transform _transform;
         public Transform Transform {
-            get
-            {
+            get {
                 if (_transform == null)
                     _transform = transform;
                 return _transform;
@@ -33,8 +28,7 @@ namespace Game.Entities
         public Vec2 Position
         {
             get => new(Transform.position.x, Transform.position.y);
-            set
-            {
+            set {
                 var yOffset = Descriptor.DrawOnGround ? -0.5f : 0f;
                 Transform.position = new Vector3(value.x, value.y + yOffset, -Z);
             }
@@ -47,7 +41,7 @@ namespace Game.Entities
         protected ushort[] Inventory;
         public ObjectDesc Descriptor;
         public Square Square;
-        protected IMoveController _moveController;
+        protected IMoveController _moveController;       
         public virtual void Init(ObjectDesc descriptor, ObjectDefinition definition) {
             Descriptor = descriptor;
             Name = Descriptor.DisplayId;
