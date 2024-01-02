@@ -1,4 +1,5 @@
 using Account;
+using Data;
 using Game;
 using Game.Controllers;
 using Static;
@@ -53,16 +54,25 @@ namespace Game.Entities {
         /// <summary>
         /// Runs when any player gets initalized
         /// </summary>
-        public override void Init(ObjectDesc descriptor, ObjectDefinition definition) {
-            base.Init(descriptor, definition);
-            IsMyPlayer = false;
-            SlotTypes = new ItemType[Inventory.Length];
+        public override void Init(ObjectDesc descriptor, ObjectDefinition definition, bool isMyPlayer = false) {
+            base.Init(descriptor, definition, isMyPlayer);
+            IsMyPlayer = isMyPlayer;
             Type = GameObjectType.Player;
+
+            var plrDescriptor = AssetLibrary.GetPlayerDesc(descriptor.Type);
+            if (plrDescriptor == null)
+                return;
+
+            Inventory = new ushort[plrDescriptor.Equipment.Length];
+            SlotTypes = new ItemType[Inventory.Length];
+            for (int i = 0; i < SlotTypes.Length; i++)
+                SlotTypes[i] = plrDescriptor.SlotTypes[i];
+
         }
         /// <summary>
         /// Only called when our player connects
         /// </summary>
-        public void OnMyPlayer() { 
+        public void OnMyPlayerConnected() { 
             _moveController = new PlayerMoveController(this);
             //var charStats = AccountData.Characters[AccountData.CurrentCharId];
             //Inventory = charStats.Inventory;
@@ -135,6 +145,7 @@ namespace Game.Entities {
             return ret;
         }
         public override bool Tick() {
+            InputController?.Tick();
             return base.Tick();
         }
         public void OnMove() {

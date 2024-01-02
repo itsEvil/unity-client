@@ -67,7 +67,10 @@ namespace Game.Controllers {
                 return;
 
             if (Input.GetKeyDown(Settings.ResetRotation))
-                Settings.CameraAngle = 180 * Mathf.Deg2Rad;
+                ResetCameraRotation();
+        }
+        public static void ResetCameraRotation() {
+            Settings.CameraAngle = 180 * Mathf.Deg2Rad;
         }
 
         public void SetFocus(GameObject focus) {
@@ -80,6 +83,7 @@ namespace Game.Controllers {
 
         public void Clear() {
             _rotatingEntities.Clear();
+            ResetCameraRotation();
         }
 
         public void RemoveRotatingEntity(Entity entity) {

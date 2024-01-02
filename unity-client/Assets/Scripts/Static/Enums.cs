@@ -18,6 +18,9 @@ namespace Static
     public enum ModelType {
         None,
         Wall,
+        Tower,
+        Pillar,
+        BrokenPillar,
         //GasEmitter,
         //Tower,
         //Web,

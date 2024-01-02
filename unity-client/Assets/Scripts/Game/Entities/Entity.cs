@@ -42,11 +42,14 @@ namespace Game.Entities {
         public ObjectDesc Descriptor;
         public Square Square;
         protected IMoveController _moveController;       
-        public virtual void Init(ObjectDesc descriptor, ObjectDefinition definition) {
+        public virtual void Init(ObjectDesc descriptor, ObjectDefinition definition, bool isMyPlayer = false) {
             Descriptor = descriptor;
             Name = Descriptor.DisplayId;
             Id = definition.ObjectStatus.Id;
-            Position = definition.ObjectStatus.Position;
+            
+            if(Id != Map.MyPlayer.Id)
+                MoveTo(definition.ObjectStatus.Position);
+
             Inventory = new ushort[8];
 
             Renderer.gameObject.SetActive(true);
@@ -108,7 +111,7 @@ namespace Game.Entities {
 
         }
         public virtual void Dispose() {
-            gameObject.SetActive(true);
+            gameObject.SetActive(false);
         }
         public virtual bool MoveTo(Vec2 pos) {
             Map.Instance.MoveEntity(this, pos);
@@ -157,8 +160,10 @@ namespace Game.Entities {
         }
         public static Entity Resolve(ObjectDefinition definition) {
             var descriptor = AssetLibrary.GetObjectDesc(definition.ObjectType);
-            if (definition.ObjectStatus.Id == PacketHandler.Instance.PlayerId) {
-                Map.MyPlayer.Init(descriptor, definition);
+            var isMyPlayer = definition.ObjectStatus.Id == PacketHandler.Instance.PlayerId;
+            if (isMyPlayer) {
+                Map.MyPlayer.Init(descriptor, definition, isMyPlayer);
+                Map.MyPlayer.OnMyPlayerConnected();
                 Map.MyPlayer.UpdateObjectStats(definition.ObjectStatus.Stats);
                 Map.Instance.OnMyPlayerConnected();
                 return Map.MyPlayer;
@@ -167,8 +172,6 @@ namespace Game.Entities {
             if(descriptor.ModelType != ModelType.None) {
                 var model = Map.Instance.EntityPool.Get(GameObjectType.Model) as Model;
                 model.Init(descriptor, definition);
-                model.Transform.SetPositionAndRotation(new Vector3(definition.ObjectStatus.Position.x, definition.ObjectStatus.Position.y, -0.5f), Quaternion.Euler(0, 180, 0));
-                model.Transform.localScale = new Vector3(50, 50, 50);
                 return model;
             }
 

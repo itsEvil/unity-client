@@ -50,10 +50,9 @@ namespace Game {
         }
 
         public void Clear() {
-            foreach (var queue in _entityPool.Values) {
+            foreach (var queue in _entityPool.Values)
                 queue.Clear();
-            }
-
+            
             var childCount = _wrapperParent.childCount;
             for(int i = 0; i < childCount; i++)
                 Destroy(_wrapperParent.GetChild(i).gameObject);

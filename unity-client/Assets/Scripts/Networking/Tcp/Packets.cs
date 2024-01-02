@@ -103,10 +103,6 @@ namespace Networking.Tcp
         public void Handle() {
             //Utils.Log("Handling NewTick Id:{0} Time:{1}", TickId, TickTime);
 
-            var pos = Map.MyPlayer.Position;
-            var tile = Map.Instance.GetTile((int)pos.x, (int)pos.y, true);
-            if(tile != null)
-                TcpTicker.Send(new Move(TickId, TickTime, pos.x, pos.y, PacketHandler.Instance.History));
 
             foreach(var objectStat in Statuses) {
                 var entity = Map.Instance.GetEntity(objectStat.Id);
@@ -115,10 +111,18 @@ namespace Networking.Tcp
                 
                 bool isMyPlayer = PacketHandler.Instance.PlayerId == objectStat.Id;
                 entity.UpdateObjectStats(objectStat.Stats);
+
                 if (isMyPlayer)
                     continue;
-
+                
                 entity.OnNewTick(objectStat.Position);
+            }
+
+            var pos = Map.UseCreatePosition ? Map.CreateSuccess.Position : Map.MyPlayer.Position;
+            Utils.Log($"Sending move with {(Map.UseCreatePosition ? "Create" : "Player")} position which is {pos.x} {pos.y}");
+            var tile = Map.Instance.GetTile((int)pos.x, (int)pos.y, true);
+            if (tile != null) { 
+                TcpTicker.Send(new Move(Map.MapInfo.WorldId, TickId, TickTime, pos.x, pos.y, PacketHandler.Instance.History));
             }
         }
     }
@@ -152,6 +156,7 @@ namespace Networking.Tcp
                 Objects[i] = new ObjectDefinition(buffer, ref ptr, len);
         }
         public void Handle() {
+            Utils.Log("Handling update packet {0}, {1}, {2}", Objects.Length, Drops.Length, TileTypes.Length);
             TcpTicker.Send(new UpdateAck());
 
             Map.Instance.SetTiles(TilePositions, TileTypes);
@@ -163,10 +168,8 @@ namespace Networking.Tcp
             Span<ObjectDefinition> objects = Objects.AsSpan();
             for(int i = 0; i < objects.Length; i++) {
                 var obj = objects[i];
-
                 //Creates entity data and places it at starting position
                 var entity = Entity.Resolve(obj);
-
                 //Prepares to add the entity to the world
                 Map.Instance.AddEntity(entity);
             }
@@ -229,13 +232,13 @@ namespace Networking.Tcp
         public S2CPacketId Id => S2CPacketId.CreateSuccess;
         public readonly int ObjectId;
         public readonly int CharacterId;
+        public readonly Vec2 Position;
         public CreateSuccess(Span<byte> buffer, ref int ptr, int len) {
             ObjectId = PacketUtils.ReadInt(buffer, ref ptr, len);
             CharacterId = PacketUtils.ReadInt(buffer, ref ptr, len);
+            Position = new Vec2(PacketUtils.ReadFloat(buffer, ref ptr, len), PacketUtils.ReadFloat(buffer, ref ptr, len));
         }
         public void Handle() {
-            PacketHandler.Instance.PlayerId = ObjectId;
-            AccountData.CurrentCharId = CharacterId;
             Map.Instance.OnCreateSuccess(this);
         }
     }
@@ -327,7 +330,8 @@ namespace Networking.Tcp
         public S2CPacketId Id => S2CPacketId.MapInfo;
         public readonly int Width;
         public readonly int Height;
-        public readonly string WorldId;
+        public readonly int WorldId;
+        public readonly string WorldName;
         public readonly string DisplayName;
         public readonly uint Seed;
         public readonly int Difficulty;
@@ -340,11 +344,11 @@ namespace Networking.Tcp
         public readonly float DayLightIntensity;
         public readonly float NightLightIntensity;
         public readonly long TotalElapsedMicroSeconds;
-        public MapInfo(Span<byte> buffer, ref int ptr, int len)
-        {
+        public MapInfo(Span<byte> buffer, ref int ptr, int len) {
             Width = PacketUtils.ReadInt(buffer, ref ptr, len);
             Height = PacketUtils.ReadInt(buffer, ref ptr, len);
-            WorldId = PacketUtils.ReadString(buffer, ref ptr, len);
+            WorldId = PacketUtils.ReadInt(buffer, ref ptr, len);
+            WorldName = PacketUtils.ReadString(buffer, ref ptr, len);
             DisplayName = PacketUtils.ReadString(buffer, ref ptr, len);
             Seed = PacketUtils.ReadUInt(buffer, ref ptr, len);
             Difficulty = PacketUtils.ReadInt(buffer, ref ptr, len);
@@ -372,11 +376,10 @@ namespace Networking.Tcp
             //}
         }
         public void Handle() {
-            TcpTicker.Send(new UpdateAck()); //Hack but should fix 'Connection Timeout (UpdateAck);'
-
+            //TcpTicker.Send(new UpdateAck()); //Hack but should fix 'Connection Timeout (UpdateAck);'
             Map.Instance.Init(this);
             PacketHandler.Instance.Random = new wRandom(Seed);
-            //Utils.Log("Loading into {0}. Difficulty {1}", DisplayName, Difficulty);
+            Utils.Log("Loading into {0}", DisplayName);
         }
     }
     public readonly struct NameResult : IIncomingPacket {
@@ -549,8 +552,7 @@ namespace Networking.Tcp
 
         }
     }
-    public readonly struct UpdateAck : IOutgoingPacket
-    {
+    public readonly struct UpdateAck : IOutgoingPacket {
         public C2SPacketId Id => C2SPacketId.UpdateAck;
         public void Write(Span<byte> buffer, ref int ptr)
         {
@@ -613,7 +615,13 @@ namespace Networking.Tcp
     public readonly struct PlayerText : IOutgoingPacket
     {
         public C2SPacketId Id => C2SPacketId.PlayerText;
-        public void Write(Span<byte> buffer, ref int ptr) { }
+        public readonly string Message;
+        public PlayerText(string message) {
+            Message = message;
+        }
+        public void Write(Span<byte> buffer, ref int ptr) { 
+            PacketUtils.WriteString(buffer, Message, ref ptr);
+        }
     }
     public readonly struct PlayerShoot : IOutgoingPacket
     {
@@ -633,12 +641,14 @@ namespace Networking.Tcp
     public readonly struct Move : IOutgoingPacket
     {
         public C2SPacketId Id => C2SPacketId.Move;
+        public readonly int WorldId;
         public readonly int TickId;
         public readonly long TickTime;
         public readonly float X;
         public readonly float Y;
         public readonly MoveRecord[] History;
-        public Move(int tickId, long tickTime, float x, float y, MoveRecord[] history) {
+        public Move(int worldId, int tickId, long tickTime, float x, float y, MoveRecord[] history) {
+            WorldId = worldId;
             TickId = tickId;
             TickTime = tickTime;
             X = x;
@@ -646,6 +656,7 @@ namespace Networking.Tcp
             History = history;
         }
         public void Write(Span<byte> buffer, ref int ptr) {
+            PacketUtils.WriteInt(buffer, WorldId, ref ptr);
             PacketUtils.WriteInt(buffer, TickId, ref ptr);
             PacketUtils.WriteLong(buffer, TickTime, ref ptr);
             PacketUtils.WriteFloat(buffer, X, ref ptr);

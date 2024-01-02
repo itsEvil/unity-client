@@ -28,11 +28,9 @@ public class PacketHandler {
         InitData = initData;
     }
     public void Start() {
-        for(int i = 0; i < History.Length; i++) {
+        for(int i = 0; i < History.Length; i++)
             History[i] = new MoveRecord();
-        }
-
-        Instance = this;
+        
         _toBeHandled = new ConcurrentQueue<IIncomingPacket>();
         TcpTicker.Start(this);
         TcpTicker.Send(

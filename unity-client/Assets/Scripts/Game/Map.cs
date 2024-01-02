@@ -1,3 +1,4 @@
+using Account;
 using Data;
 using Game.Controllers;
 using Game.Entities;
@@ -12,6 +13,7 @@ using UI;
 using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
 using UnityEngine.Analytics;
+using UnityEngine.TextCore.Text;
 using UnityEngine.Tilemaps;
 using static UnityEngine.EventSystems.EventTrigger;
 using TileData = Static.TileData;
@@ -31,6 +33,8 @@ namespace Game {
         [SerializeField] private Wall _wallPrefab; 
         public static Map Instance;
         public static MapInfo MapInfo;
+        public static CreateSuccess CreateSuccess;
+        public static bool UseCreatePosition;
 
         public static Square[,] Tiles;
 
@@ -67,17 +71,24 @@ namespace Game {
             Tiles = new Square[MapInfo.Width, MapInfo.Height];
             GameScreenController.Instance.OnMapInfo();
         }
-        public void OnCreateSuccess(CreateSuccess create)
-        {
-            var plr = EntityPool.Get(GameObjectType.Player) as Player;
-            plr.Id = create.ObjectId;
-            MyPlayer = plr; 
+        public void OnCreateSuccess(CreateSuccess create) {
+            CreateSuccess = create;
+            UseCreatePosition = true;
+            PacketHandler.Instance.PlayerId = create.ObjectId;
+            AccountData.CurrentCharId = create.CharacterId;
+            
+            if(MyPlayer == null) {
+                var plr = EntityPool.Get(GameObjectType.Player) as Player;
+                plr.Id = create.ObjectId;
+                MyPlayer = plr;
+            }
         }
         public void OnMyPlayerConnected() {
-            MyPlayer.OnMyPlayer();
-            Utils.Log("MyPlayerConnected! {0}", MyPlayer.Name);
+            MyPlayer.Position = new Vec2(CreateSuccess.Position.x, CreateSuccess.Position.y);
+            Utils.Log("MyPlayerConnected! {0} at {1}", MyPlayer.Name, MyPlayer.Position);
             CameraController.Instance.SetFocus(MyPlayer.gameObject);
             GameScreenController.Instance.OnMyPlayerConnected(MyPlayer);
+            UseCreatePosition = false;
             //Hide preloader
         }
 
@@ -139,11 +150,13 @@ namespace Game {
             var tile = GetTile((int)position.x, (int)position.y);
             entity.SetPosition(position);
 
+            if (tile == null)
+                return;
+
             if (entity.Descriptor.Static) {
                 if (entity.Square != null) {
                     entity.Square.StaticObject = null;
                 }
-
                 tile.StaticObject = entity as StaticEntity;
             }
             entity.Square = tile;
@@ -250,7 +263,7 @@ namespace Game {
                 Entities[ent.Id] = ent;
 
                 if (ent.IsInteractive)
-                    Interactives.Add(ent.Id, ent as Interactive);
+                    Interactives[ent.Id] = ent as Interactive;
 
                 if (ent.Descriptor.Static) {
                     var tile = GetTile((int)ent.Position.x, (int)ent.Position.y, true);
@@ -270,6 +283,9 @@ namespace Game {
         private void Remove() {
             for (int i = 0; i < ToRemoveEntities.Count; i++) {
                 var objectId = ToRemoveEntities[i];
+
+                Utils.Log("Trying to remove ent {0}", objectId);
+
                 if(!Entities.TryGetValue(objectId, out var ent))
                     continue;
 
@@ -285,6 +301,8 @@ namespace Game {
 
                     tile.StaticObject = null;
                 }
+
+                Utils.Log("Removed ent {0} {1}", ent.Descriptor.Id, objectId);
 
                 EntityPool.Return(ent);
                 Entities.Remove(objectId);
@@ -321,19 +339,20 @@ namespace Game {
 
             TickInteractives();
 
-            if (MyPlayer != null) {
+            if (MyPlayer != null)
                 MyPlayer.OnMove();
-            }
         }
 
         public void Dispose() {
+            TcpTicker.ClearSend();
             TokenSource?.Cancel();
             GameScreenController.Instance.SetAllOptionalWidgetVisibility(false);
             _tileMap.ClearAllTiles();
             CameraController.Instance.Clear();
-            foreach (var (_, ent) in Entities) {
+            MyPlayer = null;
+            foreach (var (_, ent) in Entities)
                 Destroy(ent.gameObject);
-            }
+            
 
             TokenSource = new();
             EntityPool.Clear();

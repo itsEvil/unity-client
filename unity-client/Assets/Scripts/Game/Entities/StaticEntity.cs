@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace Game.Entities {
     public sealed class StaticEntity : Entity {
-        public override void Init(ObjectDesc descriptor, ObjectDefinition definition) {
-            base.Init(descriptor, definition);
+        public override void Init(ObjectDesc descriptor, ObjectDefinition definition, bool isMyPlayer = false) {
+            base.Init(descriptor, definition, isMyPlayer);
             Type = GameObjectType.Static;
         }
         public override bool MoveTo(Vec2 pos) {

@@ -1750,6 +1750,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Material: {fileID: 2100000, guid: 08545d9a68a0f8142ad0e9f945188e24, type: 2}
   WallMeshFilter: {fileID: -5754084199372789682, guid: ab661d78304daa34aadf9b66b83bd3a2, type: 3}
+  TowerMeshFilter: {fileID: -6400281290468069383, guid: d9e0342f9d9b6014fa5a80abf7b63281, type: 3}
+  PillarMeshFilter: {fileID: -5754084199372789682, guid: 8ae159bef2fd6d74db717398086dd236, type: 3}
+  BrokenPillarMeshFilter: {fileID: -5754084199372789682, guid: 2a56a8ddf773ddb4fb7efeb5c3df5d0c, type: 3}
 --- !u!4 &490293472
 Transform:
   m_ObjectHideFlags: 0

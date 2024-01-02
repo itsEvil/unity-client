@@ -115,7 +115,9 @@ namespace Networking {
 
             Utils.Log("Tcp Disconnected!");
         }
-
+        public static void ClearSend() {
+            _pending.Clear();
+        }
         // called on main thread
         public static void Send(IOutgoingPacket packet) {
             if (!Running) {

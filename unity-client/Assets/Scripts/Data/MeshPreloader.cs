@@ -9,7 +9,7 @@ namespace Data {
         public static MeshPreloader Instance { get; private set; }
         private static readonly Dictionary<ushort, Mesh> NameToMesh = new();
         [SerializeField] private Material Material;
-        [SerializeField] private MeshFilter WallMeshFilter; //Example of a mesh which was loaded up via AssetLoader
+        [SerializeField] private MeshFilter WallMeshFilter, TowerMeshFilter, PillarMeshFilter, BrokenPillarMeshFilter; //Example of a mesh which was loaded up via AssetLoader
         private void Awake() {
             Instance = this;
         }
@@ -32,15 +32,21 @@ namespace Data {
         }
         private void TryParseModel(ObjectDesc descriptor) {
             switch (descriptor.ModelType) {
-                case ModelType.Wall: ParseWallUVs(descriptor); break;
+                case ModelType.BrokenPillar:
+                case ModelType.Pillar:
+                    ParseWallUVs(descriptor, PillarMeshFilter.sharedMesh); break;
+                case ModelType.Tower:
+                    ParseWallUVs(descriptor, TowerMeshFilter.sharedMesh); break;
+                case ModelType.Wall: 
+                    ParseWallUVs(descriptor, WallMeshFilter.sharedMesh); break;
                 case ModelType.None:
                 default: return;
             }
         }
 
-        private void ParseWallUVs(ObjectDesc descriptor) {
+        private void ParseWallUVs(ObjectDesc descriptor, Mesh meshToCopy) {
             Utils.Log("Parsing wall mesh for {0}", descriptor.Id);
-            var meshCopy = MakeReadableMeshCopy(WallMeshFilter.sharedMesh);
+            var meshCopy = MakeReadableMeshCopy(meshToCopy);
             var uv = meshCopy.uv;
 
             var sheetData = SpriteAtlasCreator.GetSheetData(descriptor.TextureData.TextureName);
