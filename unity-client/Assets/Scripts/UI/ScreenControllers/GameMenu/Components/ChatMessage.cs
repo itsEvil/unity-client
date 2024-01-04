@@ -23,6 +23,7 @@ namespace UI {
             bool addName = false;
             var color = "#FFFFFF";
             char prefix = ' ';
+
             if(textPacket.Name.Length > 0) {
                 addName = true;
                 prefix = textPacket.Name[0];
@@ -38,6 +39,9 @@ namespace UI {
                 }
             }
             //Name
+
+            var parsedMessage = ChatEmojis.ParseForEmojis(textPacket.Message);
+
             if (addName) {
                 if (prefix == '@') //Admin prefix
                     sb.Append(StringUtils.AddColorTag(textPacket.Name[1..], "#f7f700"));
@@ -49,11 +53,11 @@ namespace UI {
                 sb.Append('|');
                 sb.Append(' ');
                 sb.Append("<noparse>");
-                sb.Append(textPacket.Message);
+                sb.Append(parsedMessage);
                 sb.Append("</noparse>");
             }
             else {
-                sb.Append(StringUtils.AddColorTag(textPacket.Message, color));
+                sb.Append(StringUtils.AddColorTag(parsedMessage, color));
             }
 
             //Actual message

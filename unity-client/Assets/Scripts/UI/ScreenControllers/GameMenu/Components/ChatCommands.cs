@@ -9,6 +9,7 @@ namespace UI {
         {
             { "help", new("help", "Provides more information about a command", ".help <commandName>", 1, ExecuteHelpCommand) },
             { "commands", new("commands", "Lists all available commands", ".commands", 0, ExecuteCommandsCommand) },
+            { "emojis", new("emojis", "Lists all available emojis", ".emojis", 0, ExecuteEmojisCommand) },
         };
 
         public static void ParseChatCommand(string message) {
@@ -60,6 +61,20 @@ namespace UI {
         }
         private static void ExecuteCommandsCommand(string[] words) {
             SendCommandList();
+        }
+        private static void ExecuteEmojisCommand(string[] words) {
+            StringBuilder sb = new();
+            sb.Append("\n");
+            sb.Append("Valid emojis are are: ");
+            sb.Append("<size=14px>");
+            foreach (var (tag, index) in ChatEmojis.TagToIndex) {
+                sb.Append("\n");
+                sb.Append($"Tag: '{tag}' Sprite: '<sprite index={index}>'");
+            }
+            sb.Append("</size>");
+            
+
+            SendSystemMessage(sb.ToString());
         }
         private static void SendSystemMessage(string message) {
             ChatWidget.Instance.AddMessage(new Text("*System*", -1, -1, 0, "", message));

@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace UI {
     public class ChatInput : MonoBehaviour {
@@ -19,6 +20,7 @@ namespace UI {
             PlayerInputController.InputEnabled = true;
             InputField.DeactivateInputField();
             IsSelected = false;
+            EventSystem.current.SetSelectedGameObject(null);
         }
 
         public void Update() {
