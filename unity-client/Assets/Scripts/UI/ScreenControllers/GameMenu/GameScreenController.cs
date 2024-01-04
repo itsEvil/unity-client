@@ -1,5 +1,6 @@
 using Game;
 using Game.Entities;
+using Networking.Tcp;
 using Static;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,6 +11,7 @@ namespace UI {
         [SerializeField] private StatsWidget _statsWidget;
         [SerializeField] private MinimapWidget _minimapWidget;
         [SerializeField] private PortalWidget _portalWidget;
+        [SerializeField] private ChatWidget _chatWidget;
         public GameObject Object { get => gameObject; }
         private void Awake() => Instance = this;
         public void Reset(object data = null) {
@@ -21,6 +23,8 @@ namespace UI {
                 Utils.Error("Game | Data is null, expected int value");
                 return;
             }
+            
+            _chatWidget.ClearInput();
 
             var init = (GameInitData)data;
             var handler = new PacketHandler(init);
@@ -30,7 +34,9 @@ namespace UI {
             _statsWidget.Init(myPlayer);
             _statsWidget.gameObject.SetActive(true);
         }
-        public void OnMapInfo() {
+        public void OnMapInfo(MapInfo info) {
+            _chatWidget.AddMessage(new Networking.Tcp.Text("", -1, -1, 0, "", $"Connecting to {info.WorldName}"));
+            _chatWidget.ClearInput();
             //_minimapWidget.Init();
             //_minimapWidget.gameObject.SetActive(true);
         }
@@ -47,6 +53,7 @@ namespace UI {
         private void OnMenu() {
             ViewManager.ChangeView(View.Menu);
         }
+        public void AddMessage(Networking.Tcp.Text textPacket) => _chatWidget.AddMessage(textPacket);
 
         void Update() {
             PacketHandler.Instance.Tick();

@@ -7,6 +7,9 @@ namespace Game.Controllers {
     public class PlayerInputController {
         public static bool InputEnabled = true;
         public void Tick() {
+            if (!InputEnabled)
+                return;
+
             if (Input.GetKeyDown(KeyCode.G)) {
                 TcpTicker.Send(new PlayerText("/spawn 1 Abyss of demons Portal"));
             }
@@ -15,7 +18,7 @@ namespace Game.Controllers {
                 TcpTicker.Send(new Escape());
             }
 
-            if (Input.GetKeyDown(KeyCode.Escape)) {
+            if (Input.GetKeyDown(Settings.Menu)) {
                 ViewManager.ChangeView(View.Menu);
                 return;
             }

@@ -34,7 +34,8 @@ public static class StringUtils
     public static string AddColorTag(string msg, string color)
     {
         StringBuilder sb = new();
-        sb.Append(_colorOne).Replace("0", color);
+        sb.Append(_colorOne);
+        sb.Replace("0", color);
         sb.Append(msg);
         sb.Append(_colorTwo);
         return sb.ToString();

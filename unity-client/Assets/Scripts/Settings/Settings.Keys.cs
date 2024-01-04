@@ -17,6 +17,8 @@ public static partial class Settings
     public static KeyCode Interact = KeyCode.F;
     public static KeyCode EscapeToNexus = KeyCode.R;
 
+    public static KeyCode EnterChat = KeyCode.Return;
+    public static KeyCode Menu = KeyCode.Escape;
 
     public static KeyCode ResetRotation = KeyCode.LeftShift;
 }

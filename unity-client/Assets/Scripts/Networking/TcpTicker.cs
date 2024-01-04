@@ -11,6 +11,7 @@ using System.Text;
 using UnityEditor.Experimental.Rendering;
 using System.Threading;
 using UnityEditor.PackageManager.UI;
+using UI;
 
 namespace Networking {
     public enum SocketEventState {
@@ -145,6 +146,7 @@ namespace Networking {
             catch (Exception e) {
                 Utils.Error("TcpTicker::{0}::{1}", e.Message , e.StackTrace);
                 Stop(nameof(Tick));
+                GameScreenController.Instance.AddMessage(new Text("*System*", -1, -1, 0, "", $"Lost connection. \nPlease press {Settings.Menu} to return to main menu."));
                 //_crashed = true;
             }
         }

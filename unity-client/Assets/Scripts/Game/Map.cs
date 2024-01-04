@@ -69,7 +69,7 @@ namespace Game {
             Dispose();
             MapInfo = mapInfo;
             Tiles = new Square[MapInfo.Width, MapInfo.Height];
-            GameScreenController.Instance.OnMapInfo();
+            GameScreenController.Instance.OnMapInfo(mapInfo);
         }
         public void OnCreateSuccess(CreateSuccess create) {
             CreateSuccess = create;

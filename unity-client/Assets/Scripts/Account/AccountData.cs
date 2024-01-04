@@ -23,6 +23,7 @@ namespace Account
         public static int AccountId;
         public static int MaxCharacters;
         public static short NextCharId;
+        public static bool IsMuted;
 
         public static bool SignedIn;
         public static string PlayerName = UndefinedName;

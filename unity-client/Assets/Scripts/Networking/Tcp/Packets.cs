@@ -3,6 +3,7 @@ using Game;
 using Game.Entities;
 using Static;
 using System;
+using UI;
 using UnityEngine;
 using static UnityEditor.PlayerSettings;
 
@@ -505,9 +506,17 @@ namespace Networking.Tcp
         public readonly byte BubbleTime;
         public readonly string Recipient;
         public readonly string Message;
+        public Text(string name, int objectId, int stars, byte bubbleTime, string recipient, string message) {
+            Name = name;
+            ObjectId = objectId;
+            NumStars = stars;
+            BubbleTime = bubbleTime;
+            Recipient = recipient;
+            Message = message;
+        }
         public Text(Span<byte> buffer, ref int ptr, int len) {
             Name = PacketUtils.ReadString(buffer, ref ptr, len);
-            ObjectId= PacketUtils.ReadInt(buffer, ref ptr, len);
+            ObjectId = PacketUtils.ReadInt(buffer, ref ptr, len);
             NumStars = PacketUtils.ReadInt(buffer, ref ptr, len);
             BubbleTime = PacketUtils.ReadByte(buffer, ref ptr, len);
             Recipient = PacketUtils.ReadString(buffer, ref ptr, len);
@@ -515,6 +524,7 @@ namespace Networking.Tcp
         }
         public void Handle() {
             Utils.Log("Handling Text packet {0}, {1}", Name, Message);
+            ChatWidget.Instance.AddMessage(this);
         }
     }
     #endregion
