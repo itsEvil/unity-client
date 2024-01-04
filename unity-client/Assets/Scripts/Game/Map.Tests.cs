@@ -31,7 +31,7 @@ namespace Game {
                 ObjectDefinition defi = new(desc.Type, new ObjectStatus(id, Vec2.zero));
                 Utils.Log("Spawning in: {0}", desc.DisplayId);
                 var entity = EntityPool.Get(desc.ObjectClass);
-                entity.Init(desc, defi);
+                entity.Init(desc, defi.ObjectStatus.Id, defi.ObjectStatus.Position, false);
                 AddEntity(entity);
             }
         }

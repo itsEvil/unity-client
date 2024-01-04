@@ -45,6 +45,8 @@ namespace Game {
         public static List<Entity> ToAddEntities = new(BUFFER_SIZE_MED);
         public static List<int> ToRemoveEntities = new(BUFFER_SIZE_MED);
         public static Dictionary<int, Entity> Entities = new(BUFFER_SIZE_LARGE);
+        public static Dictionary<int, Entity> Enemies = new(BUFFER_SIZE_LARGE);
+        public static Dictionary<int, Entity> Players = new(BUFFER_SIZE_LARGE);
         public static Dictionary<int, Interactive> Interactives = new(BUFFER_SIZE_MED);
         
         public static List<FPTimer> Timers = new(BUFFER_SIZE_MED);
@@ -262,6 +264,12 @@ namespace Game {
                 ent.AddToWorld();
                 Entities[ent.Id] = ent;
 
+                if (ent.Descriptor.Class == ObjectType.Player)
+                    Players[ent.Id] = ent;
+
+                if (ent.Descriptor.Enemy)
+                    Enemies[ent.Id] = ent;
+
                 if (ent.IsInteractive)
                     Interactives[ent.Id] = ent as Interactive;
 
@@ -290,6 +298,12 @@ namespace Game {
                     continue;
 
                 CameraController.Instance.RemoveRotatingEntity(ent);
+
+                if (ent.Descriptor.Class == ObjectType.Player)
+                    Players.Remove(ent.Id);
+
+                if (ent.Descriptor.Enemy)
+                    Enemies.Remove(ent.Id);
 
                 if (ent.IsInteractive)
                     Interactives.Remove(objectId);
@@ -357,6 +371,8 @@ namespace Game {
             TokenSource = new();
             EntityPool.Clear();
             Entities.Clear();
+            Players.Clear();
+            Enemies.Clear();
             Interactives.Clear();
             ToAddEntities.Clear();
             ToRemoveEntities.Clear();

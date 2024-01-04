@@ -5,8 +5,8 @@ using UI;
 
 namespace Game.Entities {
     public sealed class Interactive : Entity {
-        public override void Init(ObjectDesc descriptor, ObjectDefinition definition, bool isMyPlayer = false) {
-            base.Init(descriptor, definition, isMyPlayer);
+        public override void Init(ObjectDesc descriptor, int id, Vec2 position, bool isMyPlayer = false) {
+            base.Init(descriptor, id, position, isMyPlayer);
             Type = GameObjectType.Interactive;
             IsInteractive = true;
         }

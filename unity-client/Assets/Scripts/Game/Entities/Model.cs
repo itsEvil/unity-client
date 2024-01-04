@@ -9,20 +9,20 @@ namespace Game.Entities {
     public class Model : Entity {
         [SerializeField] private MeshFilter MeshFilter;
         [SerializeField] private MeshRenderer MeshRenderer;
-        public override void Init(ObjectDesc descriptor, ObjectDefinition definition, bool isMyPlayer = false) {
+        public override void Init(ObjectDesc descriptor, int id, Vec2 position, bool isMyPlayer = false) {
             Descriptor = descriptor;
             Name = Descriptor.DisplayId;
-            Id = definition.ObjectStatus.Id;
+            Id = id;
             Type = GameObjectType.Model;
             if (MeshPreloader.Instance.TryGetMesh(descriptor.Type, out Mesh mesh))
                 MeshFilter.sharedMesh = mesh;
 
-            var position = new Vector3(
-                definition.ObjectStatus.Position.x, 
-                definition.ObjectStatus.Position.y, 
+            var pos = new Vector3(
+                position.x, 
+                position.y, 
                 -0.5f);
 
-            SetModelProperties(descriptor, position);
+            SetModelProperties(descriptor, pos);
 
             MeshRenderer.material = MeshPreloader.Instance.GetModelMaterial();
         }

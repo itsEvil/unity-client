@@ -54,8 +54,8 @@ namespace Game.Entities {
         /// <summary>
         /// Runs when any player gets initalized
         /// </summary>
-        public override void Init(ObjectDesc descriptor, ObjectDefinition definition, bool isMyPlayer = false) {
-            base.Init(descriptor, definition, isMyPlayer);
+        public override void Init(ObjectDesc descriptor, int id, Vec2 position, bool isMyPlayer = false) {
+            base.Init(descriptor, id, position, isMyPlayer);
             IsMyPlayer = isMyPlayer;
             Type = GameObjectType.Player;
 
@@ -74,6 +74,7 @@ namespace Game.Entities {
         /// </summary>
         public void OnMyPlayerConnected() { 
             _moveController = new PlayerMoveController(this);
+            Hp = 1000;
             //var charStats = AccountData.Characters[AccountData.CurrentCharId];
             //Inventory = charStats.Inventory;
             IsMyPlayer = true;

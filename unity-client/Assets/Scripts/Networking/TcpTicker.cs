@@ -224,13 +224,13 @@ namespace Networking {
                 //
                 //    return;
                 //}
-
+                    
                 //StringBuilder sb = new();
                 //for (int i = 0; i < len; i++)
                 //    sb.Append('[').Append(_Receive.PacketBytes[i]).Append(']');
 
                 var packetId = (S2CPacketId)PacketUtils.ReadByte(buffer[ptr..], ref ptr, len); //nextPacketPtr
-                //Utils.Log("Received Packet {1} | Length: {0}", len, packetId);
+                Utils.Log("Received Packet {1} | Actual Length: {0} | Read Length: {2}", len, packetId, packetLen);
 
                 PacketHandler.Instance.ReadPacket(packetId, buffer, ref ptr, len); //nextPacketPtr
             }

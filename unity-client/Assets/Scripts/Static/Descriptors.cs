@@ -549,6 +549,7 @@ namespace Static
 
         public readonly ushort ContainerType;
 
+        public readonly TextureData TextureData;
         public ProjectileDesc(XElement e, ushort containerType)
         {
             ContainerType = containerType;
@@ -578,6 +579,8 @@ namespace Static
 
             Accelerate = e.ParseBool("Accelerate");
             Decelerate = e.ParseBool("Decelerate");
+
+            TextureData = new TextureData(e);
         }
     }
 

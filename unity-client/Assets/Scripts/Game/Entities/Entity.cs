@@ -34,21 +34,21 @@ namespace Game.Entities {
             }
         }
         public float Z;
-        protected int Hp;
-        protected int MaxHp;
-        protected int Size;
-        protected int SinkLevel;
-        protected ushort[] Inventory;
+        [SerializeField] protected int Hp;
+        [SerializeField] protected int MaxHp;
+        [SerializeField] protected int Size;
+        [SerializeField] protected int SinkLevel;
+        [SerializeField] protected ushort[] Inventory;
         public ObjectDesc Descriptor;
         public Square Square;
         protected IMoveController _moveController;       
-        public virtual void Init(ObjectDesc descriptor, ObjectDefinition definition, bool isMyPlayer = false) {
+        public virtual void Init(ObjectDesc descriptor, int id, Vec2 position, bool isMyPlayer = false) {
             Descriptor = descriptor;
             Name = Descriptor.DisplayId;
-            Id = definition.ObjectStatus.Id;
+            Id = id;
             
             if(Id != Map.MyPlayer.Id)
-                MoveTo(definition.ObjectStatus.Position);
+                MoveTo(position);
 
             Inventory = new ushort[8];
 
@@ -64,6 +64,7 @@ namespace Game.Entities {
 
         }
         public virtual void AddToWorld() {
+            Dead = false;
             gameObject.SetActive(true);
         }
         public void OnNewTick(Vec2 position) {
@@ -88,11 +89,12 @@ namespace Game.Entities {
             }
 
             if (damage > 0) {
+                Hp -= damage;
                 Dead = Hp <= 0 && !Descriptor.Static;
 
                 int lifeTimeMS = 1000;
                 Color color = Color.red;
-
+                Utils.Log("We damaged {0} for {1} dmg {2}/{3}", Descriptor.DisplayId, damage, Hp, MaxHp);
                 //TODO add
                 //Map.AddDamageText(this, damage, color, lifeTimeMS);
             }
@@ -111,6 +113,7 @@ namespace Game.Entities {
 
         }
         public virtual void Dispose() {
+            Dead = true;
             gameObject.SetActive(false);
         }
         public virtual bool MoveTo(Vec2 pos) {
@@ -162,7 +165,7 @@ namespace Game.Entities {
             var descriptor = AssetLibrary.GetObjectDesc(definition.ObjectType);
             var isMyPlayer = definition.ObjectStatus.Id == PacketHandler.Instance.PlayerId;
             if (isMyPlayer) {
-                Map.MyPlayer.Init(descriptor, definition, isMyPlayer);
+                Map.MyPlayer.Init(descriptor, definition.ObjectStatus.Id, definition.ObjectStatus.Position, isMyPlayer);
                 Map.MyPlayer.OnMyPlayerConnected();
                 Map.MyPlayer.UpdateObjectStats(definition.ObjectStatus.Stats);
                 Map.Instance.OnMyPlayerConnected();
@@ -171,12 +174,12 @@ namespace Game.Entities {
 
             if(descriptor.ModelType != ModelType.None) {
                 var model = Map.Instance.EntityPool.Get(GameObjectType.Model) as Model;
-                model.Init(descriptor, definition);
+                model.Init(descriptor, definition.ObjectStatus.Id, definition.ObjectStatus.Position);
                 return model;
             }
 
             var entity = Map.Instance.EntityPool.Get(descriptor.ObjectClass);
-            entity.Init(descriptor, definition);
+            entity.Init(descriptor, definition.ObjectStatus.Id, definition.ObjectStatus.Position);
             entity.UpdateObjectStats(definition.ObjectStatus.Stats);
 
             return entity;

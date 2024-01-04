@@ -120,7 +120,7 @@ namespace Networking.Tcp
             }
 
             var pos = Map.UseCreatePosition ? Map.CreateSuccess.Position : Map.MyPlayer.Position;
-            Utils.Log($"Sending move with {(Map.UseCreatePosition ? "Create" : "Player")} position which is {pos.x} {pos.y}");
+            //Utils.Log($"Sending move with {(Map.UseCreatePosition ? "Create" : "Player")} position which is {pos.x} {pos.y}");
             var tile = Map.Instance.GetTile((int)pos.x, (int)pos.y, true);
             if (tile != null) { 
                 TcpTicker.Send(new Move(Map.MapInfo.WorldId, TickId, TickTime, pos.x, pos.y, PacketHandler.Instance.History));
@@ -261,11 +261,45 @@ namespace Networking.Tcp
     }
     public readonly struct EnemyShoot : IIncomingPacket {
         public S2CPacketId Id => S2CPacketId.EnemyShoot;
-        public EnemyShoot(Span<byte> buffer, ref int ptr, int len)
-        {
+        public readonly int BulletId;
+        public readonly int OwnerId;
+        public readonly byte BulletType;
+        public readonly Vec2 Position;
+        public readonly float Angle;
+        public readonly short Damage;
+        public readonly byte NumShots;
+        public readonly float AngleIncrement;
+        public EnemyShoot(Span<byte> buffer, ref int ptr, int len) {
+            BulletId = PacketUtils.ReadInt(buffer, ref ptr, len);
+            OwnerId = PacketUtils.ReadInt(buffer, ref ptr, len);
+            BulletType = PacketUtils.ReadByte(buffer[ptr..], ref ptr, len);
+            Position = new (PacketUtils.ReadFloat(buffer, ref ptr, len), PacketUtils.ReadFloat(buffer, ref ptr, len));
+            Angle = PacketUtils.ReadFloat(buffer, ref ptr, len);
+            Damage = PacketUtils.ReadShort(buffer, ref ptr, len);
+            NumShots = PacketUtils.ReadByte(buffer[ptr..], ref ptr, len);
 
+            Utils.Log("EnemyShoot Packet | NumShots: {0}", NumShots);
+
+            if (NumShots > 1)
+                AngleIncrement = PacketUtils.ReadFloat(buffer, ref ptr, len);
+            else AngleIncrement = 0;
         }
-        public void Handle() { }
+        public void Handle() {
+            TcpTicker.Send(new ShootAck(GameTime.Time));
+
+            var owner = Map.Instance.GetEntity(OwnerId);
+            if (owner == null || owner.Dead)
+                return;
+
+            var projDesc = owner.Descriptor.Projectiles[BulletType];
+            for(int i = 0; i < NumShots; i++) {
+                var angle = Angle + AngleIncrement * i;
+                var projectile = Projectile.Create(owner, projDesc, BulletId + i, GameTime.Time, angle,
+                    Position, Damage);
+                
+                Map.Instance.AddEntity(projectile);
+            }
+        }
     }
     public readonly struct Failure : IIncomingPacket {
         public S2CPacketId Id => S2CPacketId.Failure;
@@ -585,18 +619,26 @@ namespace Networking.Tcp
 
         }
     }
-    public readonly struct SquareHit: IOutgoingPacket
-    {
+    public readonly struct SquareHit: IOutgoingPacket {
         public C2SPacketId Id => C2SPacketId.SquareHit;
-        public void Write(Span<byte> buffer, ref int ptr)
-        {
-
+        public readonly int Time;
+        public readonly int BulletId;
+        public SquareHit(int time, int bulletId) {
+            Time = time;
+            BulletId = bulletId;
+        }
+        public void Write(Span<byte> buffer, ref int ptr) {
+            PacketUtils.WriteInt(buffer, Time, ref ptr);
+            PacketUtils.WriteInt(buffer, BulletId, ref ptr);
         }
     }
-    public readonly struct ShootAck : IOutgoingPacket
-    {
+    public readonly struct ShootAck : IOutgoingPacket {
         public C2SPacketId Id => C2SPacketId.ShootAck;
-        public void Write(Span<byte> buffer, ref int ptr) { }
+        public readonly int Time;
+        public ShootAck(int time) { Time = time; }
+        public void Write(Span<byte> buffer, ref int ptr) {
+            PacketUtils.WriteInt(buffer, Time, ref ptr);
+        }
     }
     public readonly struct Reskin : IOutgoingPacket
     {
@@ -638,10 +680,15 @@ namespace Networking.Tcp
         public C2SPacketId Id => C2SPacketId.PlayerShoot;
         public void Write(Span<byte> buffer, ref int ptr) { }
     }
-    public readonly struct PlayerHit : IOutgoingPacket
-    {
+    public readonly struct PlayerHit : IOutgoingPacket {
         public C2SPacketId Id => C2SPacketId.PlayerHit;
-        public void Write(Span<byte> buffer, ref int ptr) { }
+        public readonly int BulletId;
+        public PlayerHit(int bulletId) {
+            BulletId = bulletId;
+        }
+        public void Write(Span<byte> buffer, ref int ptr) {
+            PacketUtils.WriteInt(buffer, BulletId, ref ptr);
+        }
     }
     public readonly struct OtherHit : IOutgoingPacket
     {
@@ -742,10 +789,21 @@ namespace Networking.Tcp
         public C2SPacketId Id => C2SPacketId.Escape;
         public void Write(Span<byte> buffer, ref int ptr) { }
     }
-    public readonly struct EnemyHit : IOutgoingPacket
-    {
+    public readonly struct EnemyHit : IOutgoingPacket {
         public C2SPacketId Id => C2SPacketId.EnemyHit;
-        public void Write(Span<byte> buffer, ref int ptr) { }
+        public readonly int Time;
+        public readonly int BulletId;
+        public readonly int ObjectId;
+        public EnemyHit(int time, int bulletId, int objectId) {
+            Time = time;
+            BulletId = bulletId;
+            ObjectId = objectId;
+        }
+        public void Write(Span<byte> buffer, ref int ptr) {
+            PacketUtils.WriteInt(buffer, Time, ref ptr);
+            PacketUtils.WriteInt(buffer, BulletId, ref ptr);
+            PacketUtils.WriteInt(buffer, ObjectId, ref ptr);
+        }
     }
     public readonly struct EditAccountList : IOutgoingPacket
     {
