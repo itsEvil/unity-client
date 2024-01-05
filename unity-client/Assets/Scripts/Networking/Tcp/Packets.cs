@@ -286,6 +286,9 @@ namespace Networking.Tcp
         }
         public void Handle() {
             TcpTicker.Send(new ShootAck(GameTime.Time));
+            if (Map.MyPlayer.Dead)
+                return;
+
 
             var owner = Map.Instance.GetEntity(OwnerId);
             if (owner == null || owner.Dead)

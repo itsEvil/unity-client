@@ -141,7 +141,7 @@ namespace Game.Entities {
             var target = result.Closest;
             Utils.Log("Closest target is: {0} at {1}", target.Descriptor.DisplayId, result.Distance);
             if (CanHit(target)) {
-                var dmg = ProjectileDescriptor.Damage;
+                var dmg = 0;//ProjectileDescriptor.Damage;
                 target.Damage(dmg, Array.Empty<ConditionEffectDesc>(), this);
 
                 if (target.Id == Map.MyPlayer.Id)
